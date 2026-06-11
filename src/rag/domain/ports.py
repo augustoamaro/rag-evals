@@ -28,7 +28,9 @@ class ChunkStore(Protocol):
 
 
 class Retriever(Protocol):
-    def retrieve(self, query: str, k: int, strategy: Strategy) -> list[RetrievedChunk]: ...
+    def retrieve(
+        self, query: str, k: int, strategy: Strategy
+    ) -> list[RetrievedChunk]: ...
 
 
 class Reranker(Protocol):

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 
 Vector = list[float]
 
 
-class Strategy(str, Enum):
+class Strategy(StrEnum):
     DENSE = "dense"
     SPARSE = "sparse"
     HYBRID = "hybrid"

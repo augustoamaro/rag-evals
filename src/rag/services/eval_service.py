@@ -3,6 +3,7 @@ from __future__ import annotations
 import time
 import uuid
 
+from rag.adapters.llm.pricing import cost_usd
 from rag.domain.entities import (
     CaseResult,
     EvalCase,
@@ -10,26 +11,62 @@ from rag.domain.entities import (
     RunMetrics,
     Strategy,
 )
-from rag.domain.ports import ChunkStore, Retriever
+from rag.domain.ports import ChunkStore, Generator, Judge, Retriever
 from rag.metrics.relevance import relevant_chunk_ids
 from rag.metrics.retrieval import mrr, ndcg_at_k, precision_at_k, recall_at_k
 from rag.metrics.stats import mean, percentile
 
 
 class EvalService:
-    def __init__(self, retriever: Retriever, store: ChunkStore) -> None:
+    def __init__(
+        self,
+        retriever: Retriever,
+        store: ChunkStore,
+        generator: Generator | None = None,
+        judge: Judge | None = None,
+        model: str = "claude-opus-4-8",
+    ) -> None:
         self._retriever = retriever
         self._store = store
+        self._generator = generator
+        self._judge = judge
+        self._model = model
 
-    def run_retrieval(self, cases: list[EvalCase], strategy: Strategy, k: int) -> EvalRun:
+    def run(
+        self,
+        cases: list[EvalCase],
+        strategy: Strategy,
+        k: int,
+        with_answers: bool = False,
+    ) -> EvalRun:
+        do_answers = (
+            with_answers and self._generator is not None and self._judge is not None
+        )
         chunks = self._store.all_chunks()
         results: list[CaseResult] = []
+        total_cost = 0.0
         for case in cases:
             relevant = relevant_chunk_ids(chunks, case.relevant_snippets)
             started = time.perf_counter()
             retrieved = self._retriever.retrieve(case.question, k, strategy)
-            elapsed_ms = int((time.perf_counter() - started) * 1000)
             ranked = [rc.chunk.id for rc in retrieved]
+
+            answer_text: str | None = None
+            judge_scores = None
+            case_cost = 0.0
+            if do_answers:
+                assert self._generator is not None and self._judge is not None
+                answer = self._generator.answer(case.question, retrieved)
+                judge_scores, judge_usage = self._judge.score(
+                    case.question, answer, retrieved, case.reference_answer
+                )
+                answer_text = answer.text
+                case_cost = cost_usd(self._model, answer.usage) + cost_usd(
+                    self._model, judge_usage
+                )
+                total_cost += case_cost
+
+            elapsed_ms = int((time.perf_counter() - started) * 1000)
             results.append(
                 CaseResult(
                     case_id=case.id,
@@ -39,25 +76,42 @@ class EvalService:
                     precision=precision_at_k(ranked, relevant, k),
                     mrr=mrr(ranked, relevant),
                     ndcg=ndcg_at_k(ranked, relevant, k),
+                    answer=answer_text,
+                    judge_scores=judge_scores,
+                    cost_usd=case_cost,
                     latency_ms=elapsed_ms,
                 )
             )
+
         latencies = [float(r.latency_ms) for r in results]
         return EvalRun(
             id=uuid.uuid4().hex,
             strategy=strategy,
             k=k,
-            retrieval_metrics=_aggregate(results),
+            retrieval_metrics=_aggregate_retrieval(results),
             case_results=results,
+            answer_metrics=_aggregate_answers(results) if do_answers else None,
+            cost_usd=total_cost,
             latency_p50_ms=int(percentile(latencies, 50)),
             latency_p95_ms=int(percentile(latencies, 95)),
         )
 
 
-def _aggregate(results: list[CaseResult]) -> RunMetrics:
+def _aggregate_retrieval(results: list[CaseResult]) -> RunMetrics:
     return RunMetrics(
         recall=mean([r.recall for r in results]),
         precision=mean([r.precision for r in results]),
         mrr=mean([r.mrr for r in results]),
         ndcg=mean([r.ndcg for r in results]),
     )
+
+
+def _aggregate_answers(results: list[CaseResult]) -> dict[str, float]:
+    scored = [r.judge_scores for r in results if r.judge_scores is not None]
+    if not scored:
+        return {}
+    return {
+        "faithfulness": mean([s.faithfulness for s in scored]),
+        "relevance": mean([s.relevance for s in scored]),
+        "citation_correctness": mean([s.citation_correctness for s in scored]),
+    }

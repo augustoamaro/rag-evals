@@ -1,6 +1,14 @@
 from __future__ import annotations
 
-from rag.domain.entities import Chunk, EvalCase, RetrievedChunk, Strategy
+from rag.domain.entities import (
+    Answer,
+    AnswerScores,
+    Chunk,
+    EvalCase,
+    RetrievedChunk,
+    Strategy,
+    Usage,
+)
 from rag.metrics.retrieval import mrr, recall_at_k
 from rag.metrics.stats import mean
 from rag.services.eval_service import EvalService
@@ -48,7 +56,7 @@ def test_run_retrieval_aggregates_metrics() -> None:
     ]
     # q1: alpha (c1) retrieved at rank 1; q2: beta (c2) retrieved at rank 2.
     retriever = ScriptedRetriever({"q1": ["c1", "c3"], "q2": ["c3", "c2"]})
-    run = EvalService(retriever, FakeStore()).run_retrieval(cases, Strategy.HYBRID, k=3)
+    run = EvalService(retriever, FakeStore()).run(cases, Strategy.HYBRID, k=3)
 
     assert run.retrieval_metrics.recall == mean(
         [recall_at_k(["c1", "c3"], {"c1"}, 3), recall_at_k(["c3", "c2"], {"c2"}, 3)]
@@ -59,6 +67,50 @@ def test_run_retrieval_aggregates_metrics() -> None:
     assert run.retrieval_metrics.mrr == mean([1.0, 0.5])
     assert len(run.case_results) == 2
     assert run.strategy is Strategy.HYBRID
+    assert run.answer_metrics is None  # no answer track without judge
+
+
+class StubGenerator:
+    def answer(self, question: str, context: list[RetrievedChunk]) -> Answer:
+        return Answer(text="grounded answer", citations=[], usage=Usage(100, 20))
+
+
+class StubJudge:
+    def score(
+        self,
+        question: str,
+        answer: Answer,
+        context: list[RetrievedChunk],
+        reference_answer: str,
+    ) -> tuple[AnswerScores, Usage]:
+        scores = AnswerScores(
+            faithfulness=0.9, relevance=0.8, citation_correctness=0.7, rationale="ok"
+        )
+        return scores, Usage(50, 10)
+
+
+def test_answer_track_aggregates_scores_and_cost() -> None:
+    cases = [
+        EvalCase(
+            id="q1", question="q1", relevant_snippets=["alpha"], reference_answer="a"
+        )
+    ]
+    service = EvalService(
+        ScriptedRetriever({"q1": ["c1"]}),
+        FakeStore(),
+        generator=StubGenerator(),
+        judge=StubJudge(),
+        model="claude-opus-4-8",
+    )
+    run = service.run(cases, Strategy.HYBRID, k=3, with_answers=True)
+    assert run.answer_metrics == {
+        "faithfulness": 0.9,
+        "relevance": 0.8,
+        "citation_correctness": 0.7,
+    }
+    assert run.case_results[0].answer == "grounded answer"
+    # cost = generator (100 in, 20 out) + judge (50 in, 10 out) at Opus 4.8 pricing
+    assert run.cost_usd > 0.0
 
 
 def test_gate_reports_failures_below_threshold() -> None:

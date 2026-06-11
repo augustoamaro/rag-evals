@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: rag
+          POSTGRES_PASSWORD: rag
+          POSTGRES_DB: rag
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U rag"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
+    env:
+      RAG_DATABASE_URL: postgresql://rag:rag@localhost:5432/rag
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Sync dependencies
+        run: uv sync --frozen
+
+      - name: Ruff lint
+        run: uv run ruff check src tests
+
+      - name: Ruff format check
+        run: uv run ruff format --check src tests
+
+      - name: Mypy (strict)
+        run: uv run mypy src
+
+      - name: Unit tests
+        run: uv run pytest
+
+      - name: Integration tests
+        run: uv run pytest -m integration
+
+      - name: Ingest corpus + regression gate
+        run: |
+          uv run rag ingest
+          uv run rag eval --strategy hybrid --k 10 --gate
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build

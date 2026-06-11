@@ -96,6 +96,13 @@ def test_query_rejects_invalid_strategy() -> None:
     assert resp.status_code == 400
 
 
+def test_query_rejects_out_of_range_k_and_empty_question() -> None:
+    client = _client()
+    assert client.post("/query", json={"question": "q", "k": -1}).status_code == 422
+    assert client.post("/query", json={"question": "q", "k": 999}).status_code == 422
+    assert client.post("/query", json={"question": ""}).status_code == 422
+
+
 def test_eval_run_with_answers_unavailable_is_rejected() -> None:
     # Without a configured key the answer track cannot run; requesting it must
     # fail loudly instead of silently returning a retrieval-only run.

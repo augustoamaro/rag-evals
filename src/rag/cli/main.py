@@ -39,8 +39,8 @@ def ingest() -> None:
 
 @app.command(name="eval")
 def run_eval(
-    strategy: str = "hybrid",
-    k: int = 10,
+    strategy: Strategy = Strategy.HYBRID,
+    k: int = typer.Option(10, min=1, max=50),
     judge: bool = False,
     gate: bool = False,
     min_recall: float = 0.7,
@@ -56,14 +56,18 @@ def run_eval(
         generator, judge_adapter = _llm_adapters(settings) if judge else (None, None)
         run = EvalService(
             retriever, store, generator, judge_adapter, settings.llm_model
-        ).run(load_golden(), Strategy(strategy), k, with_answers=generator is not None)
+        ).run(load_golden(), strategy, k, with_answers=generator is not None)
         EvalStore(pool).save_run(
             run,
-            {"strategy": strategy, "k": k, "embedding_model": settings.embedding_model},
+            {
+                "strategy": strategy.value,
+                "k": k,
+                "embedding_model": settings.embedding_model,
+            },
         )
         m = run.retrieval_metrics
         typer.echo(
-            f"strategy={strategy} k={k}  recall={m.recall:.3f} "
+            f"strategy={strategy.value} k={k}  recall={m.recall:.3f} "
             f"precision={m.precision:.3f} mrr={m.mrr:.3f} ndcg={m.ndcg:.3f}  "
             f"p95={run.latency_p95_ms}ms"
         )

@@ -160,10 +160,11 @@ What the tests prove:
 - **Retrieval** — dense returns the semantically-closest chunk, sparse matches
   keywords only, hybrid fuses both, rerank reorders — against real Postgres.
 - **LLM adapters** — the generator parses citations and the judge maps structured
-  scores, both via a fake Anthropic client (no key in CI); `live`-marked tests hit
-  the real API on demand.
-- **End-to-end** — ingest → eval → persist → API returns it; the regression gate
-  runs on every push.
+  scores, both via a fake Anthropic client (no key in CI); opt-in `live`-marked
+  tests hit the real API (`RAG_ANTHROPIC_API_KEY=... uv run pytest -m live`).
+- **End-to-end** — ingest → hybrid eval → persist → the API serves the results,
+  through the real stack (integration-marked); the regression gate runs on every
+  push.
 
 ## License
 

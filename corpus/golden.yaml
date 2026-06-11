@@ -1,0 +1,142 @@
+# Golden evaluation set. Each case anchors relevance to passages (substrings that
+# must appear in a relevant chunk), so retrieval metrics stay stable across chunking.
+cases:
+  # --- CAP theorem ---
+  - id: cap-tradeoff
+    question: "During a network partition, what does the CAP theorem force you to choose between?"
+    relevant_snippets: ["between consistency and availability"]
+    reference_answer: "During a partition you must choose between consistency and availability; you cannot have both."
+  - id: cap-cp
+    question: "What does a CP system give up during a partition?"
+    relevant_snippets: ["A CP system favors consistency"]
+    reference_answer: "A CP system favors consistency and gives up availability, rejecting requests rather than returning stale data."
+  - id: cap-ap
+    question: "How does an AP system behave during a partition?"
+    relevant_snippets: ["An AP system favors availability"]
+    reference_answer: "An AP system favors availability, keeps serving both sides of the partition, and reconciles divergence afterward."
+
+  # --- Consistency models ---
+  - id: cons-eventual
+    question: "What does eventual consistency guarantee?"
+    relevant_snippets: ["Eventual consistency only guarantees"]
+    reference_answer: "Eventual consistency guarantees only that, with no new writes, all replicas eventually converge to the same value."
+  - id: cons-causal
+    question: "What is causal consistency?"
+    relevant_snippets: ["Causal consistency sits between the two"]
+    reference_answer: "Causal consistency ensures causally related operations are seen in the same order by all processes, while concurrent operations may be seen in different orders."
+  - id: cons-ryw
+    question: "What does read-your-writes consistency ensure?"
+    relevant_snippets: ["Read-your-writes consistency"]
+    reference_answer: "Read-your-writes consistency ensures a client always sees the effects of its own prior writes."
+
+  # --- Embeddings ---
+  - id: emb-cosine
+    question: "How is similarity between two embeddings usually measured?"
+    relevant_snippets: ["measured with cosine similarity"]
+    reference_answer: "Similarity between embeddings is usually measured with cosine similarity, comparing the angle between vectors and ignoring magnitude."
+  - id: emb-dim
+    question: "How many dimensions does the bge-small embedding model output?"
+    relevant_snippets: ["produces 384-dimensional vectors"]
+    reference_answer: "The bge-small model produces 384-dimensional vectors."
+  - id: emb-advantage
+    question: "What can embedding search do that keyword matching cannot?"
+    relevant_snippets: ["retrieve passages that share no words with the query"]
+    reference_answer: "Embedding search can retrieve passages that share no words with the query but express the same idea."
+
+  # --- Vector search ---
+  - id: vec-ann
+    question: "What does approximate nearest neighbor search trade off?"
+    relevant_snippets: ["trades a small amount of accuracy for a large gain in speed"]
+    reference_answer: "ANN search trades a small amount of accuracy for a large gain in speed."
+  - id: vec-hnsw
+    question: "What index is most common for high-recall vector search?"
+    relevant_snippets: ["HNSW, Hierarchical Navigable Small World"]
+    reference_answer: "HNSW (Hierarchical Navigable Small World) graphs are the most common index for high-recall search."
+  - id: vec-recall
+    question: "What does recall measure for an ANN index?"
+    relevant_snippets: ["the fraction of the true nearest neighbors that the index actually returns"]
+    reference_answer: "Recall is the fraction of the true nearest neighbors that the index actually returns."
+
+  # --- Keyword search ---
+  - id: kw-bm25
+    question: "What is the standard ranking function for keyword search?"
+    relevant_snippets: ["BM25 is the standard ranking function"]
+    reference_answer: "BM25 is the standard ranking function for keyword search."
+  - id: kw-mismatch
+    question: "What is the main weakness of keyword search?"
+    relevant_snippets: ["vocabulary mismatch problem"]
+    reference_answer: "Its weakness is the vocabulary mismatch problem: documents that mean the same thing with different words do not match."
+  - id: kw-pg
+    question: "Which Postgres function ranks full-text matches?"
+    relevant_snippets: ["ts_rank_cd function then ranks matches"]
+    reference_answer: "The ts_rank_cd function ranks full-text matches by term proximity and frequency."
+
+  # --- Hybrid retrieval ---
+  - id: hyb-rrf
+    question: "How does Reciprocal Rank Fusion combine ranked lists?"
+    relevant_snippets: ["sums one divided by a constant plus the rank"]
+    reference_answer: "RRF sums, for each document, one divided by a constant plus its rank across the lists it appears in."
+  - id: hyb-calibration
+    question: "Why does RRF not need score calibration?"
+    relevant_snippets: ["needs no score calibration"]
+    reference_answer: "RRF uses only rank positions, not raw scores, so it needs no score calibration even when scores live on different scales."
+  - id: hyb-rerank
+    question: "What does a cross-encoder reranker do?"
+    relevant_snippets: ["reads the query and each candidate passage together"]
+    reference_answer: "A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly."
+
+  # --- Chunking ---
+  - id: chunk-unit
+    question: "Why does chunking matter for retrieval?"
+    relevant_snippets: ["a chunk is the unit of retrieval"]
+    reference_answer: "Chunking matters because a chunk is the unit of retrieval: too large blurs topics, too small loses context."
+  - id: chunk-overlap
+    question: "What is fixed-size chunking with overlap?"
+    relevant_snippets: ["fixed-size chunking with overlap"]
+    reference_answer: "Fixed-size chunking with overlap divides a document into windows of a target length where consecutive windows overlap, so facts at a boundary are not lost."
+  - id: chunk-deterministic
+    question: "Why should chunking be deterministic?"
+    relevant_snippets: ["chunking should be deterministic"]
+    reference_answer: "Chunking should be deterministic so re-ingesting the same document yields the same chunks and evaluation stays reproducible."
+
+  # --- RAG ---
+  - id: rag-hallucination
+    question: "How does RAG reduce hallucination?"
+    relevant_snippets: ["reduces hallucination by giving the model concrete source text"]
+    reference_answer: "RAG reduces hallucination by giving the model concrete source text to draw from."
+  - id: rag-citations
+    question: "Why should RAG answers include citations?"
+    relevant_snippets: ["citations that point back to the specific chunks"]
+    reference_answer: "Citations point back to the specific chunks an answer relied on so a reader can verify each claim and grounding can be measured."
+  - id: rag-bound
+    question: "Why is retrieval the limiting factor for a RAG system?"
+    relevant_snippets: ["the generator cannot cite what the retriever failed to find"]
+    reference_answer: "A RAG system is bounded by retrieval because the generator cannot cite what the retriever failed to find."
+
+  # --- Evaluation metrics ---
+  - id: metric-recall
+    question: "What is recall at k?"
+    relevant_snippets: ["the fraction of all relevant documents that appear in the top k"]
+    reference_answer: "Recall at k is the fraction of all relevant documents that appear in the top k results."
+  - id: metric-mrr
+    question: "What does mean reciprocal rank focus on?"
+    relevant_snippets: ["the position of the first relevant result"]
+    reference_answer: "MRR focuses on the position of the first relevant result, taking the reciprocal of its rank and averaging over queries."
+  - id: metric-ndcg
+    question: "Why does nDCG always fall between zero and one?"
+    relevant_snippets: ["divided by the ideal gain"]
+    reference_answer: "nDCG divides the discounted gain by the ideal gain, so it always falls between zero and one and is comparable across queries."
+
+  # --- LLM-as-judge ---
+  - id: judge-faithfulness
+    question: "What does the faithfulness dimension measure?"
+    relevant_snippets: ["Faithfulness measures whether every claim in the answer is supported"]
+    reference_answer: "Faithfulness measures whether every claim in the answer is supported by the retrieved context; an unsupported claim is a hallucination."
+  - id: judge-structured
+    question: "Why does the judge return structured output?"
+    relevant_snippets: ["Structured output turns a free -form opinion into machine-readable data"]
+    reference_answer: "Structured output turns a free-form opinion into machine-readable data that can be aggregated across a run and tracked over time."
+  - id: judge-limits
+    question: "What are known limitations of LLM judges?"
+    relevant_snippets: ["They can be inconsistent between runs"]
+    reference_answer: "LLM judges can be inconsistent between runs and may prefer longer or more confident answers regardless of correctness."

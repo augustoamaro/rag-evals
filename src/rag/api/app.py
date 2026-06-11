@@ -98,6 +98,7 @@ def build_app() -> FastAPI:
     from rag.adapters.embedding.fastembed_embedder import FastEmbedEmbedder
     from rag.adapters.llm.claude_generator import ClaudeGenerator
     from rag.adapters.retrieval.pgvector_retriever import PgVectorRetriever
+    from rag.adapters.retrieval.reranker import FastEmbedReranker
     from rag.config import get_settings
     from rag.services.corpus_loader import load_golden
     from rag.services.eval_service import EvalService
@@ -105,7 +106,7 @@ def build_app() -> FastAPI:
     settings = get_settings()
     pool = make_pool(settings.database_url)
     embedder = FastEmbedEmbedder(settings.embedding_model, settings.embedding_dim)
-    retriever = PgVectorRetriever(pool, embedder)
+    retriever = PgVectorRetriever(pool, embedder, reranker=FastEmbedReranker())
     store = PgChunkStore(pool)
 
     generator: Generator | None = None

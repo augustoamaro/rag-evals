@@ -10,6 +10,7 @@ from rag.adapters.embedding.fastembed_embedder import FastEmbedEmbedder
 from rag.adapters.llm.claude_generator import ClaudeGenerator
 from rag.adapters.llm.claude_judge import ClaudeJudge
 from rag.adapters.retrieval.pgvector_retriever import PgVectorRetriever
+from rag.adapters.retrieval.reranker import FastEmbedReranker
 from rag.config import get_settings
 from rag.domain.entities import Strategy
 from rag.services.corpus_loader import load_documents, load_golden
@@ -50,7 +51,7 @@ def run_eval(
     pool = make_pool(settings.database_url)
     try:
         embedder = FastEmbedEmbedder(settings.embedding_model, settings.embedding_dim)
-        retriever = PgVectorRetriever(pool, embedder)
+        retriever = PgVectorRetriever(pool, embedder, reranker=FastEmbedReranker())
         store = PgChunkStore(pool)
         generator, judge_adapter = _llm_adapters(settings) if judge else (None, None)
         run = EvalService(

@@ -76,6 +76,27 @@ def test_hybrid_includes_keyword_and_semantic(pool: Pool) -> None:
     assert "a" in ids
 
 
+def test_hybrid_rerank_without_reranker_fails_loudly(pool: Pool) -> None:
+    embedder = StubEmbedder()
+    _seed(pool, embedder)
+    retriever = PgVectorRetriever(pool, embedder)  # no reranker wired
+    with pytest.raises(ValueError, match="no reranker"):
+        retriever.retrieve("alpha", 3, Strategy.HYBRID_RERANK)
+
+
+def test_real_cross_encoder_reranker_returns_permutation(pool: Pool) -> None:
+    # Exercises the production FastEmbedReranker (downloads the model once).
+    from rag.adapters.retrieval.reranker import FastEmbedReranker
+
+    embedder = StubEmbedder()
+    _seed(pool, embedder)
+    retriever = PgVectorRetriever(pool, embedder, reranker=FastEmbedReranker())
+    plain = {r.chunk.id for r in retriever.retrieve("alpha", 3, Strategy.HYBRID)}
+    reranked = retriever.retrieve("alpha topic", 3, Strategy.HYBRID_RERANK)
+    assert {r.chunk.id for r in reranked} == plain  # same candidates, reordered
+    assert [r.rank for r in reranked] == [1, 2, 3]
+
+
 def test_rerank_reorders_hybrid_candidates(pool: Pool) -> None:
     embedder = StubEmbedder()
     _seed(pool, embedder)

@@ -29,6 +29,10 @@ class PgVectorRetriever:
         self._pool_k = pool_k  # candidate depth per arm before fusion / rerank
 
     def retrieve(self, query: str, k: int, strategy: Strategy) -> list[RetrievedChunk]:
+        if strategy is Strategy.HYBRID_RERANK and self._reranker is None:
+            # Never degrade silently: a run labelled hybrid_rerank must have
+            # actually reranked, or the persisted metrics lie about the config.
+            raise ValueError("hybrid_rerank requested but no reranker is configured")
         if strategy is Strategy.DENSE:
             chunks = self._load(self._dense_ids(query, k))
         elif strategy is Strategy.SPARSE:

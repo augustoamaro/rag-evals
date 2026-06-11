@@ -113,6 +113,51 @@ def test_answer_track_aggregates_scores_and_cost() -> None:
     assert run.cost_usd > 0.0
 
 
+class ExplodingGenerator:
+    """Fails on one specific question — a rate limit mid-run, for example."""
+
+    def __init__(self, fail_on: str) -> None:
+        self._fail_on = fail_on
+
+    def answer(self, question: str, context: list[RetrievedChunk]) -> Answer:
+        if question == self._fail_on:
+            raise RuntimeError("rate limited")
+        return Answer(text="ok", citations=[], usage=Usage(100, 20))
+
+
+def test_answer_track_survives_per_case_failures() -> None:
+    cases = [
+        EvalCase(
+            id="q1", question="q1", relevant_snippets=["alpha"], reference_answer="a"
+        ),
+        EvalCase(
+            id="q2", question="q2", relevant_snippets=["beta"], reference_answer="b"
+        ),
+    ]
+    service = EvalService(
+        ScriptedRetriever({"q1": ["c1"], "q2": ["c2"]}),
+        FakeStore(),
+        generator=ExplodingGenerator(fail_on="q1"),
+        judge=StubJudge(),
+        model="claude-opus-4-8",
+    )
+    run = service.run(cases, Strategy.HYBRID, k=3, with_answers=True)
+
+    # The run completes: the failed case is recorded without an answer, the
+    # healthy case is judged, and aggregates cover only the scored cases.
+    by_id = {r.case_id: r for r in run.case_results}
+    assert by_id["q1"].answer is None
+    assert by_id["q1"].judge_scores is None
+    assert by_id["q2"].answer == "ok"
+    assert run.answer_metrics == {
+        "faithfulness": 0.9,
+        "relevance": 0.8,
+        "citation_correctness": 0.7,
+    }
+    # retrieval metrics still cover ALL cases
+    assert len(run.case_results) == 2
+
+
 def test_gate_reports_failures_below_threshold() -> None:
     from rag.domain.entities import RunMetrics
 

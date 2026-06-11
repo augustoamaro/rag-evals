@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import time
 import uuid
 
@@ -15,6 +16,8 @@ from rag.domain.ports import ChunkStore, Generator, Judge, Retriever
 from rag.metrics.relevance import relevant_chunk_ids
 from rag.metrics.retrieval import mrr, ndcg_at_k, precision_at_k, recall_at_k
 from rag.metrics.stats import mean, percentile
+
+logger = logging.getLogger(__name__)
 
 
 class EvalService:
@@ -56,15 +59,21 @@ class EvalService:
             case_cost = 0.0
             if do_answers:
                 assert self._generator is not None and self._judge is not None
-                answer = self._generator.answer(case.question, retrieved)
-                judge_scores, judge_usage = self._judge.score(
-                    case.question, answer, retrieved, case.reference_answer
-                )
-                answer_text = answer.text
-                case_cost = cost_usd(self._model, answer.usage) + cost_usd(
-                    self._model, judge_usage
-                )
-                total_cost += case_cost
+                # One bad API call (rate limit, refusal, truncation) must not
+                # throw away the whole run: record the case as unanswered,
+                # keep its retrieval metrics, and continue.
+                try:
+                    answer = self._generator.answer(case.question, retrieved)
+                    judge_scores, judge_usage = self._judge.score(
+                        case.question, answer, retrieved, case.reference_answer
+                    )
+                    answer_text = answer.text
+                    case_cost = cost_usd(self._model, answer.usage) + cost_usd(
+                        self._model, judge_usage
+                    )
+                    total_cost += case_cost
+                except Exception:
+                    logger.exception("answer track failed for case %s", case.id)
 
             elapsed_ms = int((time.perf_counter() - started) * 1000)
             results.append(

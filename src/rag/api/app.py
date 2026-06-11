@@ -25,6 +25,7 @@ class AppDeps:
     eval_service: Any  # EvalService (Any keeps the API layer decoupled from its shape)
     eval_store: Any  # EvalStore
     cases: list[EvalCase]
+    answers_available: bool = False
 
 
 def create_app(deps: AppDeps) -> FastAPI:
@@ -62,6 +63,11 @@ def create_app(deps: AppDeps) -> FastAPI:
     @app.post("/evals/run", response_model=RunIdResponse)
     def run_eval(req: RunRequest) -> RunIdResponse:
         strategy = _parse_strategy(req.strategy)
+        if req.with_answers and not deps.answers_available:
+            raise HTTPException(
+                status_code=400,
+                detail="answer track unavailable — set RAG_ANTHROPIC_API_KEY",
+            )
         run = deps.eval_service.run(deps.cases, strategy, req.k, req.with_answers)
         deps.eval_store.save_run(run, {"strategy": req.strategy, "k": req.k})
         return RunIdResponse(id=run.id)
@@ -97,6 +103,7 @@ def build_app() -> FastAPI:
     from rag.adapters.db.pool import make_pool
     from rag.adapters.embedding.fastembed_embedder import FastEmbedEmbedder
     from rag.adapters.llm.claude_generator import ClaudeGenerator
+    from rag.adapters.llm.claude_judge import ClaudeJudge
     from rag.adapters.retrieval.pgvector_retriever import PgVectorRetriever
     from rag.adapters.retrieval.reranker import FastEmbedReranker
     from rag.config import get_settings
@@ -110,17 +117,20 @@ def build_app() -> FastAPI:
     store = PgChunkStore(pool)
 
     generator: Generator | None = None
+    judge = None
     if settings.anthropic_api_key:
         import anthropic
 
         client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
         generator = ClaudeGenerator(client, settings.llm_model)
+        judge = ClaudeJudge(client, settings.llm_model)
 
     deps = AppDeps(
         retriever=retriever,
         generator=generator,
-        eval_service=EvalService(retriever, store, generator, None, settings.llm_model),
+        eval_service=EvalService(retriever, store, generator, judge, settings.llm_model),
         eval_store=EvalStore(pool),
         cases=load_golden(),
+        answers_available=generator is not None,
     )
     return create_app(deps)

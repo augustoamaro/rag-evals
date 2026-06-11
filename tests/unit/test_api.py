@@ -66,6 +66,7 @@ def _client(*, with_generator: bool = True) -> TestClient:
         eval_service=FakeEvalService(),
         eval_store=FakeEvalStore(),
         cases=[],
+        answers_available=with_generator,
     )
     return TestClient(create_app(deps))
 
@@ -92,6 +93,23 @@ def test_query_without_generator_still_returns_chunks() -> None:
 def test_query_rejects_invalid_strategy() -> None:
     resp = _client().post("/query", json={"question": "q", "strategy": "bogus"})
     assert resp.status_code == 400
+
+
+def test_eval_run_with_answers_unavailable_is_rejected() -> None:
+    # Without a configured key the answer track cannot run; requesting it must
+    # fail loudly instead of silently returning a retrieval-only run.
+    resp = _client(with_generator=False).post(
+        "/evals/run", json={"strategy": "hybrid", "k": 5, "with_answers": True}
+    )
+    assert resp.status_code == 400
+    assert "answer track" in resp.json()["detail"]
+
+
+def test_eval_run_with_answers_available_succeeds() -> None:
+    resp = _client().post(
+        "/evals/run", json={"strategy": "hybrid", "k": 5, "with_answers": True}
+    )
+    assert resp.status_code == 200
 
 
 def test_eval_run_and_list_and_detail() -> None:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Protocol
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,16 +14,34 @@ from rag.api.schemas import (
     RunIdResponse,
     RunRequest,
 )
-from rag.domain.entities import Answer, EvalCase, Strategy
+from rag.domain.entities import Answer, EvalCase, EvalRun, Strategy
 from rag.domain.ports import Generator, Retriever
+
+
+class EvalRunner(Protocol):
+    """What the API needs from an eval service."""
+
+    def run(
+        self, cases: list[EvalCase], strategy: Strategy, k: int, with_answers: bool
+    ) -> EvalRun: ...
+
+
+class RunStore(Protocol):
+    """What the API needs from run persistence."""
+
+    def save_run(self, run: EvalRun, config: dict[str, Any]) -> None: ...
+
+    def list_runs(self) -> list[dict[str, Any]]: ...
+
+    def get_run(self, run_id: str) -> dict[str, Any] | None: ...
 
 
 @dataclass
 class AppDeps:
     retriever: Retriever
     generator: Generator | None
-    eval_service: Any  # EvalService (Any keeps the API layer decoupled from its shape)
-    eval_store: Any  # EvalStore
+    eval_service: EvalRunner
+    eval_store: RunStore
     cases: list[EvalCase]
     answers_available: bool = False
 
@@ -76,12 +94,11 @@ def create_app(deps: AppDeps) -> FastAPI:
 
     @app.get("/evals/runs")
     def list_runs() -> list[dict[str, Any]]:
-        runs: list[dict[str, Any]] = deps.eval_store.list_runs()
-        return runs
+        return deps.eval_store.list_runs()
 
     @app.get("/evals/runs/{run_id}")
     def get_run(run_id: str) -> dict[str, Any]:
-        run: dict[str, Any] | None = deps.eval_store.get_run(run_id)
+        run = deps.eval_store.get_run(run_id)
         if run is None:
             raise HTTPException(status_code=404, detail="run not found")
         return run

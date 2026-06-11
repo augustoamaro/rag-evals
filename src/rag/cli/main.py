@@ -11,7 +11,7 @@ from rag.adapters.llm.claude_generator import ClaudeGenerator
 from rag.adapters.llm.claude_judge import ClaudeJudge
 from rag.adapters.retrieval.pgvector_retriever import PgVectorRetriever
 from rag.adapters.retrieval.reranker import FastEmbedReranker
-from rag.config import get_settings
+from rag.config import Settings, get_settings
 from rag.domain.entities import Strategy
 from rag.services.corpus_loader import load_documents, load_golden
 from rag.services.eval_service import EvalService
@@ -88,15 +88,16 @@ def run_eval(
         pool.close()
 
 
-def _llm_adapters(settings: object) -> tuple[ClaudeGenerator | None, ClaudeJudge | None]:
-    api_key = getattr(settings, "anthropic_api_key", None)
-    model = getattr(settings, "llm_model", "claude-opus-4-8")
-    if not api_key:
+def _llm_adapters(
+    settings: Settings,
+) -> tuple[ClaudeGenerator | None, ClaudeJudge | None]:
+    if not settings.anthropic_api_key:
         typer.echo("Answer track needs RAG_ANTHROPIC_API_KEY — running retrieval only.")
         return None, None
     import anthropic
 
-    client = anthropic.Anthropic(api_key=api_key)
+    client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+    model = settings.llm_model
     return ClaudeGenerator(client, model), ClaudeJudge(client, model)
 
 

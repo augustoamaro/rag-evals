@@ -54,6 +54,12 @@ class PgVectorRetriever:
     def _dense_ids(self, query: str, k: int) -> list[str]:
         vec = self._embedder.embed([query])[0]
         with self._pool.connection() as conn:
+            # pgvector's HNSW default ef_search is 40; asking for more
+            # candidates than that silently truncates the dense arm once the
+            # index is actually used. Keep the search width >= the request.
+            conn.execute(
+                "SELECT set_config('hnsw.ef_search', %s, true)", (str(max(k, 40)),)
+            )
             rows = conn.execute(
                 "SELECT id FROM chunks ORDER BY embedding <=> %s LIMIT %s",
                 (PgVector(vec), k),

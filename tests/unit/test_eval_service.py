@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from rag.domain.entities import Chunk, EvalCase, RetrievedChunk, Strategy
-from rag.metrics.stats import mean
 from rag.metrics.retrieval import mrr, recall_at_k
+from rag.metrics.stats import mean
 from rag.services.eval_service import EvalService
 from rag.services.gate import check_thresholds
 
@@ -39,8 +39,12 @@ class ScriptedRetriever:
 
 def test_run_retrieval_aggregates_metrics() -> None:
     cases = [
-        EvalCase(id="q1", question="q1", relevant_snippets=["alpha"], reference_answer="a"),
-        EvalCase(id="q2", question="q2", relevant_snippets=["beta"], reference_answer="b"),
+        EvalCase(
+            id="q1", question="q1", relevant_snippets=["alpha"], reference_answer="a"
+        ),
+        EvalCase(
+            id="q2", question="q2", relevant_snippets=["beta"], reference_answer="b"
+        ),
     ]
     # q1: alpha (c1) retrieved at rank 1; q2: beta (c2) retrieved at rank 2.
     retriever = ScriptedRetriever({"q1": ["c1", "c3"], "q2": ["c3", "c2"]})
@@ -49,7 +53,9 @@ def test_run_retrieval_aggregates_metrics() -> None:
     assert run.retrieval_metrics.recall == mean(
         [recall_at_k(["c1", "c3"], {"c1"}, 3), recall_at_k(["c3", "c2"], {"c2"}, 3)]
     )
-    assert run.retrieval_metrics.mrr == mean([mrr(["c1", "c3"], {"c1"}), mrr(["c3", "c2"], {"c2"})])
+    assert run.retrieval_metrics.mrr == mean(
+        [mrr(["c1", "c3"], {"c1"}), mrr(["c3", "c2"], {"c2"})]
+    )
     assert run.retrieval_metrics.mrr == mean([1.0, 0.5])
     assert len(run.case_results) == 2
     assert run.strategy is Strategy.HYBRID

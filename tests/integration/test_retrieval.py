@@ -76,6 +76,31 @@ def test_hybrid_includes_keyword_and_semantic(pool: Pool) -> None:
     assert "a" in ids
 
 
+def test_reingest_replaces_chunks_without_orphans(pool: Pool) -> None:
+    embedder = StubEmbedder()
+    store = PgChunkStore(pool)
+    doc = Document(id="doc", source="s", title="t", content="x")
+
+    big = [
+        Chunk(
+            id=f"doc:{i}", document_id="doc", ordinal=i, text=f"text {i}", token_count=2
+        )
+        for i in range(3)
+    ]
+    store.add_document(
+        doc, list(zip(big, embedder.embed([c.text for c in big]), strict=True))
+    )
+
+    # The document shrank: re-ingest must not leave doc:1 / doc:2 behind.
+    small = [Chunk(id="doc:0", document_id="doc", ordinal=0, text="only", token_count=1)]
+    store.add_document(
+        doc, list(zip(small, embedder.embed([c.text for c in small]), strict=True))
+    )
+
+    ids = [c.id for c in store.all_chunks() if c.document_id == "doc"]
+    assert ids == ["doc:0"]
+
+
 def test_hybrid_rerank_without_reranker_fails_loudly(pool: Pool) -> None:
     embedder = StubEmbedder()
     _seed(pool, embedder)

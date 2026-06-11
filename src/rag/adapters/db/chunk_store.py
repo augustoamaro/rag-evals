@@ -20,21 +20,26 @@ class PgChunkStore:
                 "ON CONFLICT (id) DO UPDATE SET content = EXCLUDED.content",
                 (doc.id, doc.source, doc.title, doc.content),
             )
-            for chunk, vec in chunks:
-                conn.execute(
+            # Replace, don't upsert: if a document shrinks on re-ingest, an
+            # upsert would leave orphan higher-ordinal chunks polluting
+            # retrieval. Delete + insert in one transaction is fully idempotent.
+            conn.execute("DELETE FROM chunks WHERE document_id = %s", (doc.id,))
+            with conn.cursor() as cur:
+                cur.executemany(
                     "INSERT INTO chunks "
                     "(id, document_id, ordinal, text, embedding, token_count) "
-                    "VALUES (%s, %s, %s, %s, %s, %s) "
-                    "ON CONFLICT (id) DO UPDATE SET "
-                    "text = EXCLUDED.text, embedding = EXCLUDED.embedding",
-                    (
-                        chunk.id,
-                        chunk.document_id,
-                        chunk.ordinal,
-                        chunk.text,
-                        PgVector(vec),
-                        chunk.token_count,
-                    ),
+                    "VALUES (%s, %s, %s, %s, %s, %s)",
+                    [
+                        (
+                            chunk.id,
+                            chunk.document_id,
+                            chunk.ordinal,
+                            chunk.text,
+                            PgVector(vec),
+                            chunk.token_count,
+                        )
+                        for chunk, vec in chunks
+                    ],
                 )
             conn.commit()
 

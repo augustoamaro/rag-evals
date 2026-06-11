@@ -23,7 +23,12 @@ def load_documents(docs_dir: Path = DOCS_DIR) -> list[Document]:
     for path in sorted(docs_dir.glob("*.md")):
         text = path.read_text()
         docs.append(
-            Document(id=path.stem, source=path.name, title=_title(text, path.stem), content=text)
+            Document(
+                id=path.stem,
+                source=path.name,
+                title=_title(text, path.stem),
+                content=text,
+            )
         )
     return docs
 

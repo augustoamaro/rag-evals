@@ -52,8 +52,9 @@ def test_ingestion_stores_all_chunks() -> None:
     embedder = FakeEmbedder()
     store = FakeStore()
     service = IngestionService(embedder, store)
+    long_content = " ".join(f"w{i}" for i in range(250))
     docs = [
-        Document(id="d1", source="s", title="t", content=" ".join(f"w{i}" for i in range(250))),
+        Document(id="d1", source="s", title="t", content=long_content),
         Document(id="d2", source="s", title="t", content="short doc"),
     ]
     total = service.ingest(docs)

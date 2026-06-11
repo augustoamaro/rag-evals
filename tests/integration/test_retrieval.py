@@ -82,5 +82,7 @@ def test_rerank_reorders_hybrid_candidates(pool: Pool) -> None:
     base = PgVectorRetriever(pool, embedder)
     reranking = PgVectorRetriever(pool, embedder, reranker=ReverseReranker())
     hybrid = [r.chunk.id for r in base.retrieve("alpha", 3, Strategy.HYBRID)]
-    reranked = [r.chunk.id for r in reranking.retrieve("alpha", 3, Strategy.HYBRID_RERANK)]
+    reranked = [
+        r.chunk.id for r in reranking.retrieve("alpha", 3, Strategy.HYBRID_RERANK)
+    ]
     assert reranked == list(reversed(hybrid))

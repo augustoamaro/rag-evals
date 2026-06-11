@@ -77,7 +77,9 @@ class PgVectorRetriever:
                 (ids,),
             ).fetchall()
         by_id = {
-            r[0]: Chunk(id=r[0], document_id=r[1], ordinal=r[2], text=r[3], token_count=r[4])
+            r[0]: Chunk(
+                id=r[0], document_id=r[1], ordinal=r[2], text=r[3], token_count=r[4]
+            )
             for r in rows
         }
         return [by_id[i] for i in ids if i in by_id]

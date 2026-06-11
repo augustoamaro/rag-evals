@@ -10,7 +10,9 @@ from rag.domain.entities import Vector
 class FastEmbedEmbedder:
     """Local, key-free embeddings via fastembed (ONNX). Default: bge-small (384-dim)."""
 
-    def __init__(self, model_name: str = "BAAI/bge-small-en-v1.5", dim: int = 384) -> None:
+    def __init__(
+        self, model_name: str = "BAAI/bge-small-en-v1.5", dim: int = 384
+    ) -> None:
         self._model_name = model_name
         self._dim = dim
 

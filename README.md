@@ -80,8 +80,6 @@ Decisions worth calling out:
 - **psycopg3 + explicit SQL over an ORM.** The hybrid-retrieval SQL (pgvector +
   FTS + RRF) is the interesting part — it stays visible.
 
-Full design rationale: [`docs/superpowers/specs/2026-06-11-rag-evals-design.md`](docs/superpowers/specs/2026-06-11-rag-evals-design.md).
-
 ## Eval methodology
 
 - **Retrieval track (no LLM):** for each golden case, retrieve with a strategy

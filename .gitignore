@@ -31,4 +31,7 @@ test-results/
 .fastembed_cache/
 local-data/
 
+# Internal design-process artifacts — keep local, never publish
+docs/superpowers/
+
 *.log

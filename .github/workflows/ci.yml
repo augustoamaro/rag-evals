@@ -44,7 +44,7 @@ jobs:
         run: uv run ruff format --check src tests
 
       - name: Mypy (strict)
-        run: uv run mypy src
+        run: uv run mypy src tests
 
       - name: Unit tests
         run: uv run pytest
@@ -52,10 +52,15 @@ jobs:
       - name: Integration tests
         run: uv run pytest -m integration
 
-      - name: Ingest corpus + regression gate
+      # Per-strategy gates at k=3, where the strategies actually separate.
+      # At k=10 the 20-chunk corpus saturates recall for every strategy, so a
+      # single hybrid gate would pass even with one retrieval arm fully broken.
+      - name: Ingest corpus + regression gates
         run: |
           uv run rag ingest
-          uv run rag eval --strategy hybrid --k 10 --gate
+          uv run rag eval --strategy hybrid --k 3 --gate --min-recall 0.9 --min-ndcg 0.9
+          uv run rag eval --strategy dense  --k 3 --gate --min-recall 0.9 --min-ndcg 0.85
+          uv run rag eval --strategy sparse --k 3 --gate --min-recall 0.7 --min-ndcg 0.7
 
   web:
     runs-on: ubuntu-latest

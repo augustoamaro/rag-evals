@@ -92,8 +92,10 @@ Decisions worth calling out:
 - **Cost & latency:** token usage → USD (Opus 4.8 pricing); per-case latency
   aggregated to p50/p95 per run.
 - **Regression gate:** `rag eval --gate` exits non-zero if aggregate retrieval
-  metrics drop below thresholds. It runs in CI with **no key**, so retrieval
-  regressions are caught automatically.
+  metrics drop below thresholds. CI gates **each strategy separately at k=3** —
+  on a small corpus, recall@10 saturates for every strategy, so a single hybrid
+  gate would pass even with one retrieval arm fully broken; per-arm gates at a
+  k where the strategies separate catch exactly that. Runs with **no key**.
 
 ## Tech stack
 

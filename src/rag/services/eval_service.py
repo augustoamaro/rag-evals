@@ -21,9 +21,7 @@ class EvalService:
         self._retriever = retriever
         self._store = store
 
-    def run_retrieval(
-        self, cases: list[EvalCase], strategy: Strategy, k: int
-    ) -> EvalRun:
+    def run_retrieval(self, cases: list[EvalCase], strategy: Strategy, k: int) -> EvalRun:
         chunks = self._store.all_chunks()
         results: list[CaseResult] = []
         for case in cases:

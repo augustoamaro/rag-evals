@@ -5,7 +5,6 @@ import math
 import time
 import uuid
 
-from rag.adapters.llm.pricing import cost_usd
 from rag.domain.entities import (
     CaseResult,
     EvalCase,
@@ -17,6 +16,7 @@ from rag.domain.ports import ChunkStore, Generator, Judge, Retriever
 from rag.metrics.relevance import relevant_chunk_ids
 from rag.metrics.retrieval import mrr, ndcg_at_k, precision_at_k, recall_at_k
 from rag.metrics.stats import mean, percentile
+from rag.services.pricing import cost_usd
 
 logger = logging.getLogger(__name__)
 

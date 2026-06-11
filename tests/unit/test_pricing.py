@@ -1,5 +1,5 @@
-from rag.adapters.llm.pricing import cost_usd
 from rag.domain.entities import Usage
+from rag.services.pricing import cost_usd
 
 
 def test_opus_cost() -> None:

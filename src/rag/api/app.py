@@ -48,7 +48,9 @@ def create_app(deps: AppDeps) -> FastAPI:
         if deps.generator is not None:
             answer = deps.generator.answer(req.question, chunks)
         else:
-            answer = Answer(text="Set ANTHROPIC_API_KEY to generate grounded answers.")
+            answer = Answer(
+                text="Set RAG_ANTHROPIC_API_KEY to generate grounded answers."
+            )
         return QueryResponse(
             answer=answer.text,
             citations=[CitationOut(chunk_id=c.chunk_id) for c in answer.citations],

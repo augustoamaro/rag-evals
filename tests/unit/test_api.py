@@ -86,7 +86,8 @@ def test_query_returns_answer_and_chunks() -> None:
 def test_query_without_generator_still_returns_chunks() -> None:
     resp = _client(with_generator=False).post("/query", json={"question": "q"})
     body = resp.json()
-    assert "ANTHROPIC_API_KEY" in body["answer"]
+    # Must name the actual variable (RAG_ prefix from pydantic-settings).
+    assert "RAG_ANTHROPIC_API_KEY" in body["answer"]
     assert body["chunks"][0]["id"] == "cap:0"
 
 

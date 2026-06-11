@@ -17,8 +17,8 @@ cost and latency, and **fails CI if retrieval regresses**.
 The core runs from a fresh clone with **no API key**: embeddings are local
 (fastembed/ONNX), so ingestion, retrieval, and retrieval-metric evals all work
 offline and in CI. Claude (Opus 4.8) powers the parts that need a frontier LLM —
-answer generation and the judge — gated behind `ANTHROPIC_API_KEY` and degrading
-gracefully without it.
+answer generation and the judge — gated behind `RAG_ANTHROPIC_API_KEY` and
+degrading gracefully without it.
 
 ![rag-evals dashboard](docs/media/dashboard.png)
 

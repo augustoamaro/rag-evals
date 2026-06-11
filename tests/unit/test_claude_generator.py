@@ -42,6 +42,18 @@ def test_generator_parses_citations_and_usage() -> None:
     assert "What does CAP say?" in sent["messages"][0]["content"]
 
 
+def test_generator_rejects_truncated_or_refused_responses() -> None:
+    import pytest
+
+    from rag.adapters.llm.errors import LlmError
+
+    for stop in ("max_tokens", "refusal"):
+        client = FakeAnthropic(text="partial...", usage=(10, 5), stop_reason=stop)
+        gen = ClaudeGenerator(client)
+        with pytest.raises(LlmError, match=stop):
+            gen.answer("q", _context())
+
+
 class StubGenerator:
     def answer(self, question: str, context: list[RetrievedChunk]) -> Answer:
         return Answer(text=f"answer to {question}", citations=[])

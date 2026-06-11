@@ -4,6 +4,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from rag.adapters.llm.errors import check_stop_reason
 from rag.domain.entities import Answer, AnswerScores, RetrievedChunk, Usage
 
 _SYSTEM = (
@@ -39,13 +40,16 @@ class ClaudeJudge:
         prompt = _build_prompt(question, answer, context, reference_answer)
         response = self._client.messages.parse(
             model=self._model,
-            max_tokens=1024,
+            # Generous cap: adaptive thinking draws from the same budget, and a
+            # truncated structured response fails to parse mid-run.
+            max_tokens=16000,
             thinking={"type": "adaptive"},
             output_config={"effort": "high"},
             output_format=AnswerScoresModel,
             system=_SYSTEM,
             messages=[{"role": "user", "content": prompt}],
         )
+        check_stop_reason(getattr(response, "stop_reason", None), "judge scoring")
         parsed = response.parsed_output
         scores = AnswerScores(
             faithfulness=float(parsed.faithfulness),

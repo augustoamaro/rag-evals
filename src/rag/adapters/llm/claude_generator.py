@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from rag.adapters.llm.errors import check_stop_reason
 from rag.domain.entities import Answer, Citation, RetrievedChunk, Usage
 
 _CITATION = re.compile(r"\[([^\]\s]+)\]")
@@ -26,11 +27,14 @@ class ClaudeGenerator:
         prompt = _build_prompt(question, context)
         response = self._client.messages.create(
             model=self._model,
-            max_tokens=1024,
+            # Generous cap: adaptive thinking draws from the same budget, and a
+            # too-small value truncates (or empties) the visible answer.
+            max_tokens=16000,
             thinking={"type": "adaptive"},
             system=_SYSTEM,
             messages=[{"role": "user", "content": prompt}],
         )
+        check_stop_reason(getattr(response, "stop_reason", None), "answer generation")
         text = "".join(block.text for block in response.content if block.type == "text")
         usage = Usage(
             input_tokens=int(response.usage.input_tokens),

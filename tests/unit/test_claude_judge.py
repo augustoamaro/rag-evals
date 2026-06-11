@@ -34,6 +34,20 @@ def test_judge_maps_structured_output_and_usage() -> None:
     assert "ref" in sent["messages"][0]["content"]
 
 
+def test_judge_rejects_truncated_responses() -> None:
+    import pytest
+
+    from rag.adapters.llm.errors import LlmError
+
+    parsed = AnswerScoresModel(
+        faithfulness=0.5, relevance=0.5, citation_correctness=0.5, rationale="x"
+    )
+    client = FakeAnthropic(parsed=parsed, stop_reason="max_tokens")
+    judge = ClaudeJudge(client)
+    with pytest.raises(LlmError, match="max_tokens"):
+        judge.score("q", Answer(text="a"), _context(), reference_answer="ref")
+
+
 def test_scores_model_rejects_out_of_range() -> None:
     import pytest
     from pydantic import ValidationError

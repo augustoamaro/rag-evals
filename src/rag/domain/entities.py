@@ -70,3 +70,39 @@ class AnswerScores:
     relevance: float
     citation_correctness: float
     rationale: str
+
+
+@dataclass(frozen=True)
+class RunMetrics:
+    recall: float
+    precision: float
+    mrr: float
+    ndcg: float
+
+
+@dataclass(frozen=True)
+class CaseResult:
+    case_id: str
+    strategy: str
+    retrieved_ids: list[str]
+    recall: float
+    precision: float
+    mrr: float
+    ndcg: float
+    answer: str | None = None
+    judge_scores: AnswerScores | None = None
+    cost_usd: float = 0.0
+    latency_ms: int = 0
+
+
+@dataclass(frozen=True)
+class EvalRun:
+    id: str
+    strategy: Strategy
+    k: int
+    retrieval_metrics: RunMetrics
+    case_results: list[CaseResult]
+    answer_metrics: dict[str, float] | None = None
+    cost_usd: float = 0.0
+    latency_p50_ms: int = 0
+    latency_p95_ms: int = 0

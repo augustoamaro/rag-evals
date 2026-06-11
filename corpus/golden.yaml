@@ -134,7 +134,7 @@ cases:
     reference_answer: "Faithfulness measures whether every claim in the answer is supported by the retrieved context; an unsupported claim is a hallucination."
   - id: judge-structured
     question: "Why does the judge return structured output?"
-    relevant_snippets: ["Structured output turns a free -form opinion into machine-readable data"]
+    relevant_snippets: ["Structured output turns a free-form opinion into machine-readable data"]
     reference_answer: "Structured output turns a free-form opinion into machine-readable data that can be aggregated across a run and tracked over time."
   - id: judge-limits
     question: "What are known limitations of LLM judges?"

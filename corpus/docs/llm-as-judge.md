@@ -12,10 +12,10 @@ measures whether the answer actually addresses the question that was asked. Cita
 correctness measures whether the cited chunks genuinely support the statements that
 cite them.
 
-To make scores usable, the judge is asked to return structured output: a number in a
-fixed range for each dimension plus a short rationale. Structured output turns a free
--form opinion into machine-readable data that can be aggregated across an evaluation
-run and tracked over time.
+To make scores usable, the judge is asked to return structured output: a number in
+a fixed range for each dimension plus a short rationale. Structured output turns a
+free-form opinion into machine-readable data that can be aggregated across an
+evaluation run and tracked over time.
 
 LLM judges have known limitations. They can be inconsistent between runs, and they may
 prefer longer or more confident answers regardless of correctness, a bias worth

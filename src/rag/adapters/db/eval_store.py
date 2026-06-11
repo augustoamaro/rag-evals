@@ -38,8 +38,8 @@ class EvalStore:
                 conn.execute(
                     "INSERT INTO eval_case_results (id, run_id, case_id, strategy, "
                     "retrieved_ids, recall, precision, mrr, ndcg, answer, judge_scores, "
-                    "cost_usd, latency_ms) "
-                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    "cost_usd, latency_ms, answer_ms) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                     (
                         uuid.uuid4().hex,
                         run.id,
@@ -54,6 +54,7 @@ class EvalStore:
                         judge,
                         r.cost_usd,
                         r.latency_ms,
+                        r.answer_ms,
                     ),
                 )
             conn.commit()
@@ -79,7 +80,7 @@ class EvalStore:
                 return None
             cases = conn.execute(
                 "SELECT case_id, strategy, retrieved_ids, recall, precision, mrr, ndcg, "
-                "answer, judge_scores, cost_usd, latency_ms "
+                "answer, judge_scores, cost_usd, latency_ms, answer_ms "
                 "FROM eval_case_results WHERE run_id = %s ORDER BY case_id",
                 (run_id,),
             ).fetchall()
@@ -97,6 +98,7 @@ class EvalStore:
                 "judge_scores": c[8],
                 "cost_usd": float(c[9]),
                 "latency_ms": c[10],
+                "answer_ms": c[11],
             }
             for c in cases
         ]

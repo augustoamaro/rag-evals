@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import math
 import time
 import uuid
 
@@ -50,18 +51,23 @@ class EvalService:
         total_cost = 0.0
         for case in cases:
             relevant = relevant_chunk_ids(chunks, case.relevant_snippets)
+            # Retrieval latency only — LLM time is tracked separately so the
+            # run-level percentiles stay comparable across judged/unjudged runs.
             started = time.perf_counter()
             retrieved = self._retriever.retrieve(case.question, k, strategy)
+            retrieval_ms = _elapsed_ms(started)
             ranked = [rc.chunk.id for rc in retrieved]
 
             answer_text: str | None = None
             judge_scores = None
             case_cost = 0.0
+            answer_ms = 0
             if do_answers:
                 assert self._generator is not None and self._judge is not None
                 # One bad API call (rate limit, refusal, truncation) must not
                 # throw away the whole run: record the case as unanswered,
                 # keep its retrieval metrics, and continue.
+                answer_started = time.perf_counter()
                 try:
                     answer = self._generator.answer(case.question, retrieved)
                     judge_scores, judge_usage = self._judge.score(
@@ -74,8 +80,8 @@ class EvalService:
                     total_cost += case_cost
                 except Exception:
                     logger.exception("answer track failed for case %s", case.id)
+                answer_ms = _elapsed_ms(answer_started)
 
-            elapsed_ms = int((time.perf_counter() - started) * 1000)
             results.append(
                 CaseResult(
                     case_id=case.id,
@@ -88,7 +94,8 @@ class EvalService:
                     answer=answer_text,
                     judge_scores=judge_scores,
                     cost_usd=case_cost,
-                    latency_ms=elapsed_ms,
+                    latency_ms=retrieval_ms,
+                    answer_ms=answer_ms,
                 )
             )
 
@@ -104,6 +111,11 @@ class EvalService:
             latency_p50_ms=int(percentile(latencies, 50)),
             latency_p95_ms=int(percentile(latencies, 95)),
         )
+
+
+def _elapsed_ms(started: float) -> int:
+    """Wall-clock ms since `started`, rounded up so sub-ms never displays as 0."""
+    return max(1, math.ceil((time.perf_counter() - started) * 1000))
 
 
 def _aggregate_retrieval(results: list[CaseResult]) -> RunMetrics:

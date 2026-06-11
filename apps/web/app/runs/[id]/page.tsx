@@ -36,7 +36,11 @@ export default function RunPage({ params }: { params: Promise<{ id: string }> })
         <MetricCard label="nDCG@k" value={m.ndcg.toFixed(3)} accent />
         <MetricCard label="MRR" value={m.mrr.toFixed(3)} />
         <MetricCard label="Precision@k" value={m.precision.toFixed(3)} />
-        <MetricCard label="Latency p95" value={`${run.latency_p95_ms}ms`} sub={`p50 ${run.latency_p50_ms}ms`} />
+        <MetricCard
+          label="Retrieval p95"
+          value={`${run.latency_p95_ms}ms`}
+          sub={`p50 ${run.latency_p50_ms}ms`}
+        />
       </div>
 
       {a ? (

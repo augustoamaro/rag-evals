@@ -53,7 +53,7 @@ export default function Home() {
                   <th>nDCG</th>
                   <th>MRR</th>
                   <th>Cost</th>
-                  <th>p95</th>
+                  <th>Retrieval p95</th>
                   <th />
                 </tr>
               </thead>

@@ -25,6 +25,7 @@ def _run() -> EvalRun:
                 mrr=1.0,
                 ndcg=1.0,
                 latency_ms=12,
+                answer_ms=345,
             )
         ],
         latency_p50_ms=12,
@@ -46,5 +47,6 @@ def test_save_and_read_back_run(pool: Pool) -> None:
     assert detail["config"]["strategy"] == "hybrid"
     assert len(detail["cases"]) == 1
     assert detail["cases"][0]["retrieved_ids"] == ["c1", "c2"]
+    assert detail["cases"][0]["answer_ms"] == 345
 
     assert store.get_run("missing") is None

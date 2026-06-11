@@ -92,7 +92,8 @@ class CaseResult:
     answer: str | None = None
     judge_scores: AnswerScores | None = None
     cost_usd: float = 0.0
-    latency_ms: int = 0
+    latency_ms: int = 0  # retrieval only
+    answer_ms: int = 0  # generation + judging (0 when the answer track is off)
 
 
 @dataclass(frozen=True)

@@ -35,7 +35,8 @@ export interface CaseResult {
   answer: string | null;
   judge_scores: Record<string, unknown> | null;
   cost_usd: number;
-  latency_ms: number;
+  latency_ms: number; // retrieval only
+  answer_ms: number; // generation + judging (0 when the answer track is off)
 }
 
 export interface RunDetail extends RunSummary {

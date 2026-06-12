@@ -11,9 +11,15 @@ from rag.adapters.db.pool import Pool, make_pool
 
 @pytest.fixture
 def database_url() -> str:
-    url = os.environ.get("RAG_DATABASE_URL")
+    # Deliberately a SEPARATE variable from RAG_DATABASE_URL: the integration
+    # suite truncates every table in the database it points at, so pointing it
+    # somewhere must be an explicit opt-in — never inherited from dev config.
+    url = os.environ.get("RAG_TEST_DATABASE_URL")
     if not url:
-        pytest.skip("RAG_DATABASE_URL not set — integration tests need Postgres")
+        pytest.skip(
+            "RAG_TEST_DATABASE_URL not set — integration tests need a disposable "
+            "Postgres (the suite truncates its tables)"
+        )
     return url
 
 

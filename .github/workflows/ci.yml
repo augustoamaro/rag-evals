@@ -28,6 +28,8 @@ jobs:
           --health-retries 15
     env:
       RAG_DATABASE_URL: postgresql://rag:rag@localhost:5432/rag
+      # Same throwaway service container — the integration suite truncates it.
+      RAG_TEST_DATABASE_URL: postgresql://rag:rag@localhost:5432/rag
     steps:
       - uses: actions/checkout@v4
 

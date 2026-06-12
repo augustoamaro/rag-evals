@@ -151,7 +151,8 @@ Configuration is via `RAG_`-prefixed env vars — see [`.env.example`](.env.exam
 uv run ruff check src tests       # lint
 uv run mypy src                   # strict types
 uv run pytest                     # unit (pure metrics, services, adapters via fakes)
-uv run pytest -m integration      # real Postgres + pgvector (set RAG_DATABASE_URL)
+uv run pytest -m integration      # real Postgres + pgvector — set RAG_TEST_DATABASE_URL
+                                  # to a DISPOSABLE database (the suite truncates it)
 cd apps/web && pnpm test          # dashboard component tests
 ```
 

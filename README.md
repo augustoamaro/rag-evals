@@ -53,7 +53,8 @@ rag-evals/
 │   │     embedding/   fastembed (bge-small, 384-dim, local, no key)
 │   │     retrieval/   pgvector hybrid (dense HNSW + FTS + RRF + rerank)
 │   │     db/          psycopg3, migrations, chunk store, eval store
-│   │     llm/         Claude generator + judge (the only Anthropic imports)
+│   │     llm/         Claude generator + judge (the only Anthropic SDK *usage*;
+│   │                  composition roots construct the client and inject it)
 │   ├── services/      ingestion · query · eval (orchestrate ports)
 │   ├── api/           FastAPI (thin routers, dependency-injected)
 │   └── cli/           Typer: rag ingest · rag eval [--judge] [--gate]
@@ -85,7 +86,10 @@ Decisions worth calling out:
 - **Retrieval track (no LLM):** for each golden case, retrieve with a strategy
   (`dense` / `sparse` / `hybrid` / `hybrid_rerank`) and compute **recall@k**,
   **precision@k**, **MRR**, and **nDCG@k**. Relevance is snippet-containment, so
-  metrics are deterministic and reproducible.
+  metrics are deterministic and reproducible. One known bias: a snippet that
+  falls inside the chunker's overlap window matches two chunks, so the same
+  passage counts twice in the recall denominator — metrics *understate* rather
+  than inflate (3 of 30 cases today).
 - **Answer track (Claude judge):** generate an answer from the retrieved context
   with inline citations, then score **faithfulness**, **relevance**, and
   **citation-correctness** in [0, 1] via Claude structured output.
@@ -168,6 +172,23 @@ What the tests prove:
 - **End-to-end** — ingest → hybrid eval → persist → the API serves the results,
   through the real stack (integration-marked); the regression gate runs on every
   push.
+
+## Limitations & follow-ups
+
+Deliberate scope decisions, documented as judgment rather than oversight:
+
+- **Sparse arm uses `plainto_tsquery`,** which ANDs every term — question-shaped
+  queries can match nothing, part of why sparse recall trails. OR-semantics (or
+  query rewriting) is the obvious next experiment *for the harness to measure*.
+- **The bundled corpus is small** (10 docs / 20 chunks), chosen so evals are
+  reproducible from a fresh clone in seconds. Recall saturates at large k —
+  which is why CI gates per strategy at k=3. A larger corpus profile would make
+  the strategy comparison stronger.
+- **Playground scores are ranks,** not raw similarities: RRF fuses by rank, so
+  there is no single calibrated score across arms. Surfacing per-arm cosine/BM25
+  scores is a follow-up.
+- **The API does not stream answers** and CORS is open — both fine for a local
+  demo, both documented in the code where they'd change for production.
 
 ## License
 

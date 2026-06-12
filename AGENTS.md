@@ -18,7 +18,8 @@ Claude (Opus 4.8) powers answer generation + the LLM-as-judge, gated behind
 - `src/rag/chunking` — pure deterministic chunker.
 - `src/rag/adapters` — the only modules with I/O/SDK/SQL: `embedding` (fastembed),
   `retrieval` (pgvector hybrid), `db` (psycopg3), `llm` (Claude generator + judge —
-  the only `anthropic` imports).
+  the only Anthropic SDK *usage*; the CLI/API composition roots construct the
+  client and inject it).
 - `src/rag/services` — ingestion · query · eval.
 - `src/rag/api` — FastAPI; `src/rag/cli` — Typer (`rag ingest`, `rag eval`).
 - `corpus/` — bundled docs + `golden.yaml`. `migrations/` — ordered `.sql`.

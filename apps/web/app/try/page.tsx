@@ -80,9 +80,7 @@ export default function TryPage() {
             <div className="chunk" key={c.id}>
               <div className="chunk__meta">
                 <span className="chunk__id">[{c.id}]</span>
-                <span>
-                  rank {c.rank} · score {c.score.toFixed(3)}
-                </span>
+                <span>rank {c.rank}</span>
               </div>
               <div className="chunk__text">{c.text}</div>
             </div>

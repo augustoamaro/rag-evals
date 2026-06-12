@@ -35,3 +35,4 @@ local-data/
 docs/superpowers/
 
 *.log
+*.tsbuildinfo

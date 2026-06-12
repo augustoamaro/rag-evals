@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Any, Protocol
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.types import Lifespan
 
 from rag.api.schemas import (
     CitationOut,
@@ -46,8 +49,10 @@ class AppDeps:
     answers_available: bool = False
 
 
-def create_app(deps: AppDeps) -> FastAPI:
-    app = FastAPI(title="rag-evals", version="0.0.0")
+def create_app(deps: AppDeps, lifespan: Lifespan[FastAPI] | None = None) -> FastAPI:
+    app = FastAPI(title="rag-evals", version="0.0.0", lifespan=lifespan)
+    # Deliberately open: this is a local/demo deployment where the dashboard
+    # origin is not fixed. Lock allow_origins down for anything internet-facing.
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -152,4 +157,9 @@ def build_app() -> FastAPI:
         cases=load_golden(),
         answers_available=generator is not None,
     )
-    return create_app(deps)
+    @asynccontextmanager
+    async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+        yield
+        pool.close()
+
+    return create_app(deps, lifespan=lifespan)

@@ -157,6 +157,7 @@ def build_app() -> FastAPI:
         cases=load_golden(),
         answers_available=generator is not None,
     )
+
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         yield

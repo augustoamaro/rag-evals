@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import os
+import subprocess
+
 import typer
 
 from rag.adapters.db.chunk_store import PgChunkStore
@@ -64,6 +67,7 @@ def run_eval(
                 "k": k,
                 "embedding_model": settings.embedding_model,
             },
+            git_sha=_git_sha(),
         )
         m = run.retrieval_metrics
         typer.echo(
@@ -86,6 +90,24 @@ def run_eval(
             typer.echo("GATE PASSED")
     finally:
         pool.close()
+
+
+def _git_sha() -> str | None:
+    """Best-effort code version for a run: CI env first, then local git."""
+    sha = os.environ.get("GITHUB_SHA")
+    if sha:
+        return sha[:12]
+    try:
+        out = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=5,
+        )
+        return out.stdout.strip() or None
+    except Exception:
+        return None
 
 
 def _llm_adapters(

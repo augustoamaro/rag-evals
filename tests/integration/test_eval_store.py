@@ -35,12 +35,13 @@ def _run() -> EvalRun:
 
 def test_save_and_read_back_run(pool: Pool) -> None:
     store = EvalStore(pool)
-    store.save_run(_run(), {"strategy": "hybrid", "k": 10})
+    store.save_run(_run(), {"strategy": "hybrid", "k": 10}, git_sha="abc1234")
 
     runs = store.list_runs()
     assert len(runs) == 1
     assert runs[0]["id"] == "run-1"
     assert runs[0]["retrieval_metrics"]["recall"] == 0.8
+    assert runs[0]["git_sha"] == "abc1234"
 
     detail = store.get_run("run-1")
     assert detail is not None

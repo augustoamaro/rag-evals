@@ -16,13 +16,15 @@ class EvalStore:
     def __init__(self, pool: Pool) -> None:
         self._pool = pool
 
-    def save_run(self, run: EvalRun, config: dict[str, Any]) -> None:
+    def save_run(
+        self, run: EvalRun, config: dict[str, Any], git_sha: str | None = None
+    ) -> None:
         answer_metrics = Jsonb(run.answer_metrics) if run.answer_metrics else None
         with self._pool.connection() as conn:
             conn.execute(
                 "INSERT INTO eval_runs (id, config, retrieval_metrics, answer_metrics, "
-                "cost_usd, latency_p50_ms, latency_p95_ms) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                "cost_usd, latency_p50_ms, latency_p95_ms, git_sha) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                 (
                     run.id,
                     Jsonb(config),
@@ -31,6 +33,7 @@ class EvalStore:
                     run.cost_usd,
                     run.latency_p50_ms,
                     run.latency_p95_ms,
+                    git_sha,
                 ),
             )
             for r in run.case_results:
@@ -63,7 +66,7 @@ class EvalStore:
         with self._pool.connection() as conn:
             rows = conn.execute(
                 "SELECT id, created_at, config, retrieval_metrics, answer_metrics, "
-                "cost_usd, latency_p50_ms, latency_p95_ms "
+                "cost_usd, latency_p50_ms, latency_p95_ms, git_sha "
                 "FROM eval_runs ORDER BY created_at DESC"
             ).fetchall()
         return [_run_row(r) for r in rows]
@@ -72,7 +75,7 @@ class EvalStore:
         with self._pool.connection() as conn:
             row = conn.execute(
                 "SELECT id, created_at, config, retrieval_metrics, answer_metrics, "
-                "cost_usd, latency_p50_ms, latency_p95_ms "
+                "cost_usd, latency_p50_ms, latency_p95_ms, git_sha "
                 "FROM eval_runs WHERE id = %s",
                 (run_id,),
             ).fetchone()
@@ -115,4 +118,5 @@ def _run_row(r: tuple[Any, ...]) -> dict[str, Any]:
         "cost_usd": float(r[5]),
         "latency_p50_ms": r[6],
         "latency_p95_ms": r[7],
+        "git_sha": r[8],
     }

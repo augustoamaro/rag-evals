@@ -22,6 +22,7 @@ export interface RunSummary {
   cost_usd: number;
   latency_p50_ms: number;
   latency_p95_ms: number;
+  git_sha: string | null;
 }
 
 export interface CaseResult {

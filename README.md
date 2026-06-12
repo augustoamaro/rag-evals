@@ -31,7 +31,7 @@ beating either arm alone — exactly the kind of result it exists to surface:
 
 | Strategy | Recall@10 | nDCG@10 | MRR |
 |----------|:---------:|:-------:|:---:|
-| dense    | 1.000 | 0.938 | 0.917 |
+| dense    | 1.000 | 0.951 | 0.933 |
 | sparse   | 0.817 | 0.820 | 0.833 |
 | **hybrid** | **1.000** | **0.988** | **0.983** |
 

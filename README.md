@@ -1,53 +1,103 @@
 # rag-evals
 
-**A RAG service with a rigorous evaluation harness — retrieval metrics, LLM-as-judge answer quality, cost & latency, and a regression gate in CI.**
+**A RAG service and experiment dashboard for measuring retrieval, inspecting evidence, and catching regressions before a change ships.**
 
 [![CI](https://github.com/augustoamaro/rag-evals/actions/workflows/ci.yml/badge.svg)](https://github.com/augustoamaro/rag-evals/actions/workflows/ci.yml)
 &nbsp;![Python](https://img.shields.io/badge/python-3.12-3776ab)
 &nbsp;![types](https://img.shields.io/badge/mypy-strict-2dd4bf)
 &nbsp;![pgvector](https://img.shields.io/badge/pgvector-hybrid-1b35b8)
 
-Most RAG demos answer a question and stop. This one **measures** itself. It ingests
-documents, retrieves with **hybrid search** (dense vectors + keyword, fused with
-RRF), and answers with **citations** — then a two-track eval harness scores
-retrieval quality (recall@k, MRR, nDCG) against a labeled golden set and answer
-quality (faithfulness, relevance, citation-correctness) with an LLM judge, tracks
-cost and latency, and **fails CI on quality floors or paired baseline regressions**.
+Publish an immutable document index, launch an evaluation, compare it with a
+retained baseline, and inspect the cases behind each score. The same evaluation
+service powers the CLI, FastAPI and Next.js dashboard. CI checks absolute quality
+floors and paired regressions across the full benchmark, slices and critical cases.
 
-The core runs from a fresh clone with **no API key**: embeddings are local
-(fastembed/ONNX), so ingestion, retrieval, and retrieval-metric evals all work
-offline and in CI. Claude (Opus 4.8) powers the parts that need a frontier LLM —
-answer generation and the judge — gated behind `RAG_ANTHROPIC_API_KEY`.
-Retrieval-only evals need no key; explicitly requesting `--judge` without one fails
-before connecting to the database.
+**No API key is needed for ingestion, retrieval or retrieval evaluation.** Local
+fastembed/ONNX models download on first use and can then run from their cache.
+Optional Claude answer generation and LLM judging require
+`RAG_ANTHROPIC_API_KEY`; their outcomes, coverage, usage and estimated costs are
+recorded separately. Live answer quality and judge calibration remain to be validated.
 
-![rag-evals dashboard](docs/media/dashboard.png)
+[Run it](#run-it) · [Dashboard workflow](#dashboard-workflow) ·
+[Measured baselines](#measured-baselines) · [Methodology](#eval-methodology) ·
+[Roadmap](docs/improvement-roadmap.md)
 
----
+![Evaluation history showing English smoke results, benchmark selection, retrieval trends and saved runs](docs/media/dashboard.png)
 
-## What it measures
+## Dashboard workflow
 
-The original 30-case English smoke set produced the following results before
-versioned evidence labels were introduced. These are a historical sanity check
-on ten documents, not a general retrieval-quality claim:
+- **Launch and follow an experiment.** Select a strategy, split, language and
+  retrieval depth. Progress survives reloads; cancellation retains saved work.
+- **Compare compatible runs.** Inspect paired metric changes, slice regressions
+  and descriptive 95% bootstrap intervals. Incomplete runs stay out of comparisons.
+- **Explain a result.** Open a case's reference, retrieved passages, evidence spans
+  and actual dense, sparse, RRF or reranker scores. Add run and case review notes.
+- **Keep benchmark scopes explicit.** English is the default. Portuguese runs
+  separately, and historical indexes retain their datasets and model identities.
 
-| Strategy | Recall@10 | nDCG@10 | MRR |
-|----------|:---------:|:-------:|:---:|
-| dense    | 1.000 | 0.951 | 0.933 |
-| sparse   | 0.817 | 0.820 | 0.833 |
-| **hybrid** | **1.000** | **0.988** | **0.983** |
+<details>
+<summary><strong>Experiment launcher and saved progress</strong></summary>
 
-Current evaluations use a versioned dataset: **30 English smoke cases, 10 English
-development probes and 10 separate Portuguese probes**, plus an importable
-published **BEIR/SciFact test profile**. The local development probes are unreviewed
-diagnostics. See [dataset provenance and format](corpus/README.md) and the
-[phase 2 benchmark report](docs/benchmarks-2026-09-16.md).
+![Experiment launcher with strategy, split, language and retrieval-depth controls, followed by completed jobs](docs/media/experiments.png)
+
+Answer evaluation is optional. Without a provider key, the dashboard explains its
+availability while the retrieval workflow remains usable.
+
+</details>
+
+<details>
+<summary><strong>Paired comparison and slice regressions</strong></summary>
+
+![Comparison of hybrid and reranked runs showing paired metrics and a slice regression despite equal aggregate scores](docs/media/comparison.png)
+
+Equal aggregate scores can hide changed cases. This smoke comparison exposes a
+slice regression when comparing hybrid retrieval with hybrid plus reranking.
+
+</details>
+
+<details>
+<summary><strong>Stored case evidence</strong></summary>
+
+![A saved evaluation case with its reference answer, retrieved passages, evidence coverage and score components](docs/media/evidence.png)
+
+Stored context records what the evaluation actually retrieved. Review notes are
+versioned separately from benchmark labels and results.
+
+</details>
+
+Screenshots show real local retrieval runs over the bundled corpus, with no model
+provider calls. [Capture details](docs/media/README.md) identify their scope.
+
+## Measured baselines
+
+The versioned **English smoke benchmark** contains 30 cases over 10 documents
+(20 chunks). These **k=3** measurements are retained regression baselines, not a
+general retrieval-quality claim:
+
+| Strategy | Recall@3 | nDCG@3 | MRR | Evidence recall |
+|---|---:|---:|---:|---:|
+| Dense | 1.000 | 0.951 | 0.933 | 1.000 |
+| Sparse | 0.817 | 0.820 | 0.833 | 0.833 |
+| Hybrid | 1.000 | 0.988 | 0.983 | 1.000 |
+| Hybrid + rerank | 1.000 | 0.988 | 0.983 | 1.000 |
+
+The separate **published BEIR/SciFact test profile** covers 5,183 documents and
+300 test cases. The fixed, untuned hybrid configuration reached **0.841 document
+recall@10** and **0.721 nDCG@10**. Its document labels and metrics differ from the
+local chunk benchmark; neither result establishes generated-answer quality.
+
+Ten English and ten Portuguese development probes are evaluated separately.
+Their labels have not been independently reviewed, and they share source evidence
+with the smoke set. They are diagnostics, not held-out tests.
+
+See the [measurement report](docs/benchmarks-2026-09-16.md),
+[seven per-case baseline artifacts](benchmarks/), and
+[dataset provenance and format](corpus/README.md) for complete results and limitations.
 
 ## Architecture
 
-Clean architecture: dependencies point inward toward a pure domain. The LLM
-(Anthropic SDK), the database (pgvector/SQL), and the embedding model each live
-behind a port and appear in exactly one adapter.
+Dependencies point inward toward a pure domain. The LLM (Anthropic SDK), database
+(pgvector/SQL), and embedding model live behind ports in the adapter layer.
 
 ```
 rag-evals/
@@ -75,9 +125,8 @@ rag-evals/
 
 Decisions worth calling out:
 
-- **Local embeddings + Claude, key-gated.** The whole retrieval pipeline and its
-  metrics run with zero secrets, in CI, from a fresh clone. Claude is used only
-  where a frontier LLM earns its place — answers and judging.
+- **Local embeddings, optional Claude.** Retrieval and its metrics need no
+  provider key. Generation and judging are separate, opt-in stages.
 - **Hybrid = pgvector dense + Postgres FTS sparse + RRF.** Real hybrid retrieval
   with **no extra infrastructure** (one Postgres). RRF fuses by rank, so it needs
   no score calibration across the two very different score scales.
@@ -88,9 +137,9 @@ Decisions worth calling out:
 - **Immutable indexes.** Dataset content, labels, chunking, vectors and the actual
   embedding artifacts identify a published index. Re-ingestion preserves old
   indexes and their self-contained datasets; every retrieval binds to one index.
-- **The eval harness is the spine, retrieval-first.** Retrieval metrics need no
-  LLM, so the headline quality signal is reproducible and CI-gateable for free; the
-  LLM-judge answer track layers on top.
+- **One bounded local worker.** PostgreSQL coordinates job admission and atomic
+  stage checkpoints. Retries are idempotent; restart preserves observed results
+  without replaying model calls.
 - **psycopg3 + explicit SQL over an ORM.** The hybrid-retrieval SQL (pgvector +
   FTS + RRF) is the interesting part — it stays visible.
 
@@ -195,6 +244,9 @@ docker compose up --build
 ```
 
 The API container applies migrations and ingests the bundled corpus on startup.
+Open **Experiments** to create the first run; a second compatible run enables
+comparison and a trend in the history view. The first build and model download
+require internet access.
 `rag ingest` atomically **publishes an immutable index** and prints its ID. An
 identical dataset/model/configuration reuses its existing index; changed inputs
 produce a new index. Publication prepares and validates all embeddings before
@@ -295,6 +347,12 @@ effect of a passing run. Comparison currently gates retrieval, not judge scores.
 
 ## Tests
 
+The phases 1–3 checkpoint passed **267 Python unit tests, 107 PostgreSQL
+integration/E2E tests and 68 web tests**, plus strict typing and a production build.
+The [verification report](docs/experiments-2026-09-16.md) records browser acceptance,
+failure-path coverage and operating limits. GitHub Actions runs the checks and
+smoke baseline gates on pull requests and pushes to `main`.
+
 ```bash
 uv run ruff check src tests       # lint
 uv run mypy src tests             # strict types
@@ -320,7 +378,7 @@ What the tests prove:
   runs with simulated LLMs. Real Postgres tests cover concurrent replacement,
   rollback, immutable index races, historical replay and migration races. CLI/API
   manifests and separate languages agree. Quality-floor and paired smoke gates run
-  on every push.
+  in CI.
 - **Experiment workflow** — idempotent admission, worker ownership, cancellation
   between paid stages, atomic progress checkpoints, interrupted-job recovery,
   compatible comparisons and concurrent note edits run against real PostgreSQL.
@@ -328,12 +386,11 @@ What the tests prove:
 
 ## Limitations & follow-ups
 
-Deliberate scope decisions, documented as judgment rather than oversight:
-
-The [improvement roadmap](docs/improvement-roadmap.md) tracks six phases following
-the [September 2026 audit](docs/evaluation-2026-09-16.md). Reliability and versioned
-benchmarks and the dashboard experiment workflow are implemented. The next phase
-measures retrieval changes against the retained baselines.
+The [six-phase roadmap](docs/improvement-roadmap.md) follows the
+[September 2026 audit](docs/evaluation-2026-09-16.md). **Phases 1–3 are merged into
+`main`:** evaluation reliability, versioned benchmarks and the experiment workflow.
+The remaining phases cover measured retrieval improvements, answer/judge
+validation, and shared operation with authentication, quotas and load testing.
 
 - **Sparse arm uses `plainto_tsquery`,** which ANDs every term — question-shaped
   queries can match nothing, part of why sparse recall trails. OR-semantics (or

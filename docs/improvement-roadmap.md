@@ -4,11 +4,15 @@ This roadmap follows the [September 16, 2026 audit](evaluation-2026-09-16.md).
 The audit records the original revision; this document tracks subsequent work.
 Keep the local, key-free retrieval baseline and the existing ports/adapters.
 
+Phases 1–3 are merged into `main` in
+[16af100](https://github.com/augustoamaro/rag-evals/commit/16af100aa8c2004f29ce0c6aaae62ff5135ae201).
+The verification sections below retain their measurements from each local checkpoint.
+
 | Phase | Status | Deliverable and acceptance |
 |---|---|---|
-| 1. Evaluation reliability | Completed locally, September 16, 2026 | Honest stage outcomes, coverage and cost; atomic corpus synchronization; transactional migrations; common CLI/API manifests; visible failures and retained case evidence. Reproduced failures are regression tests. |
-| 2. Representative benchmarks | Completed locally, September 16, 2026 | Immutable dataset/index snapshots and embedding provenance; stable evidence labels; strict datasets, separate English/Portuguese slices, published SciFact test profile and paired baseline gates. Reviewed project-domain labels remain a follow-up. |
-| 3. Experiment workflow | Completed locally, September 16, 2026 | Dashboard launch/progress/cancel, compatible paired comparisons, run/case notes, real retrieval scores and stale-response handling. Local worker admission, stage checkpoints and restart recovery verified; shared operation remains phase 6. |
+| 1. Evaluation reliability | Completed and merged, September 16, 2026 | Honest stage outcomes, coverage and cost; atomic corpus synchronization; transactional migrations; common CLI/API manifests; visible failures and retained case evidence. Reproduced failures are regression tests. |
+| 2. Representative benchmarks | Completed and merged, September 16, 2026 | Immutable dataset/index snapshots and embedding provenance; stable evidence labels; strict datasets, separate English/Portuguese slices, published SciFact test profile and paired baseline gates. Reviewed project-domain labels remain a follow-up. |
+| 3. Experiment workflow | Completed and merged, September 16, 2026 | Dashboard launch/progress/cancel, compatible paired comparisons, run/case notes, real retrieval scores and stale-response handling. Local worker admission, stage checkpoints and restart recovery verified; shared operation remains phase 6. |
 | 4. Retrieval experiments | Planned | Measure lexical query handling, context-aware chunks, candidate depth, token budgets and reranking; evaluate multilingual models if Portuguese is a target. Promote only measured held-out gains without critical slice regressions. |
 | 5. Answer and judge validation | Planned | Separate generator/judge configurations, calibrated correctness/completeness/abstention rubrics, deterministic citation checks, human agreement analysis, repeated trials and budgets. Requires configured live access and reviewed labels. |
 | 6. Shared operation | Planned | Authentication, quotas, bounded durable jobs, deadlines, readiness/telemetry, access controls, dependency remediation/automation, Compose CI and load/ANN benchmarks. Verify limits and failure recovery before shared billable operation. |

@@ -1,0 +1,969 @@
+{
+  "cases": [
+    {
+      "answerable": true,
+      "case_id": "cap-ap",
+      "covered_evidence_ids": [
+        "cap-theorem:words:133-138"
+      ],
+      "evidence_ids": [
+        "cap-theorem:words:133-138"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "cap-theorem:words:133-138",
+      "language": "en",
+      "mrr": 0.5,
+      "ndcg": 0.6309297535714575,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "cap-theorem:1",
+        "cap-theorem:0",
+        "consistency-models:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "cap-theorem"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "cap-cp",
+      "covered_evidence_ids": [
+        "cap-theorem:words:99-104"
+      ],
+      "evidence_ids": [
+        "cap-theorem:words:99-104"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "cap-theorem:words:99-104",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "cap-theorem:0",
+        "cap-theorem:1",
+        "rag:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "cap-theorem"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "cap-tradeoff",
+      "covered_evidence_ids": [
+        "cap-theorem:words:41-45"
+      ],
+      "evidence_ids": [
+        "cap-theorem:words:41-45"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "cap-theorem:words:41-45",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "cap-theorem:0",
+        "cap-theorem:1",
+        "consistency-models:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "cap-theorem"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "chunk-deterministic",
+      "covered_evidence_ids": [
+        "chunking:words:207-211"
+      ],
+      "evidence_ids": [
+        "chunking:words:207-211"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "chunking:words:207-211",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "chunking:1",
+        "chunking:0",
+        "consistency-models:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "chunking"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "chunk-overlap",
+      "covered_evidence_ids": [
+        "chunking:words:68-72"
+      ],
+      "evidence_ids": [
+        "chunking:words:68-72"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "chunking:words:68-72",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "chunking:0",
+        "chunking:1",
+        "embeddings:0"
+      ],
+      "split": "smoke",
+      "tags": [
+        "chunking"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "chunk-unit",
+      "covered_evidence_ids": [
+        "chunking:words:26-33"
+      ],
+      "evidence_ids": [
+        "chunking:words:26-33"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "chunking:words:26-33",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "chunking:0",
+        "chunking:1",
+        "rag:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "chunking"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "cons-causal",
+      "covered_evidence_ids": [
+        "consistency-models:words:141-147"
+      ],
+      "evidence_ids": [
+        "consistency-models:words:141-147"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "consistency-models:words:141-147",
+      "language": "en",
+      "mrr": 0.5,
+      "ndcg": 0.6309297535714575,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "consistency-models:1",
+        "consistency-models:0",
+        "cap-theorem:0"
+      ],
+      "split": "smoke",
+      "tags": [
+        "consistency-models"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "cons-eventual",
+      "covered_evidence_ids": [
+        "consistency-models:words:96-100"
+      ],
+      "evidence_ids": [
+        "consistency-models:words:96-100"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "consistency-models:words:96-100",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "consistency-models:0",
+        "cap-theorem:0",
+        "consistency-models:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "consistency-models"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "cons-ryw",
+      "covered_evidence_ids": [
+        "consistency-models:words:197-199"
+      ],
+      "evidence_ids": [
+        "consistency-models:words:197-199"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "consistency-models:words:197-199",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "consistency-models:1",
+        "consistency-models:0",
+        "cap-theorem:0"
+      ],
+      "split": "smoke",
+      "tags": [
+        "consistency-models"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "emb-advantage",
+      "covered_evidence_ids": [
+        "embeddings:words:190-199"
+      ],
+      "evidence_ids": [
+        "embeddings:words:190-199"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "embeddings:words:190-199",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "embeddings:1",
+        "embeddings:0",
+        "hybrid-retrieval:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "embeddings"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "emb-cosine",
+      "covered_evidence_ids": [
+        "embeddings:words:107-111"
+      ],
+      "evidence_ids": [
+        "embeddings:words:107-111"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "embeddings:words:107-111",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "embeddings:0",
+        "embeddings:1",
+        "vector-search:0"
+      ],
+      "split": "smoke",
+      "tags": [
+        "embeddings"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "emb-dim",
+      "covered_evidence_ids": [
+        "embeddings:words:79-82"
+      ],
+      "evidence_ids": [
+        "embeddings:words:79-82"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "embeddings:words:79-82",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "embeddings:0",
+        "embeddings:1",
+        "vector-search:0"
+      ],
+      "split": "smoke",
+      "tags": [
+        "embeddings"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "hyb-calibration",
+      "covered_evidence_ids": [
+        "hybrid-retrieval:words:145-149"
+      ],
+      "evidence_ids": [
+        "hybrid-retrieval:words:145-149"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "hybrid-retrieval:words:145-149",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "hybrid-retrieval:0",
+        "llm-as-judge:0",
+        "llm-as-judge:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "hybrid-retrieval"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "hyb-rerank",
+      "covered_evidence_ids": [
+        "hybrid-retrieval:words:196-204"
+      ],
+      "evidence_ids": [
+        "hybrid-retrieval:words:196-204"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "hybrid-retrieval:words:196-204",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "hybrid-retrieval:1",
+        "hybrid-retrieval:0",
+        "embeddings:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "hybrid-retrieval"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "hyb-rrf",
+      "covered_evidence_ids": [
+        "hybrid-retrieval:words:80-89"
+      ],
+      "evidence_ids": [
+        "hybrid-retrieval:words:80-89"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "hybrid-retrieval:words:80-89",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "hybrid-retrieval:0",
+        "hybrid-retrieval:1",
+        "evaluation-metrics:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "hybrid-retrieval"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "judge-faithfulness",
+      "covered_evidence_ids": [
+        "llm-as-judge:words:57-67"
+      ],
+      "evidence_ids": [
+        "llm-as-judge:words:57-67"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "llm-as-judge:words:57-67",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "llm-as-judge:0",
+        "consistency-models:0",
+        "cap-theorem:0"
+      ],
+      "split": "smoke",
+      "tags": [
+        "llm-as-judge"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "judge-limits",
+      "covered_evidence_ids": [
+        "llm-as-judge:words:163-169"
+      ],
+      "evidence_ids": [
+        "llm-as-judge:words:163-169"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "llm-as-judge:words:163-169",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.6666666666666666,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "llm-as-judge:1",
+        "llm-as-judge:0",
+        "cap-theorem:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "llm-as-judge"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "judge-structured",
+      "covered_evidence_ids": [
+        "llm-as-judge:words:137-146"
+      ],
+      "evidence_ids": [
+        "llm-as-judge:words:137-146"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "llm-as-judge:words:137-146",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "llm-as-judge:0",
+        "llm-as-judge:1",
+        "chunking:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "llm-as-judge"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "kw-bm25",
+      "covered_evidence_ids": [
+        "keyword-search:words:66-72"
+      ],
+      "evidence_ids": [
+        "keyword-search:words:66-72"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "keyword-search:words:66-72",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "keyword-search:0",
+        "keyword-search:1",
+        "evaluation-metrics:0"
+      ],
+      "split": "smoke",
+      "tags": [
+        "keyword-search"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "kw-mismatch",
+      "covered_evidence_ids": [
+        "keyword-search:words:49-52"
+      ],
+      "evidence_ids": [
+        "keyword-search:words:49-52"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "keyword-search:words:49-52",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "keyword-search:0",
+        "keyword-search:1",
+        "embeddings:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "keyword-search"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "kw-pg",
+      "covered_evidence_ids": [
+        "keyword-search:words:158-163"
+      ],
+      "evidence_ids": [
+        "keyword-search:words:158-163"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "keyword-search:words:158-163",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.6666666666666666,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "keyword-search:0",
+        "keyword-search:1",
+        "vector-search:0"
+      ],
+      "split": "smoke",
+      "tags": [
+        "keyword-search"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "metric-mrr",
+      "covered_evidence_ids": [
+        "evaluation-metrics:words:103-110"
+      ],
+      "evidence_ids": [
+        "evaluation-metrics:words:103-110"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "evaluation-metrics:words:103-110",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "evaluation-metrics:0",
+        "hybrid-retrieval:0",
+        "evaluation-metrics:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "evaluation-metrics"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "metric-ndcg",
+      "covered_evidence_ids": [
+        "evaluation-metrics:words:198-203"
+      ],
+      "evidence_ids": [
+        "evaluation-metrics:words:198-203"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "evaluation-metrics:words:198-203",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "evaluation-metrics:1",
+        "cap-theorem:1",
+        "cap-theorem:0"
+      ],
+      "split": "smoke",
+      "tags": [
+        "evaluation-metrics"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "metric-recall",
+      "covered_evidence_ids": [
+        "evaluation-metrics:words:42-54"
+      ],
+      "evidence_ids": [
+        "evaluation-metrics:words:42-54"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "evaluation-metrics:words:42-54",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "evaluation-metrics:0",
+        "vector-search:1",
+        "rag:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "evaluation-metrics"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "rag-bound",
+      "covered_evidence_ids": [
+        "rag:words:162-172"
+      ],
+      "evidence_ids": [
+        "rag:words:162-172"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "rag:words:162-172",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.6666666666666666,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "rag:1",
+        "rag:0",
+        "hybrid-retrieval:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "rag"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "rag-citations",
+      "covered_evidence_ids": [
+        "rag:words:110-118"
+      ],
+      "evidence_ids": [
+        "rag:words:110-118"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "rag:words:110-118",
+      "language": "en",
+      "mrr": 0.5,
+      "ndcg": 0.6309297535714575,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "rag:1",
+        "rag:0",
+        "llm-as-judge:0"
+      ],
+      "split": "smoke",
+      "tags": [
+        "rag"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "rag-hallucination",
+      "covered_evidence_ids": [
+        "rag:words:64-73"
+      ],
+      "evidence_ids": [
+        "rag:words:64-73"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "rag:words:64-73",
+      "language": "en",
+      "mrr": 0.5,
+      "ndcg": 0.6309297535714575,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "rag:1",
+        "rag:0",
+        "llm-as-judge:0"
+      ],
+      "split": "smoke",
+      "tags": [
+        "rag"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "vec-ann",
+      "covered_evidence_ids": [
+        "vector-search:words:64-76"
+      ],
+      "evidence_ids": [
+        "vector-search:words:64-76"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "vector-search:words:64-76",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "vector-search:0",
+        "embeddings:1",
+        "hybrid-retrieval:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "vector-search"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "vec-hnsw",
+      "covered_evidence_ids": [
+        "vector-search:words:100-105"
+      ],
+      "evidence_ids": [
+        "vector-search:words:100-105"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "vector-search:words:100-105",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "vector-search:0",
+        "vector-search:1",
+        "keyword-search:1"
+      ],
+      "split": "smoke",
+      "tags": [
+        "vector-search"
+      ]
+    },
+    {
+      "answerable": true,
+      "case_id": "vec-recall",
+      "covered_evidence_ids": [
+        "vector-search:words:177-189"
+      ],
+      "evidence_ids": [
+        "vector-search:words:177-189"
+      ],
+      "evidence_recall": 1.0,
+      "group_id": "vector-search:words:177-189",
+      "language": "en",
+      "mrr": 1.0,
+      "ndcg": 1.0,
+      "precision": 0.6666666666666666,
+      "recall": 1.0,
+      "retrieved_ids": [
+        "vector-search:1",
+        "vector-search:0",
+        "evaluation-metrics:0"
+      ],
+      "split": "smoke",
+      "tags": [
+        "vector-search"
+      ]
+    }
+  ],
+  "manifest": {
+    "case_count": 30,
+    "case_set_sha256": "1f2158fe3219a7ee325826d58a495c1cf3e8f0985b063f02e412e76f8697552c",
+    "chunk_count": 20,
+    "chunker": {
+      "algorithm": "word_window_v1",
+      "overlap_words": 30,
+      "target_words": 180
+    },
+    "dataset_name": "rag-engineering",
+    "dataset_sha256": "4eb980ca10e17c60b697a9be2a32888b0d3d71a7eb7f4a40fcecd3e2ac9063dc",
+    "dataset_version": "2026-09-16.1",
+    "dependency_lock_sha256": "c97d1d12c9ce3491770cfdb15decf26c9aa128dd7135738179499f90c736445d",
+    "embedding_dim": 384,
+    "embedding_identity": {
+      "artifact_sha256": "d9e46143a9cabd7abdbe181fd67443a66089fd55d721db87b7b2964085ed0bff",
+      "artifacts": {
+        "config.json": "13582bcf2effc85b7bf3d3f5532e686bc1c9ce86bb009d10f0ec33cbe92299dd",
+        "model_optimized.onnx": "51f1bd0addd6e859e42c2c8021a5e5461385bb676a649f4b269aa445449f2431",
+        "special_tokens_map.json": "5d5b662e421ea9fac075174bb0688ee0d9431699900b90662acd44b2a350503a",
+        "tokenizer.json": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+        "tokenizer_config.json": "0b29c7bfc889e53b36d9dd3e686dd4300f6525110eaa98c76a5dafceb2029f53"
+      },
+      "dimension": 384,
+      "execution_providers": [
+        "CPUExecutionProvider"
+      ],
+      "model": "BAAI/bge-small-en-v1.5",
+      "provider": "fastembed",
+      "runtime_versions": {
+        "fastembed": "0.8.0",
+        "onnxruntime": "1.26.0",
+        "tokenizers": "0.23.1"
+      }
+    },
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "evidence_metric_version": "document-or-word-union-v1",
+    "expected_chunks_sha256": "d764269c460229db390c8221b4ed18d3bef530e9ca113c6bf09f30115c5d4bb1",
+    "generator_prompt_version": "grounded-citations-v1",
+    "git_dirty": true,
+    "git_sha": "f6c2e3659103f7759179d6148c5d9576d2193f6d",
+    "index_consistency": "immutable_snapshot",
+    "index_id": "idx_e97973dded30e0626f1ddc76554336655459533616da233235029e6a9f648227",
+    "index_matches_expected": true,
+    "indexed_chunks_sha256": "d764269c460229db390c8221b4ed18d3bef530e9ca113c6bf09f30115c5d4bb1",
+    "judge_prompt_version": "structured-scores-v1",
+    "k": 3,
+    "language": "en",
+    "llm_model": "claude-opus-4-8",
+    "package_versions": {
+      "anthropic": "0.109.1",
+      "fastapi": "0.136.3",
+      "fastembed": "0.8.0",
+      "pgvector": "0.4.2",
+      "psycopg": "3.3.4"
+    },
+    "python_version": "3.12.13",
+    "ranking_metric_version": "span-overlap-chunks-v1",
+    "reranker_model": "Xenova/ms-marco-MiniLM-L-6-v2",
+    "retrieval_candidate_k": 3,
+    "retrieval_level": "chunk",
+    "retrieval_pool_k": 50,
+    "rrf_k": 60,
+    "schema_version": 2,
+    "source_sha256": "8c7c776847e9d1e61e48e107e83cb56161f03dadfbe6d32612349b0c7143e77a",
+    "split": "smoke",
+    "strategy": "dense",
+    "with_answers": false
+  },
+  "metrics": {
+    "evidence": {
+      "eligible_cases": 30,
+      "recall": 1.0,
+      "unanswerable_cases": 0
+    },
+    "retrieval": {
+      "mrr": 0.9333333333333333,
+      "ndcg": 0.9507906338095277,
+      "precision": 0.3777777777777777,
+      "recall": 1.0
+    },
+    "slices": {
+      "language:en": {
+        "count": 30,
+        "eligible_cases": 30,
+        "evidence_recall": 1.0,
+        "mrr": 0.9333333333333333,
+        "ndcg": 0.9507906338095277,
+        "precision": 0.3777777777777777,
+        "recall": 1.0
+      },
+      "tag:cap-theorem": {
+        "count": 3,
+        "eligible_cases": 3,
+        "evidence_recall": 1.0,
+        "mrr": 0.8333333333333334,
+        "ndcg": 0.8769765845238192,
+        "precision": 0.3333333333333333,
+        "recall": 1.0
+      },
+      "tag:chunking": {
+        "count": 3,
+        "eligible_cases": 3,
+        "evidence_recall": 1.0,
+        "mrr": 1.0,
+        "ndcg": 1.0,
+        "precision": 0.3333333333333333,
+        "recall": 1.0
+      },
+      "tag:consistency-models": {
+        "count": 3,
+        "eligible_cases": 3,
+        "evidence_recall": 1.0,
+        "mrr": 0.8333333333333334,
+        "ndcg": 0.8769765845238192,
+        "precision": 0.3333333333333333,
+        "recall": 1.0
+      },
+      "tag:embeddings": {
+        "count": 3,
+        "eligible_cases": 3,
+        "evidence_recall": 1.0,
+        "mrr": 1.0,
+        "ndcg": 1.0,
+        "precision": 0.3333333333333333,
+        "recall": 1.0
+      },
+      "tag:evaluation-metrics": {
+        "count": 3,
+        "eligible_cases": 3,
+        "evidence_recall": 1.0,
+        "mrr": 1.0,
+        "ndcg": 1.0,
+        "precision": 0.3333333333333333,
+        "recall": 1.0
+      },
+      "tag:hybrid-retrieval": {
+        "count": 3,
+        "eligible_cases": 3,
+        "evidence_recall": 1.0,
+        "mrr": 1.0,
+        "ndcg": 1.0,
+        "precision": 0.3333333333333333,
+        "recall": 1.0
+      },
+      "tag:keyword-search": {
+        "count": 3,
+        "eligible_cases": 3,
+        "evidence_recall": 1.0,
+        "mrr": 1.0,
+        "ndcg": 1.0,
+        "precision": 0.4444444444444444,
+        "recall": 1.0
+      },
+      "tag:llm-as-judge": {
+        "count": 3,
+        "eligible_cases": 3,
+        "evidence_recall": 1.0,
+        "mrr": 1.0,
+        "ndcg": 1.0,
+        "precision": 0.4444444444444444,
+        "recall": 1.0
+      },
+      "tag:rag": {
+        "count": 3,
+        "eligible_cases": 3,
+        "evidence_recall": 1.0,
+        "mrr": 0.6666666666666666,
+        "ndcg": 0.7539531690476383,
+        "precision": 0.4444444444444444,
+        "recall": 1.0
+      },
+      "tag:vector-search": {
+        "count": 3,
+        "eligible_cases": 3,
+        "evidence_recall": 1.0,
+        "mrr": 1.0,
+        "ndcg": 1.0,
+        "precision": 0.4444444444444444,
+        "recall": 1.0
+      }
+    }
+  },
+  "run_id": "d3fbe457746b4018b1a558db090b45dd",
+  "schema_version": 1
+}

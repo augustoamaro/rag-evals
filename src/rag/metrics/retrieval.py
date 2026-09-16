@@ -5,6 +5,9 @@ from collections.abc import Sequence
 
 
 def recall_at_k(ranked_ids: Sequence[str], relevant_ids: set[str], k: int) -> float:
+    _validate_ranking(ranked_ids)
+    if k <= 0:
+        return 0.0
     if not relevant_ids:
         return 0.0
     top = set(ranked_ids[:k])
@@ -12,6 +15,7 @@ def recall_at_k(ranked_ids: Sequence[str], relevant_ids: set[str], k: int) -> fl
 
 
 def precision_at_k(ranked_ids: Sequence[str], relevant_ids: set[str], k: int) -> float:
+    _validate_ranking(ranked_ids)
     if k <= 0:
         return 0.0
     top = ranked_ids[:k]
@@ -20,6 +24,7 @@ def precision_at_k(ranked_ids: Sequence[str], relevant_ids: set[str], k: int) ->
 
 
 def mrr(ranked_ids: Sequence[str], relevant_ids: set[str]) -> float:
+    _validate_ranking(ranked_ids)
     for i, cid in enumerate(ranked_ids):
         if cid in relevant_ids:
             return 1.0 / (i + 1)
@@ -27,6 +32,9 @@ def mrr(ranked_ids: Sequence[str], relevant_ids: set[str]) -> float:
 
 
 def ndcg_at_k(ranked_ids: Sequence[str], relevant_ids: set[str], k: int) -> float:
+    _validate_ranking(ranked_ids)
+    if k <= 0:
+        return 0.0
     if not relevant_ids:
         return 0.0
     dcg = sum(
@@ -37,3 +45,8 @@ def ndcg_at_k(ranked_ids: Sequence[str], relevant_ids: set[str], k: int) -> floa
     ideal_hits = min(len(relevant_ids), k)
     idcg = sum(1.0 / math.log2(i + 2) for i in range(ideal_hits))
     return dcg / idcg if idcg > 0 else 0.0
+
+
+def _validate_ranking(ranked_ids: Sequence[str]) -> None:
+    if len(set(ranked_ids)) != len(ranked_ids):
+        raise ValueError("ranked IDs must not contain duplicates")

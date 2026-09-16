@@ -28,7 +28,10 @@ def pool(database_url: str) -> Iterator[Pool]:
     apply_migrations(database_url)
     p = make_pool(database_url)
     with p.connection() as conn:
-        conn.execute("TRUNCATE eval_case_results, eval_runs, chunks, documents CASCADE")
+        conn.execute(
+            "TRUNCATE eval_case_results, eval_runs, chunks, documents, "
+            "snapshot_chunks, index_snapshots, dataset_snapshots CASCADE"
+        )
         conn.commit()
     yield p
     p.close()

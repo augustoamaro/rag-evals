@@ -22,7 +22,8 @@ Claude (Opus 4.8) powers answer generation + the LLM-as-judge, gated behind
   client and inject it).
 - `src/rag/services` — ingestion · query · eval.
 - `src/rag/api` — FastAPI; `src/rag/cli` — Typer (`rag ingest`, `rag eval`).
-- `corpus/` — bundled docs + `golden.yaml`. `migrations/` — ordered `.sql`.
+- `corpus/` — bundled docs + versioned `benchmark.yaml`; `golden.yaml` is legacy.
+  `benchmarks/` — per-case JSON baselines. `migrations/` — ordered `.sql`.
 
 ## Commands
 
@@ -31,8 +32,8 @@ uv sync
 uv run ruff check src tests && uv run ruff format --check src tests
 uv run mypy src
 uv run pytest                  # unit (fakes, no DB/key)
-uv run pytest -m integration   # real Postgres (set RAG_DATABASE_URL)
-uv run rag ingest              # migrate + embed + index corpus
+uv run pytest -m integration   # disposable Postgres (set RAG_TEST_DATABASE_URL)
+uv run rag ingest              # migrate + publish/reuse immutable index
 uv run rag eval --strategy hybrid --k 10 --gate
 uv run uvicorn rag.api.app:build_app --factory --port 8000
 cd apps/web && pnpm install && pnpm dev
@@ -47,5 +48,9 @@ cd apps/web && pnpm install && pnpm dev
 - Anthropic SDK calls follow the project default: `claude-opus-4-8`, adaptive
   thinking, structured output (`messages.parse`) for the judge.
 - Strict typing (mypy strict + TS strict); ruff for lint + format.
+- English is the default evaluation language; Portuguese runs separately with
+  `--split dev --language pt`. Keep smoke/dev and published test results distinct.
+- Production retrieval binds to an immutable index. Do not reintroduce mutable
+  global index reads or compare mismatched dataset/case/split/language/metric scopes.
 - Commits: English, authored as `Leonidas Augusto Amaro <augustoamaro@proton.me>`,
   no AI attribution.

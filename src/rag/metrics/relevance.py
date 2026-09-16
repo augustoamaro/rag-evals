@@ -16,8 +16,8 @@ def relevant_chunk_ids(chunks: Iterable[Chunk], snippets: list[str]) -> set[str]
     """Passage-anchored relevance.
 
     A chunk is relevant if its (whitespace-normalised, lower-cased) text contains
-    any of the case's relevant snippets. This keeps ground truth stable across
-    chunk-boundary changes — relevance is defined by content, not chunk ids.
+    any of the case's relevant snippets. Labels are content-based, but boundary
+    changes and overlapping copies can change the relevant chunk set.
     """
     norm_snips = [_norm(s) for s in snippets if s.strip()]
     out: set[str] = set()

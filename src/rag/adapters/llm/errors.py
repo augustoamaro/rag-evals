@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+from rag.domain.entities import Usage
+from rag.domain.errors import ModelCallError
 
-class LlmError(RuntimeError):
+
+class LlmError(ModelCallError):
     """An LLM call finished in a state whose content must not be trusted."""
 
 
-def check_stop_reason(stop_reason: object, context: str) -> None:
+def check_stop_reason(
+    stop_reason: object, context: str, *, usage: Usage | None = None
+) -> None:
     """Reject responses that ended for the wrong reason.
 
     ``max_tokens`` means the visible output was truncated (with adaptive
@@ -14,4 +19,4 @@ def check_stop_reason(stop_reason: object, context: str) -> None:
     silently corrupt eval results.
     """
     if stop_reason in ("max_tokens", "refusal"):
-        raise LlmError(f"{context} stopped with stop_reason={stop_reason!r}")
+        raise LlmError(f"{context} stopped with stop_reason={stop_reason!r}", usage=usage)

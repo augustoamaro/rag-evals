@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel, Field
+from anthropic._legacy_response import to_raw_response_wrapper
+from pydantic import BaseModel, Field, ValidationError
 
-from rag.adapters.llm.errors import check_stop_reason
+from rag.adapters.llm.errors import LlmError, check_stop_reason
 from rag.domain.entities import Answer, AnswerScores, RetrievedChunk, Usage
 
 _SYSTEM = (
@@ -38,7 +39,11 @@ class ClaudeJudge:
         reference_answer: str,
     ) -> tuple[AnswerScores, Usage]:
         prompt = _build_prompt(question, answer, context, reference_answer)
-        response = self._client.messages.parse(
+        # The SDK parses structured text before returning a Message. Defer that
+        # parser so malformed/truncated paid responses retain their usage. The
+        # SDK currently exposes no public with_raw_response.parse helper; the
+        # offline transport tests guard this small internal wrapper dependency.
+        raw = to_raw_response_wrapper(self._client.messages.parse)(
             model=self._model,
             # Generous cap: adaptive thinking draws from the same budget, and a
             # truncated structured response fails to parse mid-run.
@@ -49,17 +54,26 @@ class ClaudeJudge:
             system=_SYSTEM,
             messages=[{"role": "user", "content": prompt}],
         )
-        check_stop_reason(getattr(response, "stop_reason", None), "judge scoring")
+        body = raw.http_response.json()
+        usage = Usage(
+            input_tokens=int(body["usage"]["input_tokens"]),
+            output_tokens=int(body["usage"]["output_tokens"]),
+        )
+        check_stop_reason(body.get("stop_reason"), "judge scoring", usage=usage)
+        try:
+            response = raw.parse()
+        except ValidationError as exc:
+            raise LlmError(
+                "judge returned invalid structured output", usage=usage
+            ) from exc
         parsed = response.parsed_output
+        if parsed is None:
+            raise LlmError("judge returned no structured output", usage=usage)
         scores = AnswerScores(
             faithfulness=float(parsed.faithfulness),
             relevance=float(parsed.relevance),
             citation_correctness=float(parsed.citation_correctness),
             rationale=str(parsed.rationale),
-        )
-        usage = Usage(
-            input_tokens=int(response.usage.input_tokens),
-            output_tokens=int(response.usage.output_tokens),
         )
         return scores, usage
 

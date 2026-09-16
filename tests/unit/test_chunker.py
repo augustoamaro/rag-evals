@@ -22,3 +22,20 @@ def test_short_document_single_chunk() -> None:
 def test_empty_document_no_chunks() -> None:
     doc = Document(id="d3", source="s", title="t", content="   ")
     assert chunk_document(doc) == []
+
+
+def test_chunks_preserve_normalized_word_positions() -> None:
+    doc = Document("d", "s", "t", "one\n two   three four five six seven")
+    chunks = chunk_document(doc, target_words=4, overlap_words=1)
+    assert [
+        (getattr(c, "word_start", None), getattr(c, "word_end", None)) for c in chunks
+    ] == [(0, 4), (3, 7)]
+
+
+def test_invalid_chunk_windows_are_rejected() -> None:
+    import pytest
+
+    doc = Document("d", "s", "t", "one two")
+    for target, overlap in [(0, 0), (2, -1), (2, 2), (2, 3)]:
+        with pytest.raises(ValueError):
+            chunk_document(doc, target_words=target, overlap_words=overlap)

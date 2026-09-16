@@ -18,8 +18,13 @@ class FastEmbedReranker:
         return TextCrossEncoder(model_name=self._model_name)
 
     def rerank(self, query: str, chunks: list[Chunk]) -> list[Chunk]:
+        return [chunk for chunk, _ in self.rerank_with_scores(query, chunks)]
+
+    def rerank_with_scores(
+        self, query: str, chunks: list[Chunk]
+    ) -> list[tuple[Chunk, float]]:
         if not chunks:
             return []
         scores = list(self._model.rerank(query, [c.text for c in chunks]))
         order = sorted(range(len(chunks)), key=lambda i: scores[i], reverse=True)
-        return [chunks[i] for i in order]
+        return [(chunks[i], float(scores[i])) for i in order]

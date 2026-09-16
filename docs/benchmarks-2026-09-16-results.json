@@ -1,0 +1,188 @@
+{
+  "measured_on": "2026-09-16",
+  "external_profile": {
+    "name": "BEIR/SciFact",
+    "documents": 5183,
+    "chunks": 8778,
+    "source": {
+      "url": "https://public.ukp.informatik.tu-darmstadt.de/thakur/BEIR/datasets/scifact.zip",
+      "md5": "5f7d1de60b170fc8027bb7898e2efca1",
+      "sha256": "536e14446a0ba56ed1398ab1055f39fe852686ecad24a6306c80c490fa8e0165",
+      "bytes": 2816079
+    },
+    "development_cases": 809,
+    "test_cases": 300,
+    "test_tuning_performed": false,
+    "generator_judge_calls": 0
+  },
+  "runs": [
+    {
+      "artifact": "dev-en-hybrid-k3.json",
+      "dataset": "rag-engineering",
+      "split": "dev",
+      "language": "en",
+      "strategy": "hybrid",
+      "k": 3,
+      "metric_level": "chunk",
+      "cases": 10,
+      "chunks": 20,
+      "dataset_sha256": "4eb980ca10e17c60b697a9be2a32888b0d3d71a7eb7f4a40fcecd3e2ac9063dc",
+      "index_id": "idx_e97973dded30e0626f1ddc76554336655459533616da233235029e6a9f648227",
+      "retrieval": {
+        "mrr": 0.7,
+        "ndcg": 0.7181580296291102,
+        "precision": 0.3,
+        "recall": 0.8
+      },
+      "evidence": {
+        "eligible_cases": 10,
+        "recall": 0.8,
+        "unanswerable_cases": 0
+      }
+    },
+    {
+      "artifact": "dev-pt-hybrid-k3.json",
+      "dataset": "rag-engineering",
+      "split": "dev",
+      "language": "pt",
+      "strategy": "hybrid",
+      "k": 3,
+      "metric_level": "chunk",
+      "cases": 10,
+      "chunks": 20,
+      "dataset_sha256": "4eb980ca10e17c60b697a9be2a32888b0d3d71a7eb7f4a40fcecd3e2ac9063dc",
+      "index_id": "idx_e97973dded30e0626f1ddc76554336655459533616da233235029e6a9f648227",
+      "retrieval": {
+        "mrr": 0.5166666666666667,
+        "ndcg": 0.5437503349954187,
+        "precision": 0.2333333333333333,
+        "recall": 0.65
+      },
+      "evidence": {
+        "eligible_cases": 10,
+        "recall": 0.7,
+        "unanswerable_cases": 0
+      }
+    },
+    {
+      "artifact": "scifact-test-en-hybrid-k10.json",
+      "dataset": "beir",
+      "split": "test",
+      "language": "en",
+      "strategy": "hybrid",
+      "k": 10,
+      "metric_level": "document",
+      "cases": 300,
+      "chunks": 8778,
+      "dataset_sha256": "6ae00eae5ba7b99750ff4db14cb5f12bb2abcf036e4ec803ae68e2582ba63d74",
+      "index_id": "idx_de8ec1665394608ce2e6d1cae747e109d13d19808e05f7644206038e995fe6f7",
+      "retrieval": {
+        "mrr": 0.6892843915343915,
+        "ndcg": 0.7214340742661579,
+        "precision": 0.095,
+        "recall": 0.8408888888888889
+      },
+      "evidence": {
+        "eligible_cases": 300,
+        "recall": 0.8408888888888889,
+        "unanswerable_cases": 0
+      }
+    },
+    {
+      "artifact": "smoke-en-dense-k3.json",
+      "dataset": "rag-engineering",
+      "split": "smoke",
+      "language": "en",
+      "strategy": "dense",
+      "k": 3,
+      "metric_level": "chunk",
+      "cases": 30,
+      "chunks": 20,
+      "dataset_sha256": "4eb980ca10e17c60b697a9be2a32888b0d3d71a7eb7f4a40fcecd3e2ac9063dc",
+      "index_id": "idx_e97973dded30e0626f1ddc76554336655459533616da233235029e6a9f648227",
+      "retrieval": {
+        "mrr": 0.9333333333333333,
+        "ndcg": 0.9507906338095277,
+        "precision": 0.3777777777777777,
+        "recall": 1.0
+      },
+      "evidence": {
+        "eligible_cases": 30,
+        "recall": 1.0,
+        "unanswerable_cases": 0
+      }
+    },
+    {
+      "artifact": "smoke-en-hybrid-k3.json",
+      "dataset": "rag-engineering",
+      "split": "smoke",
+      "language": "en",
+      "strategy": "hybrid",
+      "k": 3,
+      "metric_level": "chunk",
+      "cases": 30,
+      "chunks": 20,
+      "dataset_sha256": "4eb980ca10e17c60b697a9be2a32888b0d3d71a7eb7f4a40fcecd3e2ac9063dc",
+      "index_id": "idx_e97973dded30e0626f1ddc76554336655459533616da233235029e6a9f648227",
+      "retrieval": {
+        "mrr": 0.9833333333333333,
+        "ndcg": 0.9876976584523819,
+        "precision": 0.3777777777777777,
+        "recall": 1.0
+      },
+      "evidence": {
+        "eligible_cases": 30,
+        "recall": 1.0,
+        "unanswerable_cases": 0
+      }
+    },
+    {
+      "artifact": "smoke-en-hybrid_rerank-k3.json",
+      "dataset": "rag-engineering",
+      "split": "smoke",
+      "language": "en",
+      "strategy": "hybrid_rerank",
+      "k": 3,
+      "metric_level": "chunk",
+      "cases": 30,
+      "chunks": 20,
+      "dataset_sha256": "4eb980ca10e17c60b697a9be2a32888b0d3d71a7eb7f4a40fcecd3e2ac9063dc",
+      "index_id": "idx_e97973dded30e0626f1ddc76554336655459533616da233235029e6a9f648227",
+      "retrieval": {
+        "mrr": 0.9833333333333333,
+        "ndcg": 0.9876976584523819,
+        "precision": 0.3777777777777777,
+        "recall": 1.0
+      },
+      "evidence": {
+        "eligible_cases": 30,
+        "recall": 1.0,
+        "unanswerable_cases": 0
+      }
+    },
+    {
+      "artifact": "smoke-en-sparse-k3.json",
+      "dataset": "rag-engineering",
+      "split": "smoke",
+      "language": "en",
+      "strategy": "sparse",
+      "k": 3,
+      "metric_level": "chunk",
+      "cases": 30,
+      "chunks": 20,
+      "dataset_sha256": "4eb980ca10e17c60b697a9be2a32888b0d3d71a7eb7f4a40fcecd3e2ac9063dc",
+      "index_id": "idx_e97973dded30e0626f1ddc76554336655459533616da233235029e6a9f648227",
+      "retrieval": {
+        "mrr": 0.8333333333333334,
+        "ndcg": 0.8204382397588487,
+        "precision": 0.3,
+        "recall": 0.8166666666666667
+      },
+      "evidence": {
+        "eligible_cases": 30,
+        "recall": 0.8333333333333334,
+        "unanswerable_cases": 0
+      }
+    }
+  ]
+}

@@ -8,8 +8,9 @@ _PRICES: dict[str, tuple[float, float]] = {
 }
 
 
-def cost_usd(model: str, usage: Usage) -> float:
+def cost_usd(model: str, usage: Usage) -> float | None:
+    """Return known standard token cost; None means pricing is unavailable."""
     if model not in _PRICES:
-        return 0.0
+        return None
     price_in, price_out = _PRICES[model]
     return usage.input_tokens / 1e6 * price_in + usage.output_tokens / 1e6 * price_out

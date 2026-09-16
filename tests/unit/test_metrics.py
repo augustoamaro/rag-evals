@@ -40,3 +40,14 @@ def test_ndcg_at_k() -> None:
 
 def test_ndcg_perfect_ranking_is_one() -> None:
     assert ndcg_at_k(["b", "d"], {"b", "d"}, 2) == pytest.approx(1.0)
+
+
+def test_duplicate_ranked_ids_are_rejected_instead_of_inflating_metrics() -> None:
+    with pytest.raises(ValueError, match="duplicate"):
+        ndcg_at_k(["a", "a"], {"a"}, 2)
+    with pytest.raises(ValueError, match="duplicate"):
+        precision_at_k(["a", "a"], {"a"}, 2)
+    with pytest.raises(ValueError, match="duplicate"):
+        recall_at_k(["a", "a"], {"a"}, 2)
+    with pytest.raises(ValueError, match="duplicate"):
+        mrr(["a", "a"], {"a"})

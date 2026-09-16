@@ -8,5 +8,5 @@ def test_opus_cost() -> None:
     assert cost_usd("claude-opus-4-8", u) == 5.0 + 5.0  # 5 + 0.2 * 25
 
 
-def test_unknown_model_zero() -> None:
-    assert cost_usd("mystery", Usage(1000, 1000)) == 0.0
+def test_unknown_model_is_not_reported_as_free() -> None:
+    assert cost_usd("mystery", Usage(1000, 1000)) is None

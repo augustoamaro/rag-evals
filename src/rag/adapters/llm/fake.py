@@ -38,6 +38,27 @@ class _ParseResponse:
 
 
 @dataclass
+class _RawParseResponse:
+    response: _ParseResponse
+
+    @property
+    def http_response(self) -> _RawParseResponse:
+        return self
+
+    def json(self) -> dict[str, Any]:
+        return {
+            "usage": {
+                "input_tokens": self.response.usage.input_tokens,
+                "output_tokens": self.response.usage.output_tokens,
+            },
+            "stop_reason": self.response.stop_reason,
+        }
+
+    def parse(self) -> _ParseResponse:
+        return self.response
+
+
+@dataclass
 class _FakeMessages:
     text: str = ""
     usage: tuple[int, int] = (0, 0)
@@ -52,9 +73,12 @@ class _FakeMessages:
             [_Block("text", self.text)], _Usage(*self.usage), self.stop_reason
         )
 
-    def parse(self, **kwargs: Any) -> _ParseResponse:
+    def parse(self, **kwargs: Any) -> _ParseResponse | _RawParseResponse:
         self.parse_calls.append(kwargs)
-        return _ParseResponse(self.parsed, _Usage(*self.usage), self.stop_reason)
+        response = _ParseResponse(self.parsed, _Usage(*self.usage), self.stop_reason)
+        if kwargs.get("extra_headers", {}).get("X-Stainless-Raw-Response") == "true":
+            return _RawParseResponse(response)
+        return response
 
 
 class FakeAnthropic:

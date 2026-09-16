@@ -30,6 +30,6 @@ COPY corpus ./corpus
 ENV RAG_DATABASE_URL=postgresql://rag:rag@db:5432/rag
 EXPOSE 8000
 
-# Migrations + ingest on start is fine for this single-replica demo; multiple
-# replicas would race here — move both to a one-shot job before scaling out.
+# Migrations/publication serialize safely; identical snapshots are reused. Move
+# ingestion to a one-shot job before scaling to avoid duplicate model preparation.
 CMD ["sh", "-c", "uv run rag ingest && uv run uvicorn rag.api.app:build_app --factory --host 0.0.0.0 --port 8000"]

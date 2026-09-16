@@ -21,8 +21,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Link href="/" className="brand">
             rag<span className="brand__accent">·</span>evals
           </Link>
-          <nav className="nav">
+          <nav className="nav" aria-label="Main navigation">
             <Link href="/">Runs</Link>
+            <Link href="/experiments">Experiments</Link>
+            <Link href="/compare">Compare</Link>
             <Link href="/try">Query</Link>
           </nav>
         </header>

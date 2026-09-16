@@ -1,26 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { query, type QueryResponse } from "@/lib/api";
+import { RetrievalScore } from "@/components/RetrievalScore";
+import { StrategyBadge } from "@/components/StrategyBadge";
 
 const STRATEGIES = ["hybrid", "dense", "sparse", "hybrid_rerank"];
 
 export default function TryPage() {
   const [question, setQuestion] = useState("What does the CAP theorem force you to trade off?");
   const [strategy, setStrategy] = useState("hybrid");
-  const [result, setResult] = useState<QueryResponse | null>(null);
+  const [result, setResult] = useState<{ response: QueryResponse; question: string; strategy: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const request = useRef<AbortController | null>(null);
+
+  useEffect(() => () => request.current?.abort(), []);
 
   const run = async () => {
+    if (!question.trim()) return;
+    request.current?.abort();
+    const controller = new AbortController();
+    request.current = controller;
+    const submitted = { question: question.trim(), strategy };
     setLoading(true);
     setError(null);
+    setResult(null);
     try {
-      setResult(await query(question, 5, strategy));
+      const response = await query(submitted.question, 5, submitted.strategy, controller.signal);
+      if (request.current === controller && !controller.signal.aborted) setResult({ response, ...submitted });
     } catch (e) {
-      setError(String(e));
+      if (request.current === controller && !controller.signal.aborted) setError(String(e));
     } finally {
-      setLoading(false);
+      if (request.current === controller && !controller.signal.aborted) setLoading(false);
     }
   };
 
@@ -56,32 +68,36 @@ export default function TryPage() {
             </option>
           ))}
         </select>
-        <button className="btn" type="submit" disabled={loading}>
-          {loading ? "Retrieving…" : "Query"}
+        <button className="btn" type="submit" disabled={!question.trim()}>
+          {loading ? "Run updated query" : "Query"}
         </button>
       </form>
 
-      {error ? <div className="empty">Could not reach the API.</div> : null}
+      {loading ? <p role="status" className="benchmark-notice">Retrieving…</p> : null}
+      {error ? <div className="workflow-error" role="alert">{error}</div> : null}
 
       {result ? (
         <>
+          <div className="submitted-query"><p>{result.question}</p><StrategyBadge strategy={result.strategy} /></div>
           <div className="section-title">Answer</div>
           <div className="answer">
-            {result.answer}
-            {result.citations.length > 0 ? (
+            {result.response.answer}
+            {result.response.citations.length > 0 ? (
               <div className="metric__sub" style={{ marginTop: 10 }}>
-                cited: {result.citations.map((c) => c.chunk_id).join(", ")}
+                cited: {result.response.citations.map((c) => c.chunk_id).join(", ")}
               </div>
             ) : null}
           </div>
 
           <div className="section-title">Retrieved chunks</div>
-          {result.chunks.map((c) => (
+          <p className="benchmark-notice">Scores use different scales for each retrieval method; compare ranks within a result, not scores across methods.</p>
+          {result.response.chunks.map((c) => (
             <div className="chunk" key={c.id}>
               <div className="chunk__meta">
                 <span className="chunk__id">[{c.id}]</span>
                 <span>rank {c.rank}</span>
               </div>
+              <RetrievalScore {...c} />
               <div className="chunk__text">{c.text}</div>
             </div>
           ))}

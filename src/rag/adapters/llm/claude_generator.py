@@ -34,12 +34,14 @@ class ClaudeGenerator:
             system=_SYSTEM,
             messages=[{"role": "user", "content": prompt}],
         )
-        check_stop_reason(getattr(response, "stop_reason", None), "answer generation")
-        text = "".join(block.text for block in response.content if block.type == "text")
         usage = Usage(
             input_tokens=int(response.usage.input_tokens),
             output_tokens=int(response.usage.output_tokens),
         )
+        check_stop_reason(
+            getattr(response, "stop_reason", None), "answer generation", usage=usage
+        )
+        text = "".join(block.text for block in response.content if block.type == "text")
         return Answer(text=text, citations=_parse_citations(text, context), usage=usage)
 
 

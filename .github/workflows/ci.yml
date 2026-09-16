@@ -55,14 +55,22 @@ jobs:
         run: uv run pytest -m integration
 
       # Per-strategy gates at k=3, where the strategies actually separate.
-      # At k=10 the 20-chunk corpus saturates recall for every strategy, so a
+      # At k=10 the 20-chunk corpus saturates hybrid recall, so a
       # single hybrid gate would pass even with one retrieval arm fully broken.
-      - name: Ingest corpus + regression gates
+      - name: Publish smoke index + paired regression gates
         run: |
           uv run rag ingest
-          uv run rag eval --strategy hybrid --k 3 --gate --min-recall 0.9 --min-ndcg 0.9
-          uv run rag eval --strategy dense  --k 3 --gate --min-recall 0.9 --min-ndcg 0.85
-          uv run rag eval --strategy sparse --k 3 --gate --min-recall 0.7 --min-ndcg 0.7
+          uv run rag eval --strategy hybrid --k 3 --gate --min-recall 0.9 --min-ndcg 0.9 --baseline benchmarks/baselines/smoke-en-hybrid-k3.json --output local-data/ci/hybrid.json
+          uv run rag eval --strategy dense --k 3 --gate --min-recall 0.9 --min-ndcg 0.85 --baseline benchmarks/baselines/smoke-en-dense-k3.json --output local-data/ci/dense.json
+          uv run rag eval --strategy sparse --k 3 --gate --min-recall 0.7 --min-ndcg 0.7 --baseline benchmarks/baselines/smoke-en-sparse-k3.json --output local-data/ci/sparse.json
+
+      - name: Retain candidate evaluation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: retrieval-evaluations
+          path: local-data/ci/*.json
+          if-no-files-found: ignore
 
   web:
     runs-on: ubuntu-latest

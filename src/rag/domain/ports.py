@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 from rag.domain.entities import (
     Answer,
@@ -21,10 +21,16 @@ class Embedder(Protocol):
     def embed(self, texts: list[str]) -> list[Vector]: ...
 
 
-class ChunkStore(Protocol):
+class ChunkReader(Protocol):
+    def all_chunks(self) -> list[Chunk]: ...
+
+
+class ChunkStore(ChunkReader, Protocol):
     def add_document(self, doc: Document, chunks: list[tuple[Chunk, Vector]]) -> None: ...
 
-    def all_chunks(self) -> list[Chunk]: ...
+    def replace_corpus(
+        self, documents: list[tuple[Document, list[tuple[Chunk, Vector]]]]
+    ) -> None: ...
 
 
 class Retriever(Protocol):
@@ -35,6 +41,15 @@ class Retriever(Protocol):
 
 class Reranker(Protocol):
     def rerank(self, query: str, chunks: list[Chunk]) -> list[Chunk]: ...
+
+
+@runtime_checkable
+class ScoredReranker(Reranker, Protocol):
+    """Optional access to cross-encoder scores in the same reranked order."""
+
+    def rerank_with_scores(
+        self, query: str, chunks: list[Chunk]
+    ) -> list[tuple[Chunk, float]]: ...
 
 
 class Generator(Protocol):

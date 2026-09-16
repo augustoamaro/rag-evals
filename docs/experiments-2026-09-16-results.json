@@ -1,0 +1,135 @@
+{
+  "phase": 3,
+  "date": "2026-09-16",
+  "provenance": {
+    "git_sha": "f6c2e3659103f7759179d6148c5d9576d2193f6d",
+    "git_dirty": true,
+    "source_sha256": "75d3de2013befc8da37183d1c78eed3c271768c46b16393bab61294aca49c8ec",
+    "dependency_lock_sha256": "c97d1d12c9ce3491770cfdb15decf26c9aa128dd7135738179499f90c736445d",
+    "python_version": "3.12.13",
+    "package_versions": {
+      "anthropic": "0.109.1",
+      "fastembed": "0.8.0",
+      "pgvector": "0.4.2",
+      "psycopg": "3.3.4",
+      "fastapi": "0.136.3"
+    }
+  },
+  "checks": {
+    "python_unit": 267,
+    "postgres_integration_e2e": 107,
+    "web_tests": 68,
+    "ruff": "passed",
+    "mypy_src_tests": "passed",
+    "python_files": 107,
+    "typescript": "passed",
+    "production_build": "passed",
+    "browser_viewport_widths": [
+      1280,
+      390
+    ],
+    "independent_review": "no important findings remaining"
+  },
+  "smoke_baselines": {
+    "dense": {
+      "k": 3,
+      "case_count": 30,
+      "metrics": {
+        "mrr": 0.9333333333333333,
+        "ndcg": 0.9507906338095277,
+        "precision": 0.3777777777777777,
+        "recall": 1.0
+      },
+      "evidence": {
+        "eligible_cases": 30,
+        "recall": 1.0,
+        "unanswerable_cases": 0
+      },
+      "paired_gate": "passed",
+      "absolute_gate": "passed"
+    },
+    "sparse": {
+      "k": 3,
+      "case_count": 30,
+      "metrics": {
+        "mrr": 0.8333333333333334,
+        "ndcg": 0.8204382397588487,
+        "precision": 0.3,
+        "recall": 0.8166666666666667
+      },
+      "evidence": {
+        "eligible_cases": 30,
+        "recall": 0.8333333333333334,
+        "unanswerable_cases": 0
+      },
+      "paired_gate": "passed",
+      "absolute_gate": "passed"
+    },
+    "hybrid": {
+      "k": 3,
+      "case_count": 30,
+      "metrics": {
+        "mrr": 0.9833333333333333,
+        "ndcg": 0.9876976584523819,
+        "precision": 0.3777777777777777,
+        "recall": 1.0
+      },
+      "evidence": {
+        "eligible_cases": 30,
+        "recall": 1.0,
+        "unanswerable_cases": 0
+      },
+      "paired_gate": "passed",
+      "absolute_gate": "passed"
+    },
+    "hybrid_rerank": {
+      "k": 3,
+      "case_count": 30,
+      "metrics": {
+        "mrr": 0.9833333333333333,
+        "ndcg": 0.9876976584523819,
+        "precision": 0.3777777777777777,
+        "recall": 1.0
+      },
+      "evidence": {
+        "eligible_cases": 30,
+        "recall": 1.0,
+        "unanswerable_cases": 0
+      },
+      "paired_gate": "passed",
+      "absolute_gate": "passed"
+    }
+  },
+  "browser": {
+    "desktop_english_default_no_key": true,
+    "completed_run_opened": "/runs/4af7fe3f4d0241558e76a8c0d2664c7c",
+    "run_note_saved": true,
+    "note_conflict_preserves_draft": true,
+    "case_note_saved": "cap-ap",
+    "live_progress": "hybrid\nRunning\n9/16/2026, 2:55:10 PM\n\nsmoke \u00b7 English \u00b7 k=3 \u00b7 Retrieval only\n\n0 / 30 cases\nretrieval \u00b7 cap-ap\nOpen run\nCancel evaluation",
+    "active_job_recovered_on_reload": true,
+    "cancelled_job": "hybrid\nCancelled\n9/16/2026, 2:55:10 PM\n\nsmoke \u00b7 English \u00b7 k=3 \u00b7 Retrieval only\n\n4 / 30 cases\ncancelled\n\nSaved progress is available for inspection and excluded from comparisons.\n\nOpen run",
+    "cancelled_detail_excludes_comparison": "/runs/66e4820dfcaf49a5aff590cf7a98666d",
+    "comparison_detects_slice_regression_with_equal_aggregate": true,
+    "same_strategy_paired_comparison_passed": true,
+    "mobile_case_link_opens_evidence_and_scores": true,
+    "incompatible_direct_url_rejected_on_mobile": true,
+    "portuguese_selection_is_separate_dev_on_mobile": true,
+    "mobile_portuguese_launch_completed": true,
+    "mobile_query_submitted_identity_and_real_scores": true,
+    "mobile_comparison_table_scrolls_without_page_overflow": true,
+    "home_prefers_english_and_excludes_cancelled_prefix": true,
+    "final_build_smoke_check": true,
+    "final_mobile_build_smoke_check": true
+  },
+  "constraints": {
+    "english_default": true,
+    "portuguese_separate": true,
+    "active_evaluation_limit": 1,
+    "provider_calls": 0,
+    "browser_cancellation_fixture_delay_ms": 600,
+    "timings_are_performance_benchmark": false,
+    "commits_created": 0,
+    "pushes": 0
+  }
+}

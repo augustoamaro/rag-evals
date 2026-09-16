@@ -1,0 +1,1026 @@
+{
+  "git_sha": "f6c2e3659103f7759179d6148c5d9576d2193f6d",
+  "python": "3.12.13",
+  "platform": "Linux-7.1.8-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "reranker_model": "Xenova/ms-marco-MiniLM-L-6-v2",
+  "dataset_sha256": "cab9faf43b0c54e99fa44274a0c12e28cd12ac032a75148f144f42c836dcbe95",
+  "corpus_sha256": "5b0a93809fb57fe063231d58dd95a5553f95ce86cd92ae4f7f86369e7b40a77a",
+  "chunks": 20,
+  "case_count": 30,
+  "method": "One sequential pass per configuration after one warm-up per strategy; no LLM; no concurrency or load-test claims.",
+  "paired_bootstrap_ndcg_at_3": [
+    {
+      "candidate": "hybrid",
+      "baseline": "dense",
+      "mean_delta": 0.036907024642854246,
+      "percentile_95_ci": [
+        0.0,
+        0.08611639083332659
+      ],
+      "resamples": 10000,
+      "seed": 20260916,
+      "wins": 3,
+      "ties": 27,
+      "losses": 0
+    },
+    {
+      "candidate": "hybrid_rerank",
+      "baseline": "hybrid",
+      "mean_delta": 0.0,
+      "percentile_95_ci": [
+        -0.036907024642854246,
+        0.036907024642854246
+      ],
+      "resamples": 10000,
+      "seed": 20260916,
+      "wins": 1,
+      "ties": 28,
+      "losses": 1
+    }
+  ],
+  "anchors": {
+    "cap-tradeoff": [
+      "cap-theorem:0"
+    ],
+    "cap-cp": [
+      "cap-theorem:0"
+    ],
+    "cap-ap": [
+      "cap-theorem:0"
+    ],
+    "cons-eventual": [
+      "consistency-models:0"
+    ],
+    "cons-causal": [
+      "consistency-models:0"
+    ],
+    "cons-ryw": [
+      "consistency-models:1"
+    ],
+    "emb-cosine": [
+      "embeddings:0"
+    ],
+    "emb-dim": [
+      "embeddings:0"
+    ],
+    "emb-advantage": [
+      "embeddings:1"
+    ],
+    "vec-ann": [
+      "vector-search:0"
+    ],
+    "vec-hnsw": [
+      "vector-search:0"
+    ],
+    "vec-recall": [
+      "vector-search:1"
+    ],
+    "kw-bm25": [
+      "keyword-search:0"
+    ],
+    "kw-mismatch": [
+      "keyword-search:0"
+    ],
+    "kw-pg": [
+      "keyword-search:0",
+      "keyword-search:1"
+    ],
+    "hyb-rrf": [
+      "hybrid-retrieval:0"
+    ],
+    "hyb-calibration": [
+      "hybrid-retrieval:0"
+    ],
+    "hyb-rerank": [
+      "hybrid-retrieval:1"
+    ],
+    "chunk-unit": [
+      "chunking:0"
+    ],
+    "chunk-overlap": [
+      "chunking:0"
+    ],
+    "chunk-deterministic": [
+      "chunking:1"
+    ],
+    "rag-hallucination": [
+      "rag:0"
+    ],
+    "rag-citations": [
+      "rag:0"
+    ],
+    "rag-bound": [
+      "rag:0",
+      "rag:1"
+    ],
+    "metric-recall": [
+      "evaluation-metrics:0"
+    ],
+    "metric-mrr": [
+      "evaluation-metrics:0"
+    ],
+    "metric-ndcg": [
+      "evaluation-metrics:1"
+    ],
+    "judge-faithfulness": [
+      "llm-as-judge:0"
+    ],
+    "judge-structured": [
+      "llm-as-judge:0"
+    ],
+    "judge-limits": [
+      "llm-as-judge:0",
+      "llm-as-judge:1"
+    ]
+  },
+  "probe_sets": {
+    "original_10": [
+      {
+        "id": "cap-tradeoff",
+        "question": "During a network partition, what does the CAP theorem force you to choose between?",
+        "relevant_snippets": [
+          "between consistency and availability"
+        ],
+        "reference_answer": "During a partition you must choose between consistency and availability; you cannot have both."
+      },
+      {
+        "id": "cons-ryw",
+        "question": "What does read-your-writes consistency ensure?",
+        "relevant_snippets": [
+          "Read-your-writes consistency"
+        ],
+        "reference_answer": "Read-your-writes consistency ensures a client always sees the effects of its own prior writes."
+      },
+      {
+        "id": "emb-dim",
+        "question": "How many dimensions does the bge-small embedding model output?",
+        "relevant_snippets": [
+          "produces 384-dimensional vectors"
+        ],
+        "reference_answer": "The bge-small model produces 384-dimensional vectors."
+      },
+      {
+        "id": "kw-mismatch",
+        "question": "What is the main weakness of keyword search?",
+        "relevant_snippets": [
+          "vocabulary mismatch problem"
+        ],
+        "reference_answer": "Its weakness is the vocabulary mismatch problem: documents that mean the same thing with different words do not match."
+      },
+      {
+        "id": "hyb-rrf",
+        "question": "How does Reciprocal Rank Fusion combine ranked lists?",
+        "relevant_snippets": [
+          "sums one divided by a constant plus the rank"
+        ],
+        "reference_answer": "RRF sums, for each document, one divided by a constant plus its rank across the lists it appears in."
+      },
+      {
+        "id": "hyb-rerank",
+        "question": "What does a cross-encoder reranker do?",
+        "relevant_snippets": [
+          "reads the query and each candidate passage together"
+        ],
+        "reference_answer": "A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly."
+      },
+      {
+        "id": "chunk-overlap",
+        "question": "What is fixed-size chunking with overlap?",
+        "relevant_snippets": [
+          "fixed-size chunking with overlap"
+        ],
+        "reference_answer": "Fixed-size chunking with overlap divides a document into windows of a target length where consecutive windows overlap, so facts at a boundary are not lost."
+      },
+      {
+        "id": "rag-citations",
+        "question": "Why should RAG answers include citations?",
+        "relevant_snippets": [
+          "citations that point back to the specific chunks"
+        ],
+        "reference_answer": "Citations point back to the specific chunks an answer relied on so a reader can verify each claim and grounding can be measured."
+      },
+      {
+        "id": "metric-mrr",
+        "question": "What does mean reciprocal rank focus on?",
+        "relevant_snippets": [
+          "the position of the first relevant result"
+        ],
+        "reference_answer": "MRR focuses on the position of the first relevant result, taking the reciprocal of its rank and averaging over queries."
+      },
+      {
+        "id": "judge-limits",
+        "question": "What are known limitations of LLM judges?",
+        "relevant_snippets": [
+          "They can be inconsistent between runs"
+        ],
+        "reference_answer": "LLM judges can be inconsistent between runs and may prefer longer or more confident answers regardless of correctness."
+      }
+    ],
+    "paraphrase_en_10": [
+      {
+        "id": "cap-tradeoff",
+        "question": "When two network segments cannot communicate, can the database both accept every request and keep all replicas consistent?",
+        "relevant_snippets": [
+          "between consistency and availability"
+        ],
+        "reference_answer": "During a partition you must choose between consistency and availability; you cannot have both."
+      },
+      {
+        "id": "cons-ryw",
+        "question": "Which consistency promise lets a user immediately observe an update they just made?",
+        "relevant_snippets": [
+          "Read-your-writes consistency"
+        ],
+        "reference_answer": "Read-your-writes consistency ensures a client always sees the effects of its own prior writes."
+      },
+      {
+        "id": "emb-dim",
+        "question": "What is the length of each vector produced by BGE small?",
+        "relevant_snippets": [
+          "produces 384-dimensional vectors"
+        ],
+        "reference_answer": "The bge-small model produces 384-dimensional vectors."
+      },
+      {
+        "id": "kw-mismatch",
+        "question": "Why might a lexical retriever miss a document that uses synonyms for the words in my question?",
+        "relevant_snippets": [
+          "vocabulary mismatch problem"
+        ],
+        "reference_answer": "Its weakness is the vocabulary mismatch problem: documents that mean the same thing with different words do not match."
+      },
+      {
+        "id": "hyb-rrf",
+        "question": "How can two search rankings be merged by summing inverse positions?",
+        "relevant_snippets": [
+          "sums one divided by a constant plus the rank"
+        ],
+        "reference_answer": "RRF sums, for each document, one divided by a constant plus its rank across the lists it appears in."
+      },
+      {
+        "id": "hyb-rerank",
+        "question": "After candidates are retrieved, how can a model that reads the question together with each passage improve their order?",
+        "relevant_snippets": [
+          "reads the query and each candidate passage together"
+        ],
+        "reference_answer": "A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly."
+      },
+      {
+        "id": "chunk-overlap",
+        "question": "How do sliding text windows retain context near the boundary between adjacent passages?",
+        "relevant_snippets": [
+          "fixed-size chunking with overlap"
+        ],
+        "reference_answer": "Fixed-size chunking with overlap divides a document into windows of a target length where consecutive windows overlap, so facts at a boundary are not lost."
+      },
+      {
+        "id": "rag-citations",
+        "question": "How can a reader check which retrieved source supports a generated claim?",
+        "relevant_snippets": [
+          "citations that point back to the specific chunks"
+        ],
+        "reference_answer": "Citations point back to the specific chunks an answer relied on so a reader can verify each claim and grounding can be measured."
+      },
+      {
+        "id": "metric-mrr",
+        "question": "Which ranking metric rewards placing the first correct result as high as possible?",
+        "relevant_snippets": [
+          "the position of the first relevant result"
+        ],
+        "reference_answer": "MRR focuses on the position of the first relevant result, taking the reciprocal of its rank and averaging over queries."
+      },
+      {
+        "id": "judge-limits",
+        "question": "What can make an automated language-model evaluator unreliable or biased?",
+        "relevant_snippets": [
+          "They can be inconsistent between runs"
+        ],
+        "reference_answer": "LLM judges can be inconsistent between runs and may prefer longer or more confident answers regardless of correctness."
+      }
+    ],
+    "translation_pt_10": [
+      {
+        "id": "cap-tradeoff",
+        "question": "Quando uma parti\u00e7\u00e3o de rede ocorre, entre quais propriedades precisamos escolher segundo o teorema CAP?",
+        "relevant_snippets": [
+          "between consistency and availability"
+        ],
+        "reference_answer": "During a partition you must choose between consistency and availability; you cannot have both."
+      },
+      {
+        "id": "cons-ryw",
+        "question": "Qual garantia permite ao cliente enxergar as pr\u00f3prias escritas anteriores?",
+        "relevant_snippets": [
+          "Read-your-writes consistency"
+        ],
+        "reference_answer": "Read-your-writes consistency ensures a client always sees the effects of its own prior writes."
+      },
+      {
+        "id": "emb-dim",
+        "question": "Quantas dimens\u00f5es t\u00eam os vetores produzidos pelo modelo bge-small?",
+        "relevant_snippets": [
+          "produces 384-dimensional vectors"
+        ],
+        "reference_answer": "The bge-small model produces 384-dimensional vectors."
+      },
+      {
+        "id": "kw-mismatch",
+        "question": "Por que uma busca por palavras-chave pode falhar quando o documento usa sin\u00f4nimos?",
+        "relevant_snippets": [
+          "vocabulary mismatch problem"
+        ],
+        "reference_answer": "Its weakness is the vocabulary mismatch problem: documents that mean the same thing with different words do not match."
+      },
+      {
+        "id": "hyb-rrf",
+        "question": "Como a fus\u00e3o de rankings rec\u00edprocos combina listas de resultados?",
+        "relevant_snippets": [
+          "sums one divided by a constant plus the rank"
+        ],
+        "reference_answer": "RRF sums, for each document, one divided by a constant plus its rank across the lists it appears in."
+      },
+      {
+        "id": "hyb-rerank",
+        "question": "O que faz um reranqueador que avalia a pergunta junto com cada passagem?",
+        "relevant_snippets": [
+          "reads the query and each candidate passage together"
+        ],
+        "reference_answer": "A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly."
+      },
+      {
+        "id": "chunk-overlap",
+        "question": "Como dividir documentos em trechos de tamanho fixo com sobreposi\u00e7\u00e3o?",
+        "relevant_snippets": [
+          "fixed-size chunking with overlap"
+        ],
+        "reference_answer": "Fixed-size chunking with overlap divides a document into windows of a target length where consecutive windows overlap, so facts at a boundary are not lost."
+      },
+      {
+        "id": "rag-citations",
+        "question": "Por que as respostas geradas com recupera\u00e7\u00e3o devem incluir cita\u00e7\u00f5es?",
+        "relevant_snippets": [
+          "citations that point back to the specific chunks"
+        ],
+        "reference_answer": "Citations point back to the specific chunks an answer relied on so a reader can verify each claim and grounding can be measured."
+      },
+      {
+        "id": "metric-mrr",
+        "question": "Qual m\u00e9trica considera a posi\u00e7\u00e3o do primeiro resultado relevante?",
+        "relevant_snippets": [
+          "the position of the first relevant result"
+        ],
+        "reference_answer": "MRR focuses on the position of the first relevant result, taking the reciprocal of its rank and averaging over queries."
+      },
+      {
+        "id": "judge-limits",
+        "question": "Quais s\u00e3o as limita\u00e7\u00f5es conhecidas de usar modelos de linguagem como avaliadores?",
+        "relevant_snippets": [
+          "They can be inconsistent between runs"
+        ],
+        "reference_answer": "LLM judges can be inconsistent between runs and may prefer longer or more confident answers regardless of correctness."
+      }
+    ]
+  },
+  "audit_date": "2026-09-16",
+  "runs": [
+    {
+      "strategy": "dense",
+      "k": 1,
+      "retrieval_metrics": {
+        "recall": 0.8166666666666667,
+        "precision": 0.8666666666666667,
+        "mrr": 0.8666666666666667,
+        "ndcg": 0.8666666666666667
+      },
+      "latency_p50_ms": 3,
+      "latency_p95_ms": 8,
+      "empty_results": 0,
+      "wall_s": 0.132
+    },
+    {
+      "strategy": "sparse",
+      "k": 1,
+      "retrieval_metrics": {
+        "recall": 0.8,
+        "precision": 0.8333333333333334,
+        "mrr": 0.8333333333333334,
+        "ndcg": 0.8333333333333334
+      },
+      "latency_p50_ms": 1,
+      "latency_p95_ms": 1,
+      "empty_results": 5,
+      "wall_s": 0.021
+    },
+    {
+      "strategy": "hybrid",
+      "k": 1,
+      "retrieval_metrics": {
+        "recall": 0.9166666666666666,
+        "precision": 0.9666666666666667,
+        "mrr": 0.9666666666666667,
+        "ndcg": 0.9666666666666667
+      },
+      "latency_p50_ms": 4,
+      "latency_p95_ms": 5,
+      "empty_results": 0,
+      "wall_s": 0.116
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "k": 1,
+      "retrieval_metrics": {
+        "recall": 0.9166666666666666,
+        "precision": 0.9666666666666667,
+        "mrr": 0.9666666666666667,
+        "ndcg": 0.9666666666666667
+      },
+      "latency_p50_ms": 195,
+      "latency_p95_ms": 281,
+      "empty_results": 0,
+      "wall_s": 6.091
+    },
+    {
+      "strategy": "dense",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 1.0,
+        "precision": 0.36666666666666664,
+        "mrr": 0.9333333333333333,
+        "ndcg": 0.9507906338095277
+      },
+      "latency_p50_ms": 3,
+      "latency_p95_ms": 6,
+      "empty_results": 0,
+      "wall_s": 0.108
+    },
+    {
+      "strategy": "sparse",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 0.8166666666666667,
+        "precision": 0.28888888888888886,
+        "mrr": 0.8333333333333334,
+        "ndcg": 0.8204382397588487
+      },
+      "latency_p50_ms": 1,
+      "latency_p95_ms": 1,
+      "empty_results": 5,
+      "wall_s": 0.02
+    },
+    {
+      "strategy": "hybrid",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 1.0,
+        "precision": 0.36666666666666664,
+        "mrr": 0.9833333333333333,
+        "ndcg": 0.9876976584523819
+      },
+      "latency_p50_ms": 4,
+      "latency_p95_ms": 5,
+      "empty_results": 0,
+      "wall_s": 0.118
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 1.0,
+        "precision": 0.36666666666666664,
+        "mrr": 0.9833333333333333,
+        "ndcg": 0.9876976584523819
+      },
+      "latency_p50_ms": 193,
+      "latency_p95_ms": 238,
+      "empty_results": 0,
+      "wall_s": 6.099
+    },
+    {
+      "strategy": "dense",
+      "k": 5,
+      "retrieval_metrics": {
+        "recall": 1.0,
+        "precision": 0.22000000000000003,
+        "mrr": 0.9333333333333333,
+        "ndcg": 0.9507906338095277
+      },
+      "latency_p50_ms": 3,
+      "latency_p95_ms": 7,
+      "empty_results": 0,
+      "wall_s": 0.116
+    },
+    {
+      "strategy": "sparse",
+      "k": 5,
+      "retrieval_metrics": {
+        "recall": 0.8166666666666667,
+        "precision": 0.17333333333333334,
+        "mrr": 0.8333333333333334,
+        "ndcg": 0.8204382397588487
+      },
+      "latency_p50_ms": 1,
+      "latency_p95_ms": 1,
+      "empty_results": 5,
+      "wall_s": 0.02
+    },
+    {
+      "strategy": "hybrid",
+      "k": 5,
+      "retrieval_metrics": {
+        "recall": 1.0,
+        "precision": 0.22000000000000003,
+        "mrr": 0.9833333333333333,
+        "ndcg": 0.9876976584523819
+      },
+      "latency_p50_ms": 4,
+      "latency_p95_ms": 9,
+      "empty_results": 0,
+      "wall_s": 0.125
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "k": 5,
+      "retrieval_metrics": {
+        "recall": 1.0,
+        "precision": 0.22000000000000003,
+        "mrr": 0.9833333333333333,
+        "ndcg": 0.9876976584523819
+      },
+      "latency_p50_ms": 188,
+      "latency_p95_ms": 227,
+      "empty_results": 0,
+      "wall_s": 5.833
+    },
+    {
+      "strategy": "dense",
+      "k": 10,
+      "retrieval_metrics": {
+        "recall": 1.0,
+        "precision": 0.11000000000000001,
+        "mrr": 0.9333333333333333,
+        "ndcg": 0.9507906338095277
+      },
+      "latency_p50_ms": 3,
+      "latency_p95_ms": 4,
+      "empty_results": 0,
+      "wall_s": 0.105
+    },
+    {
+      "strategy": "sparse",
+      "k": 10,
+      "retrieval_metrics": {
+        "recall": 0.8166666666666667,
+        "precision": 0.08666666666666667,
+        "mrr": 0.8333333333333334,
+        "ndcg": 0.8204382397588487
+      },
+      "latency_p50_ms": 1,
+      "latency_p95_ms": 1,
+      "empty_results": 5,
+      "wall_s": 0.021
+    },
+    {
+      "strategy": "hybrid",
+      "k": 10,
+      "retrieval_metrics": {
+        "recall": 1.0,
+        "precision": 0.11000000000000001,
+        "mrr": 0.9833333333333333,
+        "ndcg": 0.9876976584523819
+      },
+      "latency_p50_ms": 4,
+      "latency_p95_ms": 10,
+      "empty_results": 0,
+      "wall_s": 0.147
+    },
+    {
+      "strategy": "hybrid_rerank",
+      "k": 10,
+      "retrieval_metrics": {
+        "recall": 1.0,
+        "precision": 0.11000000000000001,
+        "mrr": 0.9833333333333333,
+        "ndcg": 0.9876976584523819
+      },
+      "latency_p50_ms": 215,
+      "latency_p95_ms": 300,
+      "empty_results": 0,
+      "wall_s": 6.616
+    }
+  ],
+  "diagnostic_runs": [
+    {
+      "set": "original_10",
+      "strategy": "dense",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 1.0,
+        "precision": 0.36666666666666664,
+        "mrr": 0.95,
+        "ndcg": 0.9630929753571458
+      },
+      "latency_p50_ms": 3,
+      "latency_p95_ms": 7
+    },
+    {
+      "set": "original_10",
+      "strategy": "sparse",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 0.8,
+        "precision": 0.3,
+        "mrr": 0.8,
+        "ndcg": 0.8
+      },
+      "latency_p50_ms": 1,
+      "latency_p95_ms": 1
+    },
+    {
+      "set": "original_10",
+      "strategy": "hybrid",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 1.0,
+        "precision": 0.36666666666666664,
+        "mrr": 1.0,
+        "ndcg": 1.0
+      },
+      "latency_p50_ms": 4,
+      "latency_p95_ms": 4
+    },
+    {
+      "set": "original_10",
+      "strategy": "hybrid_rerank",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 1.0,
+        "precision": 0.36666666666666664,
+        "mrr": 1.0,
+        "ndcg": 1.0
+      },
+      "latency_p50_ms": 196,
+      "latency_p95_ms": 233
+    },
+    {
+      "set": "paraphrase_en_10",
+      "strategy": "dense",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 0.8,
+        "precision": 0.3,
+        "mrr": 0.65,
+        "ndcg": 0.681251004986256
+      },
+      "latency_p50_ms": 5,
+      "latency_p95_ms": 14
+    },
+    {
+      "set": "paraphrase_en_10",
+      "strategy": "sparse",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 0.1,
+        "precision": 0.03333333333333333,
+        "mrr": 0.1,
+        "ndcg": 0.1
+      },
+      "latency_p50_ms": 1,
+      "latency_p95_ms": 1
+    },
+    {
+      "set": "paraphrase_en_10",
+      "strategy": "hybrid",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 0.8,
+        "precision": 0.3,
+        "mrr": 0.7,
+        "ndcg": 0.7181580296291102
+      },
+      "latency_p50_ms": 5,
+      "latency_p95_ms": 9
+    },
+    {
+      "set": "paraphrase_en_10",
+      "strategy": "hybrid_rerank",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 1.0,
+        "precision": 0.36666666666666664,
+        "mrr": 0.9,
+        "ndcg": 0.9324356157188728
+      },
+      "latency_p50_ms": 192,
+      "latency_p95_ms": 240
+    },
+    {
+      "set": "translation_pt_10",
+      "strategy": "dense",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 0.65,
+        "precision": 0.2333333333333333,
+        "mrr": 0.5166666666666667,
+        "ndcg": 0.5437503349954187
+      },
+      "latency_p50_ms": 6,
+      "latency_p95_ms": 22
+    },
+    {
+      "set": "translation_pt_10",
+      "strategy": "sparse",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 0.0,
+        "precision": 0.0,
+        "mrr": 0.0,
+        "ndcg": 0.0
+      },
+      "latency_p50_ms": 1,
+      "latency_p95_ms": 1
+    },
+    {
+      "set": "translation_pt_10",
+      "strategy": "hybrid",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 0.65,
+        "precision": 0.2333333333333333,
+        "mrr": 0.5166666666666667,
+        "ndcg": 0.5437503349954187
+      },
+      "latency_p50_ms": 4,
+      "latency_p95_ms": 5
+    },
+    {
+      "set": "translation_pt_10",
+      "strategy": "hybrid_rerank",
+      "k": 3,
+      "retrieval_metrics": {
+        "recall": 0.6,
+        "precision": 0.2,
+        "mrr": 0.4833333333333333,
+        "ndcg": 0.5130929753571458
+      },
+      "latency_p50_ms": 192,
+      "latency_p95_ms": 247
+    }
+  ],
+  "checks": {
+    "ruff": "passed",
+    "mypy_src_tests": "passed",
+    "python_unit_passed": 47,
+    "python_integration_passed": 13,
+    "live_skipped": 2,
+    "live_skip_reason": "RAG_ANTHROPIC_API_KEY absent",
+    "web_tests_passed": 2,
+    "web_typecheck": "passed",
+    "web_build": "passed",
+    "ci_strategy_gates": "passed dense/sparse/hybrid at k=3",
+    "compose_runtime": "Docker Compose 5.5.1 over Podman compatibility socket; isolated fresh volume and loopback port overrides"
+  },
+  "reproductions": {
+    "partial_failure": {
+      "attempted": 30,
+      "scored": 1,
+      "metrics": {
+        "faithfulness": 1.0,
+        "relevance": 1.0,
+        "citation_correctness": 1.0
+      },
+      "recorded_cost": 0.0015,
+      "known_successful_generation_cost": 0.03,
+      "failed_judge_case_answer": null
+    },
+    "all_failed": {
+      "metrics": {},
+      "recorded_cost": 0.0
+    },
+    "all_failed_cli": {
+      "exit_code": 1,
+      "exception_type": "KeyError",
+      "exception": "'faithfulness'"
+    },
+    "duplicate_ranked_ids_ndcg": 1.6309297535714575,
+    "unknown_model_cost": 0.0,
+    "chunking_variants": [
+      {
+        "size": 180,
+        "overlap": 30,
+        "chunks": 20,
+        "unanchored": [],
+        "multi_positive": [
+          "kw-pg",
+          "rag-bound",
+          "judge-limits"
+        ]
+      },
+      {
+        "size": 100,
+        "overlap": 20,
+        "chunks": 30,
+        "unanchored": [],
+        "multi_positive": [
+          "cons-eventual",
+          "hyb-rrf",
+          "rag-bound",
+          "judge-limits"
+        ]
+      },
+      {
+        "size": 50,
+        "overlap": 0,
+        "chunks": 50,
+        "unanchored": [
+          "cap-cp",
+          "kw-mismatch",
+          "hyb-rerank",
+          "metric-recall",
+          "metric-ndcg"
+        ],
+        "multi_positive": []
+      },
+      {
+        "size": 20,
+        "overlap": 0,
+        "chunks": 113,
+        "unanchored": [
+          "cap-cp",
+          "emb-dim",
+          "vec-recall",
+          "kw-pg",
+          "hyb-rerank",
+          "metric-ndcg",
+          "judge-faithfulness",
+          "judge-structured"
+        ],
+        "multi_positive": []
+      }
+    ],
+    "all_failed_persisted_metrics": null,
+    "empty_document_reingest": {
+      "reported_ingested": 0,
+      "remaining_chunks": [
+        "doc:0"
+      ]
+    },
+    "removed_document_sync": {
+      "remaining_chunks": [
+        "doc:0"
+      ]
+    },
+    "metadata_after_reingest": {
+      "source": "old.md",
+      "title": "Old title",
+      "content": "beta"
+    },
+    "migration_first_failure": "CheckViolation",
+    "migration_ddl_survived_failure": true,
+    "migration_retry_failure": "DuplicateTable"
+  },
+  "compose_smoke": {
+    "http://127.0.0.1:18000/healthz": {
+      "status": 200
+    },
+    "http://127.0.0.1:13000": {
+      "status": 200
+    },
+    "query": {
+      "status": 200,
+      "ids": [
+        "cap-theorem:0",
+        "cap-theorem:1",
+        "consistency-models:0"
+      ]
+    },
+    "eval": {
+      "status": 200,
+      "id": "17faf37357bd4d18a4e7ac83003d3585",
+      "metrics": {
+        "mrr": 0.9833333333333333,
+        "ndcg": 0.9876976584523819,
+        "recall": 1.0,
+        "precision": 0.36666666666666664
+      },
+      "cases": 30
+    }
+  },
+  "explain": {
+    "actual_chunks": 20,
+    "pgvector_version": "0.8.2",
+    "node_types": [
+      "Limit",
+      "Sort",
+      "Seq Scan"
+    ]
+  },
+  "secret_pattern_scan": {
+    "scope": "Targeted credential-pattern scan of current tracked files and all reachable commit diffs; no high-entropy scan or secret validity tests.",
+    "tracked_file_hits": [],
+    "history_pattern_counts": {
+      "anthropic_key": 0,
+      "openai_key": 0,
+      "github_token": 0,
+      "private_key": 0,
+      "aws_access_key": 0
+    }
+  },
+  "browser_stale_result": {
+    "question": "",
+    "error": "Could not reach the API.",
+    "chunks": 5,
+    "answer": "Set RAG_ANTHROPIC_API_KEY to generate grounded answers."
+  },
+  "browser_mobile_table": {
+    "viewport": 735,
+    "panelWidth": 332,
+    "tableWidth": 654.09375,
+    "tableRows": 20,
+    "panelOverflow": "hidden"
+  },
+  "dependency_audit": {
+    "pnpm-audit": {
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 14,
+          "high": 14,
+          "critical": 3
+        },
+        "dependencies": 306,
+        "devDependencies": 0,
+        "optionalDependencies": 0,
+        "totalDependencies": 306
+      },
+      "unique_advisory_entries": 29
+    },
+    "pnpm-audit-prod": {
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 8,
+          "high": 11,
+          "critical": 2
+        },
+        "dependencies": 129,
+        "devDependencies": 0,
+        "optionalDependencies": 0,
+        "totalDependencies": 129
+      },
+      "unique_advisory_entries": 21
+    },
+    "python": [
+      {
+        "name": "pillow",
+        "version": "12.2.0",
+        "records": 25,
+        "distinct_ids": [
+          "PYSEC-2026-2253",
+          "PYSEC-2026-2254",
+          "PYSEC-2026-2255",
+          "PYSEC-2026-2256",
+          "PYSEC-2026-2257",
+          "PYSEC-2026-3451",
+          "PYSEC-2026-3452",
+          "PYSEC-2026-3453",
+          "PYSEC-2026-3454",
+          "PYSEC-2026-3493",
+          "PYSEC-2026-3494",
+          "PYSEC-2026-3495",
+          "PYSEC-2026-3496"
+        ]
+      },
+      {
+        "name": "pydantic-settings",
+        "version": "2.14.1",
+        "records": 1,
+        "distinct_ids": [
+          "CVE-2026-58203"
+        ]
+      },
+      {
+        "name": "starlette",
+        "version": "1.3.0",
+        "records": 2,
+        "distinct_ids": [
+          "PYSEC-2026-249"
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "No live generation or judge scoring measured.",
+    "One warm pass per benchmark configuration, not a concurrency or load test.",
+    "Hand-written probes reuse existing relevance labels and are exploratory.",
+    "Initial 23-chunk pilot excluded; final preflight verified exactly 20 expected chunks.",
+    "Dependency scanner findings are not proven exploitable application paths."
+  ],
+  "compose_browser": {
+    "url": "http://localhost:13000/try",
+    "answer": "Set RAG_ANTHROPIC_API_KEY to generate grounded answers.",
+    "chunks": 5
+  }
+}

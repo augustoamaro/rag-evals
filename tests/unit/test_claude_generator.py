@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from rag.adapters.llm.claude_generator import ClaudeGenerator
 from rag.adapters.llm.fake import FakeAnthropic
-from rag.domain.entities import Answer, Chunk, RetrievedChunk, Strategy
+from rag.domain.entities import Answer, Chunk, RetrievedChunk, Strategy, Usage
 from rag.services.query_service import QueryService
 
 
@@ -50,8 +50,9 @@ def test_generator_rejects_truncated_or_refused_responses() -> None:
     for stop in ("max_tokens", "refusal"):
         client = FakeAnthropic(text="partial...", usage=(10, 5), stop_reason=stop)
         gen = ClaudeGenerator(client)
-        with pytest.raises(LlmError, match=stop):
+        with pytest.raises(LlmError, match=stop) as exc:
             gen.answer("q", _context())
+        assert exc.value.usage == Usage(input_tokens=10, output_tokens=5)
 
 
 class StubGenerator:

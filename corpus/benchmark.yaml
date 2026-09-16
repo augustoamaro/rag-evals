@@ -1,0 +1,929 @@
+# Versioned local benchmark. Word offsets use content.split(), start inclusive and end exclusive.
+# The original golden.yaml stays unchanged for legacy consumers.
+schema_version: 1
+name: rag-engineering
+version: 2026-09-16.1
+default_split: smoke
+provenance:
+  origin: Bundled local engineering documents and the original 30 golden cases.
+  annotations: Legacy snippet anchors converted to document-qualified word spans by an assistant;
+    not independently human-reviewed.
+  diagnostics: Assistant-authored English paraphrases and Portuguese translations from the
+    2026-09-16 audit; unreviewed development probes.
+  scope: English smoke baseline and language-separated development diagnostics; no held-out
+    or domain-generalization claim.
+  languages: English is the base; Portuguese is a separate diagnostic slice over English documents.
+documents:
+- id: cap-theorem
+  path: docs/cap-theorem.md
+- id: chunking
+  path: docs/chunking.md
+- id: consistency-models
+  path: docs/consistency-models.md
+- id: embeddings
+  path: docs/embeddings.md
+- id: evaluation-metrics
+  path: docs/evaluation-metrics.md
+- id: hybrid-retrieval
+  path: docs/hybrid-retrieval.md
+- id: keyword-search
+  path: docs/keyword-search.md
+- id: llm-as-judge
+  path: docs/llm-as-judge.md
+- id: rag
+  path: docs/rag.md
+- id: vector-search
+  path: docs/vector-search.md
+evidence:
+- id: cap-theorem:words:41-45
+  document_id: cap-theorem
+  word_start: 41
+  word_end: 45
+  quote: 'between consistency and availability:'
+- id: cap-theorem:words:99-104
+  document_id: cap-theorem
+  word_start: 99
+  word_end: 104
+  quote: 'A CP system favors consistency:'
+- id: cap-theorem:words:133-138
+  document_id: cap-theorem
+  word_start: 133
+  word_end: 138
+  quote: 'An AP system favors availability:'
+- id: consistency-models:words:96-100
+  document_id: consistency-models
+  word_start: 96
+  word_end: 100
+  quote: Eventual consistency only guarantees
+- id: consistency-models:words:141-147
+  document_id: consistency-models
+  word_start: 141
+  word_end: 147
+  quote: 'Causal consistency sits between the two:'
+- id: consistency-models:words:197-199
+  document_id: consistency-models
+  word_start: 197
+  word_end: 199
+  quote: Read-your-writes consistency,
+- id: embeddings:words:107-111
+  document_id: embeddings
+  word_start: 107
+  word_end: 111
+  quote: measured with cosine similarity,
+- id: embeddings:words:79-82
+  document_id: embeddings
+  word_start: 79
+  word_end: 82
+  quote: produces 384-dimensional vectors.
+- id: embeddings:words:190-199
+  document_id: embeddings
+  word_start: 190
+  word_end: 199
+  quote: retrieve passages that share no words with the query
+- id: vector-search:words:64-76
+  document_id: vector-search
+  word_start: 64
+  word_end: 76
+  quote: trades a small amount of accuracy for a large gain in speed.
+- id: vector-search:words:100-105
+  document_id: vector-search
+  word_start: 100
+  word_end: 105
+  quote: HNSW, Hierarchical Navigable Small World
+- id: vector-search:words:177-189
+  document_id: vector-search
+  word_start: 177
+  word_end: 189
+  quote: the fraction of the true nearest neighbors that the index actually returns.
+- id: keyword-search:words:66-72
+  document_id: keyword-search
+  word_start: 66
+  word_end: 72
+  quote: BM25 is the standard ranking function
+- id: keyword-search:words:49-52
+  document_id: keyword-search
+  word_start: 49
+  word_end: 52
+  quote: 'vocabulary mismatch problem:'
+- id: keyword-search:words:158-163
+  document_id: keyword-search
+  word_start: 158
+  word_end: 163
+  quote: ts_rank_cd function then ranks matches
+- id: hybrid-retrieval:words:80-89
+  document_id: hybrid-retrieval
+  word_start: 80
+  word_end: 89
+  quote: sums one divided by a constant plus the rank,
+- id: hybrid-retrieval:words:145-149
+  document_id: hybrid-retrieval
+  word_start: 145
+  word_end: 149
+  quote: 'needs no score calibration:'
+- id: hybrid-retrieval:words:196-204
+  document_id: hybrid-retrieval
+  word_start: 196
+  word_end: 204
+  quote: reads the query and each candidate passage together
+- id: chunking:words:26-33
+  document_id: chunking
+  word_start: 26
+  word_end: 33
+  quote: 'a chunk is the unit of retrieval:'
+- id: chunking:words:68-72
+  document_id: chunking
+  word_start: 68
+  word_end: 72
+  quote: fixed-size chunking with overlap.
+- id: chunking:words:207-211
+  document_id: chunking
+  word_start: 207
+  word_end: 211
+  quote: chunking should be deterministic
+- id: rag:words:64-73
+  document_id: rag
+  word_start: 64
+  word_end: 73
+  quote: reduces hallucination by giving the model concrete source text
+- id: rag:words:110-118
+  document_id: rag
+  word_start: 110
+  word_end: 118
+  quote: citations that point back to the specific chunks
+- id: rag:words:162-172
+  document_id: rag
+  word_start: 162
+  word_end: 172
+  quote: the generator cannot cite what the retriever failed to find.
+- id: evaluation-metrics:words:42-54
+  document_id: evaluation-metrics
+  word_start: 42
+  word_end: 54
+  quote: the fraction of all relevant documents that appear in the top k
+- id: evaluation-metrics:words:103-110
+  document_id: evaluation-metrics
+  word_start: 103
+  word_end: 110
+  quote: the position of the first relevant result.
+- id: evaluation-metrics:words:198-203
+  document_id: evaluation-metrics
+  word_start: 198
+  word_end: 203
+  quote: divided by the ideal gain
+- id: llm-as-judge:words:57-67
+  document_id: llm-as-judge
+  word_start: 57
+  word_end: 67
+  quote: Faithfulness measures whether every claim in the answer is supported
+- id: llm-as-judge:words:137-146
+  document_id: llm-as-judge
+  word_start: 137
+  word_end: 146
+  quote: Structured output turns a free-form opinion into machine-readable data
+- id: llm-as-judge:words:163-169
+  document_id: llm-as-judge
+  word_start: 163
+  word_end: 169
+  quote: They can be inconsistent between runs,
+cases:
+- id: cap-tradeoff
+  question: During a network partition, what does the CAP theorem force you to choose between?
+  relevant_snippets:
+  - between consistency and availability
+  reference_answer: During a partition you must choose between consistency and availability;
+    you cannot have both.
+  evidence_ids:
+  - cap-theorem:words:41-45
+  split: smoke
+  tags:
+  - cap-theorem
+  language: en
+  answerable: true
+  group_id: cap-theorem:words:41-45
+- id: cap-cp
+  question: What does a CP system give up during a partition?
+  relevant_snippets:
+  - A CP system favors consistency
+  reference_answer: A CP system favors consistency and gives up availability, rejecting requests
+    rather than returning stale data.
+  evidence_ids:
+  - cap-theorem:words:99-104
+  split: smoke
+  tags:
+  - cap-theorem
+  language: en
+  answerable: true
+  group_id: cap-theorem:words:99-104
+- id: cap-ap
+  question: How does an AP system behave during a partition?
+  relevant_snippets:
+  - An AP system favors availability
+  reference_answer: An AP system favors availability, keeps serving both sides of the partition,
+    and reconciles divergence afterward.
+  evidence_ids:
+  - cap-theorem:words:133-138
+  split: smoke
+  tags:
+  - cap-theorem
+  language: en
+  answerable: true
+  group_id: cap-theorem:words:133-138
+- id: cons-eventual
+  question: What does eventual consistency guarantee?
+  relevant_snippets:
+  - Eventual consistency only guarantees
+  reference_answer: Eventual consistency guarantees only that, with no new writes, all replicas
+    eventually converge to the same value.
+  evidence_ids:
+  - consistency-models:words:96-100
+  split: smoke
+  tags:
+  - consistency-models
+  language: en
+  answerable: true
+  group_id: consistency-models:words:96-100
+- id: cons-causal
+  question: What is causal consistency?
+  relevant_snippets:
+  - Causal consistency sits between the two
+  reference_answer: Causal consistency ensures causally related operations are seen in the
+    same order by all processes, while concurrent operations may be seen in different orders.
+  evidence_ids:
+  - consistency-models:words:141-147
+  split: smoke
+  tags:
+  - consistency-models
+  language: en
+  answerable: true
+  group_id: consistency-models:words:141-147
+- id: cons-ryw
+  question: What does read-your-writes consistency ensure?
+  relevant_snippets:
+  - Read-your-writes consistency
+  reference_answer: Read-your-writes consistency ensures a client always sees the effects
+    of its own prior writes.
+  evidence_ids:
+  - consistency-models:words:197-199
+  split: smoke
+  tags:
+  - consistency-models
+  language: en
+  answerable: true
+  group_id: consistency-models:words:197-199
+- id: emb-cosine
+  question: How is similarity between two embeddings usually measured?
+  relevant_snippets:
+  - measured with cosine similarity
+  reference_answer: Similarity between embeddings is usually measured with cosine similarity,
+    comparing the angle between vectors and ignoring magnitude.
+  evidence_ids:
+  - embeddings:words:107-111
+  split: smoke
+  tags:
+  - embeddings
+  language: en
+  answerable: true
+  group_id: embeddings:words:107-111
+- id: emb-dim
+  question: How many dimensions does the bge-small embedding model output?
+  relevant_snippets:
+  - produces 384-dimensional vectors
+  reference_answer: The bge-small model produces 384-dimensional vectors.
+  evidence_ids:
+  - embeddings:words:79-82
+  split: smoke
+  tags:
+  - embeddings
+  language: en
+  answerable: true
+  group_id: embeddings:words:79-82
+- id: emb-advantage
+  question: What can embedding search do that keyword matching cannot?
+  relevant_snippets:
+  - retrieve passages that share no words with the query
+  reference_answer: Embedding search can retrieve passages that share no words with the query
+    but express the same idea.
+  evidence_ids:
+  - embeddings:words:190-199
+  split: smoke
+  tags:
+  - embeddings
+  language: en
+  answerable: true
+  group_id: embeddings:words:190-199
+- id: vec-ann
+  question: What does approximate nearest neighbor search trade off?
+  relevant_snippets:
+  - trades a small amount of accuracy for a large gain in speed
+  reference_answer: ANN search trades a small amount of accuracy for a large gain in speed.
+  evidence_ids:
+  - vector-search:words:64-76
+  split: smoke
+  tags:
+  - vector-search
+  language: en
+  answerable: true
+  group_id: vector-search:words:64-76
+- id: vec-hnsw
+  question: What index is most common for high-recall vector search?
+  relevant_snippets:
+  - HNSW, Hierarchical Navigable Small World
+  reference_answer: HNSW (Hierarchical Navigable Small World) graphs are the most common index
+    for high-recall search.
+  evidence_ids:
+  - vector-search:words:100-105
+  split: smoke
+  tags:
+  - vector-search
+  language: en
+  answerable: true
+  group_id: vector-search:words:100-105
+- id: vec-recall
+  question: What does recall measure for an ANN index?
+  relevant_snippets:
+  - the fraction of the true nearest neighbors that the index actually returns
+  reference_answer: Recall is the fraction of the true nearest neighbors that the index actually
+    returns.
+  evidence_ids:
+  - vector-search:words:177-189
+  split: smoke
+  tags:
+  - vector-search
+  language: en
+  answerable: true
+  group_id: vector-search:words:177-189
+- id: kw-bm25
+  question: What is the standard ranking function for keyword search?
+  relevant_snippets:
+  - BM25 is the standard ranking function
+  reference_answer: BM25 is the standard ranking function for keyword search.
+  evidence_ids:
+  - keyword-search:words:66-72
+  split: smoke
+  tags:
+  - keyword-search
+  language: en
+  answerable: true
+  group_id: keyword-search:words:66-72
+- id: kw-mismatch
+  question: What is the main weakness of keyword search?
+  relevant_snippets:
+  - vocabulary mismatch problem
+  reference_answer: 'Its weakness is the vocabulary mismatch problem: documents that mean
+    the same thing with different words do not match.'
+  evidence_ids:
+  - keyword-search:words:49-52
+  split: smoke
+  tags:
+  - keyword-search
+  language: en
+  answerable: true
+  group_id: keyword-search:words:49-52
+- id: kw-pg
+  question: Which Postgres function ranks full-text matches?
+  relevant_snippets:
+  - ts_rank_cd function then ranks matches
+  reference_answer: The ts_rank_cd function ranks full-text matches by term proximity and
+    frequency.
+  evidence_ids:
+  - keyword-search:words:158-163
+  split: smoke
+  tags:
+  - keyword-search
+  language: en
+  answerable: true
+  group_id: keyword-search:words:158-163
+- id: hyb-rrf
+  question: How does Reciprocal Rank Fusion combine ranked lists?
+  relevant_snippets:
+  - sums one divided by a constant plus the rank
+  reference_answer: RRF sums, for each document, one divided by a constant plus its rank across
+    the lists it appears in.
+  evidence_ids:
+  - hybrid-retrieval:words:80-89
+  split: smoke
+  tags:
+  - hybrid-retrieval
+  language: en
+  answerable: true
+  group_id: hybrid-retrieval:words:80-89
+- id: hyb-calibration
+  question: Why does RRF not need score calibration?
+  relevant_snippets:
+  - needs no score calibration
+  reference_answer: RRF uses only rank positions, not raw scores, so it needs no score calibration
+    even when scores live on different scales.
+  evidence_ids:
+  - hybrid-retrieval:words:145-149
+  split: smoke
+  tags:
+  - hybrid-retrieval
+  language: en
+  answerable: true
+  group_id: hybrid-retrieval:words:145-149
+- id: hyb-rerank
+  question: What does a cross-encoder reranker do?
+  relevant_snippets:
+  - reads the query and each candidate passage together
+  reference_answer: A cross-encoder reranker reads the query and each candidate passage together
+    and scores their relevance directly.
+  evidence_ids:
+  - hybrid-retrieval:words:196-204
+  split: smoke
+  tags:
+  - hybrid-retrieval
+  language: en
+  answerable: true
+  group_id: hybrid-retrieval:words:196-204
+- id: chunk-unit
+  question: Why does chunking matter for retrieval?
+  relevant_snippets:
+  - a chunk is the unit of retrieval
+  reference_answer: 'Chunking matters because a chunk is the unit of retrieval: too large
+    blurs topics, too small loses context.'
+  evidence_ids:
+  - chunking:words:26-33
+  split: smoke
+  tags:
+  - chunking
+  language: en
+  answerable: true
+  group_id: chunking:words:26-33
+- id: chunk-overlap
+  question: What is fixed-size chunking with overlap?
+  relevant_snippets:
+  - fixed-size chunking with overlap
+  reference_answer: Fixed-size chunking with overlap divides a document into windows of a
+    target length where consecutive windows overlap, so facts at a boundary are not lost.
+  evidence_ids:
+  - chunking:words:68-72
+  split: smoke
+  tags:
+  - chunking
+  language: en
+  answerable: true
+  group_id: chunking:words:68-72
+- id: chunk-deterministic
+  question: Why should chunking be deterministic?
+  relevant_snippets:
+  - chunking should be deterministic
+  reference_answer: Chunking should be deterministic so re-ingesting the same document yields
+    the same chunks and evaluation stays reproducible.
+  evidence_ids:
+  - chunking:words:207-211
+  split: smoke
+  tags:
+  - chunking
+  language: en
+  answerable: true
+  group_id: chunking:words:207-211
+- id: rag-hallucination
+  question: How does RAG reduce hallucination?
+  relevant_snippets:
+  - reduces hallucination by giving the model concrete source text
+  reference_answer: RAG reduces hallucination by giving the model concrete source text to
+    draw from.
+  evidence_ids:
+  - rag:words:64-73
+  split: smoke
+  tags:
+  - rag
+  language: en
+  answerable: true
+  group_id: rag:words:64-73
+- id: rag-citations
+  question: Why should RAG answers include citations?
+  relevant_snippets:
+  - citations that point back to the specific chunks
+  reference_answer: Citations point back to the specific chunks an answer relied on so a reader
+    can verify each claim and grounding can be measured.
+  evidence_ids:
+  - rag:words:110-118
+  split: smoke
+  tags:
+  - rag
+  language: en
+  answerable: true
+  group_id: rag:words:110-118
+- id: rag-bound
+  question: Why is retrieval the limiting factor for a RAG system?
+  relevant_snippets:
+  - the generator cannot cite what the retriever failed to find
+  reference_answer: A RAG system is bounded by retrieval because the generator cannot cite
+    what the retriever failed to find.
+  evidence_ids:
+  - rag:words:162-172
+  split: smoke
+  tags:
+  - rag
+  language: en
+  answerable: true
+  group_id: rag:words:162-172
+- id: metric-recall
+  question: What is recall at k?
+  relevant_snippets:
+  - the fraction of all relevant documents that appear in the top k
+  reference_answer: Recall at k is the fraction of all relevant documents that appear in the
+    top k results.
+  evidence_ids:
+  - evaluation-metrics:words:42-54
+  split: smoke
+  tags:
+  - evaluation-metrics
+  language: en
+  answerable: true
+  group_id: evaluation-metrics:words:42-54
+- id: metric-mrr
+  question: What does mean reciprocal rank focus on?
+  relevant_snippets:
+  - the position of the first relevant result
+  reference_answer: MRR focuses on the position of the first relevant result, taking the reciprocal
+    of its rank and averaging over queries.
+  evidence_ids:
+  - evaluation-metrics:words:103-110
+  split: smoke
+  tags:
+  - evaluation-metrics
+  language: en
+  answerable: true
+  group_id: evaluation-metrics:words:103-110
+- id: metric-ndcg
+  question: Why does nDCG always fall between zero and one?
+  relevant_snippets:
+  - divided by the ideal gain
+  reference_answer: nDCG divides the discounted gain by the ideal gain, so it always falls
+    between zero and one and is comparable across queries.
+  evidence_ids:
+  - evaluation-metrics:words:198-203
+  split: smoke
+  tags:
+  - evaluation-metrics
+  language: en
+  answerable: true
+  group_id: evaluation-metrics:words:198-203
+- id: judge-faithfulness
+  question: What does the faithfulness dimension measure?
+  relevant_snippets:
+  - Faithfulness measures whether every claim in the answer is supported
+  reference_answer: Faithfulness measures whether every claim in the answer is supported by
+    the retrieved context; an unsupported claim is a hallucination.
+  evidence_ids:
+  - llm-as-judge:words:57-67
+  split: smoke
+  tags:
+  - llm-as-judge
+  language: en
+  answerable: true
+  group_id: llm-as-judge:words:57-67
+- id: judge-structured
+  question: Why does the judge return structured output?
+  relevant_snippets:
+  - Structured output turns a free-form opinion into machine-readable data
+  reference_answer: Structured output turns a free-form opinion into machine-readable data
+    that can be aggregated across a run and tracked over time.
+  evidence_ids:
+  - llm-as-judge:words:137-146
+  split: smoke
+  tags:
+  - llm-as-judge
+  language: en
+  answerable: true
+  group_id: llm-as-judge:words:137-146
+- id: judge-limits
+  question: What are known limitations of LLM judges?
+  relevant_snippets:
+  - They can be inconsistent between runs
+  reference_answer: LLM judges can be inconsistent between runs and may prefer longer or more
+    confident answers regardless of correctness.
+  evidence_ids:
+  - llm-as-judge:words:163-169
+  split: smoke
+  tags:
+  - llm-as-judge
+  language: en
+  answerable: true
+  group_id: llm-as-judge:words:163-169
+- id: dev-en-cap-tradeoff
+  question: When two network segments cannot communicate, can the database both accept every
+    request and keep all replicas consistent?
+  relevant_snippets:
+  - between consistency and availability
+  reference_answer: During a partition you must choose between consistency and availability;
+    you cannot have both.
+  evidence_ids:
+  - cap-theorem:words:41-45
+  split: dev
+  tags:
+  - cap-theorem
+  - diagnostic
+  - paraphrase
+  language: en
+  answerable: true
+  group_id: cap-theorem:words:41-45
+- id: dev-pt-cap-tradeoff
+  question: Quando uma partição de rede ocorre, entre quais propriedades precisamos escolher
+    segundo o teorema CAP?
+  relevant_snippets:
+  - between consistency and availability
+  reference_answer: During a partition you must choose between consistency and availability;
+    you cannot have both.
+  evidence_ids:
+  - cap-theorem:words:41-45
+  split: dev
+  tags:
+  - cap-theorem
+  - diagnostic
+  - translation
+  language: pt
+  answerable: true
+  group_id: cap-theorem:words:41-45
+- id: dev-en-cons-ryw
+  question: Which consistency promise lets a user immediately observe an update they just
+    made?
+  relevant_snippets:
+  - Read-your-writes consistency
+  reference_answer: Read-your-writes consistency ensures a client always sees the effects
+    of its own prior writes.
+  evidence_ids:
+  - consistency-models:words:197-199
+  split: dev
+  tags:
+  - consistency-models
+  - diagnostic
+  - paraphrase
+  language: en
+  answerable: true
+  group_id: consistency-models:words:197-199
+- id: dev-pt-cons-ryw
+  question: Qual garantia permite ao cliente enxergar as próprias escritas anteriores?
+  relevant_snippets:
+  - Read-your-writes consistency
+  reference_answer: Read-your-writes consistency ensures a client always sees the effects
+    of its own prior writes.
+  evidence_ids:
+  - consistency-models:words:197-199
+  split: dev
+  tags:
+  - consistency-models
+  - diagnostic
+  - translation
+  language: pt
+  answerable: true
+  group_id: consistency-models:words:197-199
+- id: dev-en-emb-dim
+  question: What is the length of each vector produced by BGE small?
+  relevant_snippets:
+  - produces 384-dimensional vectors
+  reference_answer: The bge-small model produces 384-dimensional vectors.
+  evidence_ids:
+  - embeddings:words:79-82
+  split: dev
+  tags:
+  - embeddings
+  - diagnostic
+  - paraphrase
+  language: en
+  answerable: true
+  group_id: embeddings:words:79-82
+- id: dev-pt-emb-dim
+  question: Quantas dimensões têm os vetores produzidos pelo modelo bge-small?
+  relevant_snippets:
+  - produces 384-dimensional vectors
+  reference_answer: The bge-small model produces 384-dimensional vectors.
+  evidence_ids:
+  - embeddings:words:79-82
+  split: dev
+  tags:
+  - embeddings
+  - diagnostic
+  - translation
+  language: pt
+  answerable: true
+  group_id: embeddings:words:79-82
+- id: dev-en-kw-mismatch
+  question: Why might a lexical retriever miss a document that uses synonyms for the words
+    in my question?
+  relevant_snippets:
+  - vocabulary mismatch problem
+  reference_answer: 'Its weakness is the vocabulary mismatch problem: documents that mean
+    the same thing with different words do not match.'
+  evidence_ids:
+  - keyword-search:words:49-52
+  split: dev
+  tags:
+  - keyword-search
+  - diagnostic
+  - paraphrase
+  language: en
+  answerable: true
+  group_id: keyword-search:words:49-52
+- id: dev-pt-kw-mismatch
+  question: Por que uma busca por palavras-chave pode falhar quando o documento usa sinônimos?
+  relevant_snippets:
+  - vocabulary mismatch problem
+  reference_answer: 'Its weakness is the vocabulary mismatch problem: documents that mean
+    the same thing with different words do not match.'
+  evidence_ids:
+  - keyword-search:words:49-52
+  split: dev
+  tags:
+  - keyword-search
+  - diagnostic
+  - translation
+  language: pt
+  answerable: true
+  group_id: keyword-search:words:49-52
+- id: dev-en-hyb-rrf
+  question: How can two search rankings be merged by summing inverse positions?
+  relevant_snippets:
+  - sums one divided by a constant plus the rank
+  reference_answer: RRF sums, for each document, one divided by a constant plus its rank across
+    the lists it appears in.
+  evidence_ids:
+  - hybrid-retrieval:words:80-89
+  split: dev
+  tags:
+  - hybrid-retrieval
+  - diagnostic
+  - paraphrase
+  language: en
+  answerable: true
+  group_id: hybrid-retrieval:words:80-89
+- id: dev-pt-hyb-rrf
+  question: Como a fusão de rankings recíprocos combina listas de resultados?
+  relevant_snippets:
+  - sums one divided by a constant plus the rank
+  reference_answer: RRF sums, for each document, one divided by a constant plus its rank across
+    the lists it appears in.
+  evidence_ids:
+  - hybrid-retrieval:words:80-89
+  split: dev
+  tags:
+  - hybrid-retrieval
+  - diagnostic
+  - translation
+  language: pt
+  answerable: true
+  group_id: hybrid-retrieval:words:80-89
+- id: dev-en-hyb-rerank
+  question: After candidates are retrieved, how can a model that reads the question together
+    with each passage improve their order?
+  relevant_snippets:
+  - reads the query and each candidate passage together
+  reference_answer: A cross-encoder reranker reads the query and each candidate passage together
+    and scores their relevance directly.
+  evidence_ids:
+  - hybrid-retrieval:words:196-204
+  split: dev
+  tags:
+  - hybrid-retrieval
+  - diagnostic
+  - paraphrase
+  language: en
+  answerable: true
+  group_id: hybrid-retrieval:words:196-204
+- id: dev-pt-hyb-rerank
+  question: O que faz um reranqueador que avalia a pergunta junto com cada passagem?
+  relevant_snippets:
+  - reads the query and each candidate passage together
+  reference_answer: A cross-encoder reranker reads the query and each candidate passage together
+    and scores their relevance directly.
+  evidence_ids:
+  - hybrid-retrieval:words:196-204
+  split: dev
+  tags:
+  - hybrid-retrieval
+  - diagnostic
+  - translation
+  language: pt
+  answerable: true
+  group_id: hybrid-retrieval:words:196-204
+- id: dev-en-chunk-overlap
+  question: How do sliding text windows retain context near the boundary between adjacent
+    passages?
+  relevant_snippets:
+  - fixed-size chunking with overlap
+  reference_answer: Fixed-size chunking with overlap divides a document into windows of a
+    target length where consecutive windows overlap, so facts at a boundary are not lost.
+  evidence_ids:
+  - chunking:words:68-72
+  split: dev
+  tags:
+  - chunking
+  - diagnostic
+  - paraphrase
+  language: en
+  answerable: true
+  group_id: chunking:words:68-72
+- id: dev-pt-chunk-overlap
+  question: Como dividir documentos em trechos de tamanho fixo com sobreposição?
+  relevant_snippets:
+  - fixed-size chunking with overlap
+  reference_answer: Fixed-size chunking with overlap divides a document into windows of a
+    target length where consecutive windows overlap, so facts at a boundary are not lost.
+  evidence_ids:
+  - chunking:words:68-72
+  split: dev
+  tags:
+  - chunking
+  - diagnostic
+  - translation
+  language: pt
+  answerable: true
+  group_id: chunking:words:68-72
+- id: dev-en-rag-citations
+  question: How can a reader check which retrieved source supports a generated claim?
+  relevant_snippets:
+  - citations that point back to the specific chunks
+  reference_answer: Citations point back to the specific chunks an answer relied on so a reader
+    can verify each claim and grounding can be measured.
+  evidence_ids:
+  - rag:words:110-118
+  split: dev
+  tags:
+  - rag
+  - diagnostic
+  - paraphrase
+  language: en
+  answerable: true
+  group_id: rag:words:110-118
+- id: dev-pt-rag-citations
+  question: Por que as respostas geradas com recuperação devem incluir citações?
+  relevant_snippets:
+  - citations that point back to the specific chunks
+  reference_answer: Citations point back to the specific chunks an answer relied on so a reader
+    can verify each claim and grounding can be measured.
+  evidence_ids:
+  - rag:words:110-118
+  split: dev
+  tags:
+  - rag
+  - diagnostic
+  - translation
+  language: pt
+  answerable: true
+  group_id: rag:words:110-118
+- id: dev-en-metric-mrr
+  question: Which ranking metric rewards placing the first correct result as high as possible?
+  relevant_snippets:
+  - the position of the first relevant result
+  reference_answer: MRR focuses on the position of the first relevant result, taking the reciprocal
+    of its rank and averaging over queries.
+  evidence_ids:
+  - evaluation-metrics:words:103-110
+  split: dev
+  tags:
+  - evaluation-metrics
+  - diagnostic
+  - paraphrase
+  language: en
+  answerable: true
+  group_id: evaluation-metrics:words:103-110
+- id: dev-pt-metric-mrr
+  question: Qual métrica considera a posição do primeiro resultado relevante?
+  relevant_snippets:
+  - the position of the first relevant result
+  reference_answer: MRR focuses on the position of the first relevant result, taking the reciprocal
+    of its rank and averaging over queries.
+  evidence_ids:
+  - evaluation-metrics:words:103-110
+  split: dev
+  tags:
+  - evaluation-metrics
+  - diagnostic
+  - translation
+  language: pt
+  answerable: true
+  group_id: evaluation-metrics:words:103-110
+- id: dev-en-judge-limits
+  question: What can make an automated language-model evaluator unreliable or biased?
+  relevant_snippets:
+  - They can be inconsistent between runs
+  reference_answer: LLM judges can be inconsistent between runs and may prefer longer or more
+    confident answers regardless of correctness.
+  evidence_ids:
+  - llm-as-judge:words:163-169
+  split: dev
+  tags:
+  - llm-as-judge
+  - diagnostic
+  - paraphrase
+  language: en
+  answerable: true
+  group_id: llm-as-judge:words:163-169
+- id: dev-pt-judge-limits
+  question: Quais são as limitações conhecidas de usar modelos de linguagem como avaliadores?
+  relevant_snippets:
+  - They can be inconsistent between runs
+  reference_answer: LLM judges can be inconsistent between runs and may prefer longer or more
+    confident answers regardless of correctness.
+  evidence_ids:
+  - llm-as-judge:words:163-169
+  split: dev
+  tags:
+  - llm-as-judge
+  - diagnostic
+  - translation
+  language: pt
+  answerable: true
+  group_id: llm-as-judge:words:163-169

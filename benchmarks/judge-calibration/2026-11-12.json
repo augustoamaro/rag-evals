@@ -1,0 +1,1662 @@
+{
+  "items": [
+    {
+      "answer": "Reciprocal Rank Fusion merges ranked lists by, for each document, summing one divided by a constant plus the rank, across every list in which the document appears. The constant, often set to sixty, dampens the influence of very high ranks so that broad agreement across lists matters more than a single top placement, which causes documents that rank highly in multiple lists to rise to the top of the fused ranking [hybrid-retrieval:0].\n\nA key advantage is that RRF needs no score calibration: it uses only the rank positions, not the raw similarity scores, so it doesn't matter that cosine distances and BM25 scores live on completely different scales [hybrid-retrieval:0][hybrid-retrieval:1].",
+      "case_id": "hyb-rrf",
+      "change": null,
+      "context": [
+        {
+          "document_id": "hybrid-retrieval",
+          "id": "hybrid-retrieval:0",
+          "text": "# Hybrid Retrieval and Reciprocal Rank Fusion Hybrid retrieval combines a dense semantic retriever with a sparse keyword retriever so the strengths of each cover the other's blind spots. The dense arm finds passages that share meaning with the query, and the sparse arm finds passages that share exact terms, and a fusion step merges their two ranked lists into one. Reciprocal Rank Fusion, or RRF, is a simple and robust way to merge ranked lists. For each document it sums one divided by a constant plus the rank, across every list the document appears in. The constant, often set to sixty, dampens the influence of very high ranks so that broad agreement across lists matters more than a single top placement. Documents that rank highly in multiple lists rise to the top of the fused ranking. The great advantage of RRF is that it needs no score calibration: it uses only the rank positions, not the raw similarity scores, so it does not matter that cosine distances and BM25 scores live on completely different scales. This makes hybrid retrieval"
+        },
+        {
+          "document_id": "hybrid-retrieval",
+          "id": "hybrid-retrieval:1",
+          "text": "uses only the rank positions, not the raw similarity scores, so it does not matter that cosine distances and BM25 scores live on completely different scales. This makes hybrid retrieval easy to assemble from heterogeneous retrievers. An optional reranking stage can follow fusion. A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly, which is more accurate than comparing independent embeddings but too expensive to run over the whole collection, so it is applied only to the fused shortlist."
+        },
+        {
+          "document_id": "evaluation-metrics",
+          "id": "evaluation-metrics:1",
+          "text": "mostly cares about the single best answer being near the top. Normalized discounted cumulative gain, nDCG, accounts for the entire ranking with a position discount: a relevant result contributes less the lower it appears, weighted by one over the logarithm of its rank. The raw discounted gain is divided by the ideal gain — the score of the best possible ordering — so that nDCG always falls between zero and one, making it comparable across queries with different numbers of relevant documents."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-01",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.011579999999999998,
+        "faithfulness": 1.0,
+        "input_tokens": 1571,
+        "output_tokens": 149,
+        "rationale": "The answer accurately describes RRF's formula and the dampening constant, all supported by the context. It directly addresses the question matching the reference. Citations are correct: hybrid-retrieval:0 supports the formula and no-calibration claim, and hybrid-retrieval:1 supports the rank-positions-not-scores point.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "How does Reciprocal Rank Fusion combine ranked lists?",
+      "reference_answer": "RRF sums, for each document, one divided by a constant plus its rank across the lists it appears in."
+    },
+    {
+      "answer": "The main weakness of keyword search is the vocabulary mismatch problem: a document that means the same thing but uses different words will not match [keyword-search:0].",
+      "case_id": "kw-mismatch",
+      "change": null,
+      "context": [
+        {
+          "document_id": "keyword-search",
+          "id": "keyword-search:0",
+          "text": "# Keyword Search and BM25 Keyword search, also called lexical search, ranks documents by the query terms they contain. It is fast, interpretable, and excellent at matching exact terms such as names, error codes, and rare jargon that an embedding model may not represent well. Its weakness is the vocabulary mismatch problem: a document that means the same thing but uses different words will not match. BM25 is the standard ranking function for keyword search. It scores a document by summing, over each query term, a weight that rewards term frequency but with diminishing returns, multiplied by an inverse document frequency factor that down-weights common terms. BM25 also normalizes for document length so that long documents are not unfairly favored just for containing more words. Postgres provides built-in full-text search. Text is converted to a tsvector of normalized lexemes, and a query is converted to a tsquery; the match operator tests whether the document satisfies the query. The ts_rank_cd function then ranks matches by term proximity and frequency. A GIN index on the tsvector column makes these lookups fast. Because"
+        },
+        {
+          "document_id": "keyword-search",
+          "id": "keyword-search:1",
+          "text": "tests whether the document satisfies the query. The ts_rank_cd function then ranks matches by term proximity and frequency. A GIN index on the tsvector column makes these lookups fast. Because keyword search and semantic search fail in different ways — lexical search misses paraphrases, semantic search misses exact rare terms — combining them tends to outperform either one alone."
+        },
+        {
+          "document_id": "embeddings",
+          "id": "embeddings:1",
+          "text": "cosine similarity reduces to a simple dot product. Embeddings power semantic search: a query is embedded with the same model as the documents, and the nearest vectors are returned as the most relevant results. Unlike keyword matching, embedding search can retrieve passages that share no words with the query but express the same idea, which is its key advantage over lexical search."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-02",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.00892,
+        "faithfulness": 1.0,
+        "input_tokens": 1274,
+        "output_tokens": 102,
+        "rationale": "The answer accurately identifies the vocabulary mismatch problem as the main weakness, directly supported by keyword-search:0. The citation is correct and the answer matches the reference.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What is the main weakness of keyword search?",
+      "reference_answer": "Its weakness is the vocabulary mismatch problem: documents that mean the same thing with different words do not match."
+    },
+    {
+      "answer": "BM25 is the standard ranking function for keyword search [keyword-search:0]. It was introduced in 1994 as part of the Okapi system and uses default parameters k1 = 1.2 and b = 0.75.",
+      "case_id": "kw-bm25",
+      "change": "appended an uncited claim absent from every passage: 'It was introduced in 1994 as part of the Okapi system and uses default parameters k1 = 1.2 and b = 0.75.'",
+      "context": [
+        {
+          "document_id": "keyword-search",
+          "id": "keyword-search:0",
+          "text": "# Keyword Search and BM25 Keyword search, also called lexical search, ranks documents by the query terms they contain. It is fast, interpretable, and excellent at matching exact terms such as names, error codes, and rare jargon that an embedding model may not represent well. Its weakness is the vocabulary mismatch problem: a document that means the same thing but uses different words will not match. BM25 is the standard ranking function for keyword search. It scores a document by summing, over each query term, a weight that rewards term frequency but with diminishing returns, multiplied by an inverse document frequency factor that down-weights common terms. BM25 also normalizes for document length so that long documents are not unfairly favored just for containing more words. Postgres provides built-in full-text search. Text is converted to a tsvector of normalized lexemes, and a query is converted to a tsquery; the match operator tests whether the document satisfies the query. The ts_rank_cd function then ranks matches by term proximity and frequency. A GIN index on the tsvector column makes these lookups fast. Because"
+        },
+        {
+          "document_id": "keyword-search",
+          "id": "keyword-search:1",
+          "text": "tests whether the document satisfies the query. The ts_rank_cd function then ranks matches by term proximity and frequency. A GIN index on the tsvector column makes these lookups fast. Because keyword search and semantic search fail in different ways — lexical search misses paraphrases, semantic search misses exact rare terms — combining them tends to outperform either one alone."
+        },
+        {
+          "document_id": "evaluation-metrics",
+          "id": "evaluation-metrics:0",
+          "text": "# Retrieval Evaluation Metrics Retrieval quality is measured against a labeled set of queries for which the relevant documents are known. The metrics below all operate on the ranked list of results a retriever returns for each query. Recall at k is the fraction of all relevant documents that appear in the top k results. It answers \"of everything I should have found, how much did I find near the top.\" Precision at k is the fraction of the top k results that are actually relevant. Recall rewards finding relevant items; precision penalizes returning irrelevant ones. Mean reciprocal rank, or MRR, focuses on the position of the first relevant result. For each query it takes the reciprocal of the rank of the first relevant hit — one if it is first, one half if it is second — and averages this over all queries. MRR is ideal when the user mostly cares about the single best answer being near the top. Normalized discounted cumulative gain, nDCG, accounts for the entire ranking with a position discount: a relevant result contributes less"
+        }
+      ],
+      "defect": "unsupported_claim",
+      "derived_from": "kw-bm25",
+      "expected_low": [
+        "faithfulness"
+      ],
+      "human": null,
+      "id": "item-03",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.011505,
+        "faithfulness": 0.4,
+        "input_tokens": 1491,
+        "output_tokens": 162,
+        "rationale": "The core claim that BM25 is the standard ranking function is supported by keyword-search:0, and the citation correctly backs it. However, the answer adds unsupported details—the 1994 Okapi introduction and specific default parameters k1=1.2 and b=0.75—none of which appear in the context, lowering faithfulness. The answer is fully relevant to the question.",
+        "relevance": 1.0
+      },
+      "kind": "defect",
+      "question": "What is the standard ranking function for keyword search?",
+      "reference_answer": "BM25 is the standard ranking function for keyword search."
+    },
+    {
+      "answer": "A CP system gives up **availability** during a partition. It favors consistency, so it may reject requests rather than return possibly stale data, sacrificing availability to keep every replica in agreement [cap-theorem:0].",
+      "case_id": "cap-cp",
+      "change": null,
+      "context": [
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:0",
+          "text": "# The CAP Theorem The CAP theorem states that a distributed data store cannot simultaneously guarantee all three of consistency, availability, and partition tolerance. Since network partitions are unavoidable in any real distributed system, the practical choice during a partition is between consistency and availability: you must pick one and give up the other. Consistency here means linearizability — every read observes the most recent completed write. Availability means every request to a non-failing node receives a non-error response, even if it might be stale. Partition tolerance means the system continues to operate despite messages being dropped between nodes. A CP system favors consistency: during a partition it may reject requests rather than return possibly stale data. A CP store like a strongly consistent database sacrifices availability to keep every replica in agreement. An AP system favors availability: it keeps serving reads and writes on both sides of the partition and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability."
+        },
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:1",
+          "text": "and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability. CAP only forces the trade-off when a partition actually occurs, which is why practitioners often describe the real decision as a spectrum of latency versus consistency rather than a binary choice."
+        },
+        {
+          "document_id": "rag",
+          "id": "rag:1",
+          "text": "invented. The quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find. This is why retrieval quality is measured separately from answer quality. If a relevant passage is never retrieved, no amount of prompting will let the model ground its answer in it, so improving retrieval is usually the highest-leverage way to improve a RAG system end to end."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-04",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.00972,
+        "faithfulness": 1.0,
+        "input_tokens": 1289,
+        "output_tokens": 131,
+        "rationale": "The answer correctly states CP gives up availability, fully supported by cap-theorem:0 which explicitly says CP systems sacrifice availability to keep replicas in agreement. The citation accurately supports the claim, and the answer directly addresses the question matching the reference.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What does a CP system give up during a partition?",
+      "reference_answer": "A CP system favors consistency and gives up availability, rejecting requests rather than returning stale data."
+    },
+    {
+      "answer": "Mean reciprocal rank focuses on the position of the first relevant result. For each query it takes the reciprocal of the rank of the first relevant hit — one if it is first, one half if it is second — and averages this over all queries. It is ideal when the user mostly cares about the single best answer being near the top [evaluation-metrics:0].",
+      "case_id": "metric-mrr",
+      "change": null,
+      "context": [
+        {
+          "document_id": "evaluation-metrics",
+          "id": "evaluation-metrics:0",
+          "text": "# Retrieval Evaluation Metrics Retrieval quality is measured against a labeled set of queries for which the relevant documents are known. The metrics below all operate on the ranked list of results a retriever returns for each query. Recall at k is the fraction of all relevant documents that appear in the top k results. It answers \"of everything I should have found, how much did I find near the top.\" Precision at k is the fraction of the top k results that are actually relevant. Recall rewards finding relevant items; precision penalizes returning irrelevant ones. Mean reciprocal rank, or MRR, focuses on the position of the first relevant result. For each query it takes the reciprocal of the rank of the first relevant hit — one if it is first, one half if it is second — and averages this over all queries. MRR is ideal when the user mostly cares about the single best answer being near the top. Normalized discounted cumulative gain, nDCG, accounts for the entire ranking with a position discount: a relevant result contributes less"
+        },
+        {
+          "document_id": "hybrid-retrieval",
+          "id": "hybrid-retrieval:0",
+          "text": "# Hybrid Retrieval and Reciprocal Rank Fusion Hybrid retrieval combines a dense semantic retriever with a sparse keyword retriever so the strengths of each cover the other's blind spots. The dense arm finds passages that share meaning with the query, and the sparse arm finds passages that share exact terms, and a fusion step merges their two ranked lists into one. Reciprocal Rank Fusion, or RRF, is a simple and robust way to merge ranked lists. For each document it sums one divided by a constant plus the rank, across every list the document appears in. The constant, often set to sixty, dampens the influence of very high ranks so that broad agreement across lists matters more than a single top placement. Documents that rank highly in multiple lists rise to the top of the fused ranking. The great advantage of RRF is that it needs no score calibration: it uses only the rank positions, not the raw similarity scores, so it does not matter that cosine distances and BM25 scores live on completely different scales. This makes hybrid retrieval"
+        },
+        {
+          "document_id": "evaluation-metrics",
+          "id": "evaluation-metrics:1",
+          "text": "mostly cares about the single best answer being near the top. Normalized discounted cumulative gain, nDCG, accounts for the entire ranking with a position discount: a relevant result contributes less the lower it appears, weighted by one over the logarithm of its rank. The raw discounted gain is divided by the ideal gain — the score of the best possible ordering — so that nDCG always falls between zero and one, making it comparable across queries with different numbers of relevant documents."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-05",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.01054,
+        "faithfulness": 1.0,
+        "input_tokens": 1583,
+        "output_tokens": 105,
+        "rationale": "The answer accurately states MRR focuses on the first relevant result's position, fully supported by evaluation-metrics:0. It directly addresses the question and the citation correctly backs the claims.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What does mean reciprocal rank focus on?",
+      "reference_answer": "MRR focuses on the position of the first relevant result, taking the reciprocal of its rank and averaging over queries."
+    },
+    {
+      "answer": "According to the context, RAG answers should include citations for two main reasons:\n\n1. **Verification**: Citations point back to the specific chunks the answer relied on, letting a reader verify each claim against its source [rag:0].\n\n2. **Measuring grounding**: Citations make it possible to measure whether the answer is actually grounded in the retrieved context rather than invented [rag:0].",
+      "case_id": "rag-citations",
+      "change": null,
+      "context": [
+        {
+          "document_id": "rag",
+          "id": "rag:0",
+          "text": "# Retrieval-Augmented Generation Retrieval-augmented generation, or RAG, grounds a language model's answer in documents retrieved at query time instead of relying only on the model's parametric memory. The pipeline has two stages: a retriever fetches the passages most relevant to the question, and a generator conditions on those passages to produce the answer. RAG addresses two weaknesses of using a language model alone. It reduces hallucination by giving the model concrete source text to draw from, and it lets the system answer questions about private or up-to-date information the model was never trained on, simply by adding documents to the index rather than retraining the model. Good RAG answers include citations that point back to the specific chunks the answer relied on. Citations let a reader verify each claim against its source and make it possible to measure whether the answer is actually grounded in the retrieved context rather than invented. The quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find. This is why retrieval quality is measured separately"
+        },
+        {
+          "document_id": "rag",
+          "id": "rag:1",
+          "text": "invented. The quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find. This is why retrieval quality is measured separately from answer quality. If a relevant passage is never retrieved, no amount of prompting will let the model ground its answer in it, so improving retrieval is usually the highest-leverage way to improve a RAG system end to end."
+        },
+        {
+          "document_id": "llm-as-judge",
+          "id": "llm-as-judge:0",
+          "text": "# LLM-as-a-Judge Evaluation Answer quality is hard to measure with string matching because two correct answers can be worded completely differently. LLM-as-a-judge evaluation uses a strong language model to score an answer against a rubric, approximating human judgment at a fraction of the cost and turnaround time. For a RAG system, three rubric dimensions are especially useful. Faithfulness measures whether every claim in the answer is supported by the retrieved context — an unsupported claim is a hallucination even if it happens to be true. Answer relevance measures whether the answer actually addresses the question that was asked. Citation correctness measures whether the cited chunks genuinely support the statements that cite them. To make scores usable, the judge is asked to return structured output: a number in a fixed range for each dimension plus a short rationale. Structured output turns a free-form opinion into machine-readable data that can be aggregated across an evaluation run and tracked over time. LLM judges have known limitations. They can be inconsistent between runs, and they may prefer longer or more confident answers regardless of"
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-06",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.01075,
+        "faithfulness": 1.0,
+        "input_tokens": 1570,
+        "output_tokens": 116,
+        "rationale": "The answer accurately states both reasons citations are included—verification and measuring grounding—directly supported by passage [rag:0]. Both claims are faithful to the context, directly address the question, and the citation correctly points to the supporting passage.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "Why should RAG answers include citations?",
+      "reference_answer": "Citations point back to the specific chunks an answer relied on so a reader can verify each claim and grounding can be measured."
+    },
+    {
+      "answer": "RRF does not need score calibration because it uses only the rank positions of documents, not the raw similarity scores. This means it does not matter that cosine distances and BM25 scores live on completely different scales [hybrid-retrieval:0].",
+      "case_id": "hyb-calibration",
+      "change": null,
+      "context": [
+        {
+          "document_id": "hybrid-retrieval",
+          "id": "hybrid-retrieval:0",
+          "text": "# Hybrid Retrieval and Reciprocal Rank Fusion Hybrid retrieval combines a dense semantic retriever with a sparse keyword retriever so the strengths of each cover the other's blind spots. The dense arm finds passages that share meaning with the query, and the sparse arm finds passages that share exact terms, and a fusion step merges their two ranked lists into one. Reciprocal Rank Fusion, or RRF, is a simple and robust way to merge ranked lists. For each document it sums one divided by a constant plus the rank, across every list the document appears in. The constant, often set to sixty, dampens the influence of very high ranks so that broad agreement across lists matters more than a single top placement. Documents that rank highly in multiple lists rise to the top of the fused ranking. The great advantage of RRF is that it needs no score calibration: it uses only the rank positions, not the raw similarity scores, so it does not matter that cosine distances and BM25 scores live on completely different scales. This makes hybrid retrieval"
+        },
+        {
+          "document_id": "llm-as-judge",
+          "id": "llm-as-judge:0",
+          "text": "# LLM-as-a-Judge Evaluation Answer quality is hard to measure with string matching because two correct answers can be worded completely differently. LLM-as-a-judge evaluation uses a strong language model to score an answer against a rubric, approximating human judgment at a fraction of the cost and turnaround time. For a RAG system, three rubric dimensions are especially useful. Faithfulness measures whether every claim in the answer is supported by the retrieved context — an unsupported claim is a hallucination even if it happens to be true. Answer relevance measures whether the answer actually addresses the question that was asked. Citation correctness measures whether the cited chunks genuinely support the statements that cite them. To make scores usable, the judge is asked to return structured output: a number in a fixed range for each dimension plus a short rationale. Structured output turns a free-form opinion into machine-readable data that can be aggregated across an evaluation run and tracked over time. LLM judges have known limitations. They can be inconsistent between runs, and they may prefer longer or more confident answers regardless of"
+        },
+        {
+          "document_id": "llm-as-judge",
+          "id": "llm-as-judge:1",
+          "text": "across an evaluation run and tracked over time. LLM judges have known limitations. They can be inconsistent between runs, and they may prefer longer or more confident answers regardless of correctness, a bias worth controlling for. Because of this, the judge track complements rather than replaces the retrieval metrics, which are deterministic and need no model at all."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-07",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.010495,
+        "faithfulness": 1.0,
+        "input_tokens": 1539,
+        "output_tokens": 112,
+        "rationale": "The answer accurately states RRF uses rank positions not raw scores, directly supported by hybrid-retrieval:0. It addresses the question fully and matches the reference. Citation is correct and supports the claims.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "Why does RRF not need score calibration?",
+      "reference_answer": "RRF uses only rank positions, not raw scores, so it needs no score calibration even when scores live on different scales."
+    },
+    {
+      "answer": "Read-your-writes consistency ensures a client always sees the effects of its own prior writes [consistency-models:1].",
+      "case_id": "cons-ryw",
+      "change": null,
+      "context": [
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:1",
+          "text": "causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total order, which makes it cheaper than linearizability while still avoiding the most confusing anomalies of eventual consistency. Read-your-writes consistency, a useful session guarantee, ensures a client always sees the effects of its own prior writes."
+        },
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:0",
+          "text": "# Consistency Models A consistency model is a contract between a data store and its clients that defines which orderings of reads and writes are permitted. Stronger models are easier to reason about but cost more in latency and availability; weaker models are faster and more available but push complexity onto the application. Strong consistency, or linearizability, makes the system behave as if there were a single copy of the data and every operation took effect instantaneously at some point between its invocation and its response. Once a write completes, every subsequent read returns that value. Eventual consistency only guarantees that, if no new writes are made, all replicas eventually converge to the same value. In the meantime, different replicas may return different values for the same key. Eventual consistency is common in high-availability systems that prioritize uptime over immediate agreement. Causal consistency sits between the two: operations that are causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total"
+        },
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:0",
+          "text": "# The CAP Theorem The CAP theorem states that a distributed data store cannot simultaneously guarantee all three of consistency, availability, and partition tolerance. Since network partitions are unavoidable in any real distributed system, the practical choice during a partition is between consistency and availability: you must pick one and give up the other. Consistency here means linearizability — every read observes the most recent completed write. Availability means every request to a non-failing node receives a non-error response, even if it might be stale. Partition tolerance means the system continues to operate despite messages being dropped between nodes. A CP system favors consistency: during a partition it may reject requests rather than return possibly stale data. A CP store like a strongly consistent database sacrifices availability to keep every replica in agreement. An AP system favors availability: it keeps serving reads and writes on both sides of the partition and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-08",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.010155,
+        "faithfulness": 1.0,
+        "input_tokens": 1451,
+        "output_tokens": 116,
+        "rationale": "The answer exactly matches the context in [consistency-models:1], which states read-your-writes consistency ensures a client always sees the effects of its own prior writes. It directly addresses the question and the citation correctly supports the claim.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What does read-your-writes consistency ensure?",
+      "reference_answer": "Read-your-writes consistency ensures a client always sees the effects of its own prior writes."
+    },
+    {
+      "answer": "The `ts_rank_cd` function ranks full-text matches by term proximity and frequency [keyword-search:0][keyword-search:1].",
+      "case_id": "kw-pg",
+      "change": null,
+      "context": [
+        {
+          "document_id": "keyword-search",
+          "id": "keyword-search:0",
+          "text": "# Keyword Search and BM25 Keyword search, also called lexical search, ranks documents by the query terms they contain. It is fast, interpretable, and excellent at matching exact terms such as names, error codes, and rare jargon that an embedding model may not represent well. Its weakness is the vocabulary mismatch problem: a document that means the same thing but uses different words will not match. BM25 is the standard ranking function for keyword search. It scores a document by summing, over each query term, a weight that rewards term frequency but with diminishing returns, multiplied by an inverse document frequency factor that down-weights common terms. BM25 also normalizes for document length so that long documents are not unfairly favored just for containing more words. Postgres provides built-in full-text search. Text is converted to a tsvector of normalized lexemes, and a query is converted to a tsquery; the match operator tests whether the document satisfies the query. The ts_rank_cd function then ranks matches by term proximity and frequency. A GIN index on the tsvector column makes these lookups fast. Because"
+        },
+        {
+          "document_id": "keyword-search",
+          "id": "keyword-search:1",
+          "text": "tests whether the document satisfies the query. The ts_rank_cd function then ranks matches by term proximity and frequency. A GIN index on the tsvector column makes these lookups fast. Because keyword search and semantic search fail in different ways — lexical search misses paraphrases, semantic search misses exact rare terms — combining them tends to outperform either one alone."
+        },
+        {
+          "document_id": "vector-search",
+          "id": "vector-search:0",
+          "text": "# Vector Search and Approximate Nearest Neighbors Vector search finds the stored vectors closest to a query vector under a distance metric such as cosine or Euclidean distance. A brute-force scan compares the query against every stored vector, which is exact but grows linearly with the size of the collection and becomes too slow for millions of vectors. Approximate nearest neighbor, or ANN, search trades a small amount of accuracy for a large gain in speed. Instead of scanning everything, an ANN index narrows the search to a promising subset of candidates. The most common index for high-recall search is HNSW, Hierarchical Navigable Small World graphs, which connect vectors into a layered graph that can be traversed in logarithmic time. In Postgres, the pgvector extension adds a vector column type and supports both exact search and HNSW indexes. A cosine-distance query is written with the distance operator, ordering rows by how close their embedding is to the query vector and limiting to the top results. Recall is the key quality measure for an ANN index: it is the fraction of"
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-09",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.010655000000000001,
+        "faithfulness": 1.0,
+        "input_tokens": 1506,
+        "output_tokens": 125,
+        "rationale": "The answer correctly identifies ts_rank_cd as the ranking function, which is directly supported by both cited passages. The claim about term proximity and frequency is faithful to the context, the answer directly addresses the question, and both citations correctly support the claim.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "Which Postgres function ranks full-text matches?",
+      "reference_answer": "The ts_rank_cd function ranks full-text matches by term proximity and frequency."
+    },
+    {
+      "answer": "Fixed-size chunking with overlap is a strategy in which a document is divided into windows of a target length, and consecutive windows overlap by a fixed amount so that a sentence spanning a boundary is not lost. The overlap means that a fact falling at the edge of one chunk also appears whole in the next, improving the odds that retrieval surfaces it. The target size is usually expressed in tokens or words [chunking:0].",
+      "case_id": "chunk-overlap",
+      "change": null,
+      "context": [
+        {
+          "document_id": "chunking",
+          "id": "chunking:0",
+          "text": "# Chunking Documents for Retrieval Retrieval systems do not embed whole documents; they split them into smaller chunks and embed each chunk independently. Chunking matters because a chunk is the unit of retrieval: if a chunk is too large, its embedding blurs several topics together and retrieval precision drops; if it is too small, it loses the surrounding context needed to answer a question. A common strategy is fixed-size chunking with overlap. The document is divided into windows of a target length, and consecutive windows overlap by a fixed amount so that a sentence spanning a boundary is not lost. The overlap means a fact that falls at the edge of one chunk also appears whole in the next, improving the odds that retrieval surfaces it. The target size is usually expressed in tokens or words. Smaller chunks of a hundred to two hundred words favor precision and pinpoint citations, while larger chunks favor recall and richer context. The right size depends on the documents and the questions, which is exactly the kind of decision an evaluation harness exists to"
+        },
+        {
+          "document_id": "chunking",
+          "id": "chunking:1",
+          "text": "while larger chunks favor recall and richer context. The right size depends on the documents and the questions, which is exactly the kind of decision an evaluation harness exists to settle. More advanced strategies chunk on semantic or structural boundaries — paragraphs, headings, or sentence groups — so that each chunk is internally coherent. Whatever the strategy, chunking should be deterministic so that re-ingesting the same document yields the same chunks and evaluation results remain reproducible."
+        },
+        {
+          "document_id": "embeddings",
+          "id": "embeddings:0",
+          "text": "# Text Embeddings A text embedding is a dense vector of floating-point numbers that represents the meaning of a piece of text in a high-dimensional space. Texts with similar meaning map to vectors that are close together, so semantic similarity becomes geometric proximity that a computer can measure directly. Embeddings are produced by neural models trained so that related inputs land near each other. Modern sentence-embedding models output vectors with a few hundred dimensions; the bge-small model, for example, produces 384-dimensional vectors. Because the dimensionality is fixed, every text — short or long — becomes a vector of the same length. Similarity between two embeddings is usually measured with cosine similarity, which compares the angle between the vectors and ignores their magnitude. Cosine similarity ranges from -1 to 1, where 1 means the vectors point in the same direction and are maximally similar. Many systems store normalized vectors so that cosine similarity reduces to a simple dot product. Embeddings power semantic search: a query is embedded with the same model as the documents, and the nearest vectors are returned as"
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-10",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.011139999999999999,
+        "faithfulness": 1.0,
+        "input_tokens": 1638,
+        "output_tokens": 118,
+        "rationale": "The answer accurately describes fixed-size chunking with overlap, directly matching the content in [chunking:0]. All claims are supported by the context, the answer fully addresses the question, and the single citation correctly supports the stated claims.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What is fixed-size chunking with overlap?",
+      "reference_answer": "Fixed-size chunking with overlap divides a document into windows of a target length where consecutive windows overlap, so facts at a boundary are not lost."
+    },
+    {
+      "answer": "Chunking should be deterministic so that re-ingesting the same document yields the same chunks and evaluation results remain reproducible. [chunking:1]",
+      "case_id": "chunk-unit",
+      "change": "answer of case 'chunk-deterministic', grounded in this context, to another question",
+      "context": [
+        {
+          "document_id": "chunking",
+          "id": "chunking:0",
+          "text": "# Chunking Documents for Retrieval Retrieval systems do not embed whole documents; they split them into smaller chunks and embed each chunk independently. Chunking matters because a chunk is the unit of retrieval: if a chunk is too large, its embedding blurs several topics together and retrieval precision drops; if it is too small, it loses the surrounding context needed to answer a question. A common strategy is fixed-size chunking with overlap. The document is divided into windows of a target length, and consecutive windows overlap by a fixed amount so that a sentence spanning a boundary is not lost. The overlap means a fact that falls at the edge of one chunk also appears whole in the next, improving the odds that retrieval surfaces it. The target size is usually expressed in tokens or words. Smaller chunks of a hundred to two hundred words favor precision and pinpoint citations, while larger chunks favor recall and richer context. The right size depends on the documents and the questions, which is exactly the kind of decision an evaluation harness exists to"
+        },
+        {
+          "document_id": "chunking",
+          "id": "chunking:1",
+          "text": "while larger chunks favor recall and richer context. The right size depends on the documents and the questions, which is exactly the kind of decision an evaluation harness exists to settle. More advanced strategies chunk on semantic or structural boundaries — paragraphs, headings, or sentence groups — so that each chunk is internally coherent. Whatever the strategy, chunking should be deterministic so that re-ingesting the same document yields the same chunks and evaluation results remain reproducible."
+        },
+        {
+          "document_id": "rag",
+          "id": "rag:1",
+          "text": "invented. The quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find. This is why retrieval quality is measured separately from answer quality. If a relevant passage is never retrieved, no amount of prompting will let the model ground its answer in it, so improving retrieval is usually the highest-leverage way to improve a RAG system end to end."
+        }
+      ],
+      "defect": "other_question",
+      "derived_from": "chunk-deterministic",
+      "expected_low": [
+        "relevance"
+      ],
+      "human": null,
+      "id": "item-11",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.011205,
+        "faithfulness": 1.0,
+        "input_tokens": 1306,
+        "output_tokens": 187,
+        "rationale": "The answer's claim about deterministic chunking is directly supported by chunking:1, so it is faithful and correctly cited. However, the question asks why chunking matters for retrieval. The core reason—that a chunk is the unit of retrieval, where too large blurs topics and too small loses context—is not addressed. Instead the answer only mentions determinism/reproducibility, which is a secondary concern, making it largely irrelevant to the actual question.",
+        "relevance": 0.3
+      },
+      "kind": "defect",
+      "question": "Why does chunking matter for retrieval?",
+      "reference_answer": "Chunking matters because a chunk is the unit of retrieval: too large blurs topics, too small loses context."
+    },
+    {
+      "answer": "Recall for an ANN index is the fraction of the true nearest neighbors that the index actually returns [vector-search:1][vector-search:0].",
+      "case_id": "vec-recall",
+      "change": null,
+      "context": [
+        {
+          "document_id": "vector-search",
+          "id": "vector-search:1",
+          "text": "how close their embedding is to the query vector and limiting to the top results. Recall is the key quality measure for an ANN index: it is the fraction of the true nearest neighbors that the index actually returns. Index parameters trade recall against build time and query latency, so tuning an ANN index means choosing an acceptable point on the recall-versus-speed curve for the workload."
+        },
+        {
+          "document_id": "vector-search",
+          "id": "vector-search:0",
+          "text": "# Vector Search and Approximate Nearest Neighbors Vector search finds the stored vectors closest to a query vector under a distance metric such as cosine or Euclidean distance. A brute-force scan compares the query against every stored vector, which is exact but grows linearly with the size of the collection and becomes too slow for millions of vectors. Approximate nearest neighbor, or ANN, search trades a small amount of accuracy for a large gain in speed. Instead of scanning everything, an ANN index narrows the search to a promising subset of candidates. The most common index for high-recall search is HNSW, Hierarchical Navigable Small World graphs, which connect vectors into a layered graph that can be traversed in logarithmic time. In Postgres, the pgvector extension adds a vector column type and supports both exact search and HNSW indexes. A cosine-distance query is written with the distance operator, ordering rows by how close their embedding is to the query vector and limiting to the top results. Recall is the key quality measure for an ANN index: it is the fraction of"
+        },
+        {
+          "document_id": "evaluation-metrics",
+          "id": "evaluation-metrics:0",
+          "text": "# Retrieval Evaluation Metrics Retrieval quality is measured against a labeled set of queries for which the relevant documents are known. The metrics below all operate on the ranked list of results a retriever returns for each query. Recall at k is the fraction of all relevant documents that appear in the top k results. It answers \"of everything I should have found, how much did I find near the top.\" Precision at k is the fraction of the top k results that are actually relevant. Recall rewards finding relevant items; precision penalizes returning irrelevant ones. Mean reciprocal rank, or MRR, focuses on the position of the first relevant result. For each query it takes the reciprocal of the rank of the first relevant hit — one if it is first, one half if it is second — and averages this over all queries. MRR is ideal when the user mostly cares about the single best answer being near the top. Normalized discounted cumulative gain, nDCG, accounts for the entire ranking with a position discount: a relevant result contributes less"
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-12",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.01009,
+        "faithfulness": 1.0,
+        "input_tokens": 1473,
+        "output_tokens": 109,
+        "rationale": "The answer accurately states recall is the fraction of true nearest neighbors returned, fully supported by both cited passages. It directly matches the reference and addresses the question. Both citations correctly support the claim.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What does recall measure for an ANN index?",
+      "reference_answer": "Recall is the fraction of the true nearest neighbors that the index actually returns."
+    },
+    {
+      "answer": "RAG reduces hallucination by giving the model concrete source text to draw from—it grounds the language model's answer in documents retrieved at query time rather than relying only on the model's parametric memory [llm-as-judge:0].",
+      "case_id": "rag-hallucination",
+      "change": "citation [rag:0] replaced by retrieved passage [llm-as-judge:0]",
+      "context": [
+        {
+          "document_id": "rag",
+          "id": "rag:0",
+          "text": "# Retrieval-Augmented Generation Retrieval-augmented generation, or RAG, grounds a language model's answer in documents retrieved at query time instead of relying only on the model's parametric memory. The pipeline has two stages: a retriever fetches the passages most relevant to the question, and a generator conditions on those passages to produce the answer. RAG addresses two weaknesses of using a language model alone. It reduces hallucination by giving the model concrete source text to draw from, and it lets the system answer questions about private or up-to-date information the model was never trained on, simply by adding documents to the index rather than retraining the model. Good RAG answers include citations that point back to the specific chunks the answer relied on. Citations let a reader verify each claim against its source and make it possible to measure whether the answer is actually grounded in the retrieved context rather than invented. The quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find. This is why retrieval quality is measured separately"
+        },
+        {
+          "document_id": "rag",
+          "id": "rag:1",
+          "text": "invented. The quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find. This is why retrieval quality is measured separately from answer quality. If a relevant passage is never retrieved, no amount of prompting will let the model ground its answer in it, so improving retrieval is usually the highest-leverage way to improve a RAG system end to end."
+        },
+        {
+          "document_id": "llm-as-judge",
+          "id": "llm-as-judge:0",
+          "text": "# LLM-as-a-Judge Evaluation Answer quality is hard to measure with string matching because two correct answers can be worded completely differently. LLM-as-a-judge evaluation uses a strong language model to score an answer against a rubric, approximating human judgment at a fraction of the cost and turnaround time. For a RAG system, three rubric dimensions are especially useful. Faithfulness measures whether every claim in the answer is supported by the retrieved context — an unsupported claim is a hallucination even if it happens to be true. Answer relevance measures whether the answer actually addresses the question that was asked. Citation correctness measures whether the cited chunks genuinely support the statements that cite them. To make scores usable, the judge is asked to return structured output: a number in a fixed range for each dimension plus a short rationale. Structured output turns a free-form opinion into machine-readable data that can be aggregated across an evaluation run and tracked over time. LLM judges have known limitations. They can be inconsistent between runs, and they may prefer longer or more confident answers regardless of"
+        }
+      ],
+      "defect": "wrong_passage",
+      "derived_from": "rag-hallucination",
+      "expected_low": [
+        "citation_correctness"
+      ],
+      "human": null,
+      "id": "item-13",
+      "judge": {
+        "citation_correctness": 0.0,
+        "cost_usd": 0.0113,
+        "faithfulness": 1.0,
+        "input_tokens": 1515,
+        "output_tokens": 149,
+        "rationale": "The answer's claims are accurate and supported by the context (specifically rag:0), and it directly addresses the question. However, the citation is incorrect: the content comes from [rag:0], but the answer cites [llm-as-judge:0], which does not contain the claim about grounding answers in retrieved documents to reduce hallucination.",
+        "relevance": 1.0
+      },
+      "kind": "defect",
+      "question": "How does RAG reduce hallucination?",
+      "reference_answer": "RAG reduces hallucination by giving the model concrete source text to draw from."
+    },
+    {
+      "answer": "Chunking matters because a chunk is the unit of retrieval. If a chunk is too large, its embedding blurs several topics together and retrieval precision drops; if it is too small, it loses the surrounding context needed to answer a question [chunking:0].",
+      "case_id": "chunk-unit",
+      "change": null,
+      "context": [
+        {
+          "document_id": "chunking",
+          "id": "chunking:0",
+          "text": "# Chunking Documents for Retrieval Retrieval systems do not embed whole documents; they split them into smaller chunks and embed each chunk independently. Chunking matters because a chunk is the unit of retrieval: if a chunk is too large, its embedding blurs several topics together and retrieval precision drops; if it is too small, it loses the surrounding context needed to answer a question. A common strategy is fixed-size chunking with overlap. The document is divided into windows of a target length, and consecutive windows overlap by a fixed amount so that a sentence spanning a boundary is not lost. The overlap means a fact that falls at the edge of one chunk also appears whole in the next, improving the odds that retrieval surfaces it. The target size is usually expressed in tokens or words. Smaller chunks of a hundred to two hundred words favor precision and pinpoint citations, while larger chunks favor recall and richer context. The right size depends on the documents and the questions, which is exactly the kind of decision an evaluation harness exists to"
+        },
+        {
+          "document_id": "chunking",
+          "id": "chunking:1",
+          "text": "while larger chunks favor recall and richer context. The right size depends on the documents and the questions, which is exactly the kind of decision an evaluation harness exists to settle. More advanced strategies chunk on semantic or structural boundaries — paragraphs, headings, or sentence groups — so that each chunk is internally coherent. Whatever the strategy, chunking should be deterministic so that re-ingesting the same document yields the same chunks and evaluation results remain reproducible."
+        },
+        {
+          "document_id": "rag",
+          "id": "rag:1",
+          "text": "invented. The quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find. This is why retrieval quality is measured separately from answer quality. If a relevant passage is never retrieved, no amount of prompting will let the model ground its answer in it, so improving retrieval is usually the highest-leverage way to improve a RAG system end to end."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-14",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.01064,
+        "faithfulness": 1.0,
+        "input_tokens": 1338,
+        "output_tokens": 158,
+        "rationale": "The answer accurately reflects the content in [chunking:0], stating that a chunk is the unit of retrieval and explaining the trade-offs of too large (blurred topics, lower precision) and too small (lost context). All claims are fully supported by the cited passage. It directly addresses the question and matches the reference answer. The citation correctly supports the claims made.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "Why does chunking matter for retrieval?",
+      "reference_answer": "Chunking matters because a chunk is the unit of retrieval: too large blurs topics, too small loses context."
+    },
+    {
+      "answer": "Eventual consistency only guarantees that, if no new writes are made, all replicas eventually converge to the same value. In the meantime, different replicas may return different values for the same key [cap-theorem:0].",
+      "case_id": "cons-eventual",
+      "change": "citation [consistency-models:0] replaced by retrieved passage [cap-theorem:0]",
+      "context": [
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:0",
+          "text": "# Consistency Models A consistency model is a contract between a data store and its clients that defines which orderings of reads and writes are permitted. Stronger models are easier to reason about but cost more in latency and availability; weaker models are faster and more available but push complexity onto the application. Strong consistency, or linearizability, makes the system behave as if there were a single copy of the data and every operation took effect instantaneously at some point between its invocation and its response. Once a write completes, every subsequent read returns that value. Eventual consistency only guarantees that, if no new writes are made, all replicas eventually converge to the same value. In the meantime, different replicas may return different values for the same key. Eventual consistency is common in high-availability systems that prioritize uptime over immediate agreement. Causal consistency sits between the two: operations that are causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total"
+        },
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:1",
+          "text": "causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total order, which makes it cheaper than linearizability while still avoiding the most confusing anomalies of eventual consistency. Read-your-writes consistency, a useful session guarantee, ensures a client always sees the effects of its own prior writes."
+        },
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:0",
+          "text": "# The CAP Theorem The CAP theorem states that a distributed data store cannot simultaneously guarantee all three of consistency, availability, and partition tolerance. Since network partitions are unavoidable in any real distributed system, the practical choice during a partition is between consistency and availability: you must pick one and give up the other. Consistency here means linearizability — every read observes the most recent completed write. Availability means every request to a non-failing node receives a non-error response, even if it might be stale. Partition tolerance means the system continues to operate despite messages being dropped between nodes. A CP system favors consistency: during a partition it may reject requests rather than return possibly stale data. A CP store like a strongly consistent database sacrifices availability to keep every replica in agreement. An AP system favors availability: it keeps serving reads and writes on both sides of the partition and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability."
+        }
+      ],
+      "defect": "wrong_passage",
+      "derived_from": "cons-eventual",
+      "expected_low": [
+        "citation_correctness"
+      ],
+      "human": null,
+      "id": "item-15",
+      "judge": {
+        "citation_correctness": 0.0,
+        "cost_usd": 0.011134999999999999,
+        "faithfulness": 1.0,
+        "input_tokens": 1482,
+        "output_tokens": 149,
+        "rationale": "The answer's claims are accurate and fully supported by the context (specifically consistency-models:0). It directly and correctly addresses the question. However, the citation is wrong: the content is found in [consistency-models:0], not [cap-theorem:0], which discusses the CAP theorem and does not contain this information about eventual consistency.",
+        "relevance": 1.0
+      },
+      "kind": "defect",
+      "question": "What does eventual consistency guarantee?",
+      "reference_answer": "Eventual consistency guarantees only that, with no new writes, all replicas eventually converge to the same value."
+    },
+    {
+      "answer": "BM25 is the standard ranking function for keyword search [keyword-search:0].",
+      "case_id": "kw-bm25",
+      "change": null,
+      "context": [
+        {
+          "document_id": "keyword-search",
+          "id": "keyword-search:0",
+          "text": "# Keyword Search and BM25 Keyword search, also called lexical search, ranks documents by the query terms they contain. It is fast, interpretable, and excellent at matching exact terms such as names, error codes, and rare jargon that an embedding model may not represent well. Its weakness is the vocabulary mismatch problem: a document that means the same thing but uses different words will not match. BM25 is the standard ranking function for keyword search. It scores a document by summing, over each query term, a weight that rewards term frequency but with diminishing returns, multiplied by an inverse document frequency factor that down-weights common terms. BM25 also normalizes for document length so that long documents are not unfairly favored just for containing more words. Postgres provides built-in full-text search. Text is converted to a tsvector of normalized lexemes, and a query is converted to a tsquery; the match operator tests whether the document satisfies the query. The ts_rank_cd function then ranks matches by term proximity and frequency. A GIN index on the tsvector column makes these lookups fast. Because"
+        },
+        {
+          "document_id": "keyword-search",
+          "id": "keyword-search:1",
+          "text": "tests whether the document satisfies the query. The ts_rank_cd function then ranks matches by term proximity and frequency. A GIN index on the tsvector column makes these lookups fast. Because keyword search and semantic search fail in different ways — lexical search misses paraphrases, semantic search misses exact rare terms — combining them tends to outperform either one alone."
+        },
+        {
+          "document_id": "evaluation-metrics",
+          "id": "evaluation-metrics:0",
+          "text": "# Retrieval Evaluation Metrics Retrieval quality is measured against a labeled set of queries for which the relevant documents are known. The metrics below all operate on the ranked list of results a retriever returns for each query. Recall at k is the fraction of all relevant documents that appear in the top k results. It answers \"of everything I should have found, how much did I find near the top.\" Precision at k is the fraction of the top k results that are actually relevant. Recall rewards finding relevant items; precision penalizes returning irrelevant ones. Mean reciprocal rank, or MRR, focuses on the position of the first relevant result. For each query it takes the reciprocal of the rank of the first relevant hit — one if it is first, one half if it is second — and averages this over all queries. MRR is ideal when the user mostly cares about the single best answer being near the top. Normalized discounted cumulative gain, nDCG, accounts for the entire ranking with a position discount: a relevant result contributes less"
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-16",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.00981,
+        "faithfulness": 1.0,
+        "input_tokens": 1447,
+        "output_tokens": 103,
+        "rationale": "The answer correctly states BM25 is the standard ranking function, fully supported by keyword-search:0 which explicitly says this. The citation is accurate and the answer matches the reference.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What is the standard ranking function for keyword search?",
+      "reference_answer": "BM25 is the standard ranking function for keyword search."
+    },
+    {
+      "answer": "During a network partition, the CAP theorem forces you to choose between consistency and availability — you must pick one and give up the other [doc:0].\n\nA CP system favors consistency, potentially rejecting requests rather than returning possibly stale data, while an AP system favors availability, continuing to serve reads and writes on both sides of the partition and reconciling the divergence afterward [doc:0].",
+      "case_id": "cap-tradeoff",
+      "change": "citation [cap-theorem:0] replaced by the non-existent id [doc:0]",
+      "context": [
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:0",
+          "text": "# The CAP Theorem The CAP theorem states that a distributed data store cannot simultaneously guarantee all three of consistency, availability, and partition tolerance. Since network partitions are unavoidable in any real distributed system, the practical choice during a partition is between consistency and availability: you must pick one and give up the other. Consistency here means linearizability — every read observes the most recent completed write. Availability means every request to a non-failing node receives a non-error response, even if it might be stale. Partition tolerance means the system continues to operate despite messages being dropped between nodes. A CP system favors consistency: during a partition it may reject requests rather than return possibly stale data. A CP store like a strongly consistent database sacrifices availability to keep every replica in agreement. An AP system favors availability: it keeps serving reads and writes on both sides of the partition and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability."
+        },
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:1",
+          "text": "and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability. CAP only forces the trade-off when a partition actually occurs, which is why practitioners often describe the real decision as a spectrum of latency versus consistency rather than a binary choice."
+        },
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:1",
+          "text": "causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total order, which makes it cheaper than linearizability while still avoiding the most confusing anomalies of eventual consistency. Read-your-writes consistency, a useful session guarantee, ensures a client always sees the effects of its own prior writes."
+        }
+      ],
+      "defect": "nonexistent_id",
+      "derived_from": "cap-tradeoff",
+      "expected_low": [
+        "citation_correctness"
+      ],
+      "human": null,
+      "id": "item-17",
+      "judge": {
+        "citation_correctness": 0.5,
+        "cost_usd": 0.016385,
+        "faithfulness": 1.0,
+        "input_tokens": 1342,
+        "output_tokens": 387,
+        "rationale": "The answer accurately reflects the context: during a partition CAP forces a choice between consistency and availability, and the CP/AP descriptions match cap-theorem:0 faithfully. It directly and fully addresses the question. However, the citation uses [doc:0] rather than the actual passage identifier [cap-theorem:0]; while the cited claims are indeed supported by that passage, the mismatched identifier makes the citation labeling only partially correct.",
+        "relevance": 1.0
+      },
+      "kind": "defect",
+      "question": "During a network partition, what does the CAP theorem force you to choose between?",
+      "reference_answer": "During a partition you must choose between consistency and availability; you cannot have both."
+    },
+    {
+      "answer": "Similarity between two embeddings is usually measured with cosine similarity, which compares the angle between the vectors and ignores their magnitude. Cosine similarity ranges from -1 to 1, where 1 means the vectors point in the same direction and are maximally similar. When vectors are stored normalized, cosine similarity reduces to a simple dot product. [embeddings:0][embeddings:1]",
+      "case_id": "emb-cosine",
+      "change": null,
+      "context": [
+        {
+          "document_id": "embeddings",
+          "id": "embeddings:0",
+          "text": "# Text Embeddings A text embedding is a dense vector of floating-point numbers that represents the meaning of a piece of text in a high-dimensional space. Texts with similar meaning map to vectors that are close together, so semantic similarity becomes geometric proximity that a computer can measure directly. Embeddings are produced by neural models trained so that related inputs land near each other. Modern sentence-embedding models output vectors with a few hundred dimensions; the bge-small model, for example, produces 384-dimensional vectors. Because the dimensionality is fixed, every text — short or long — becomes a vector of the same length. Similarity between two embeddings is usually measured with cosine similarity, which compares the angle between the vectors and ignores their magnitude. Cosine similarity ranges from -1 to 1, where 1 means the vectors point in the same direction and are maximally similar. Many systems store normalized vectors so that cosine similarity reduces to a simple dot product. Embeddings power semantic search: a query is embedded with the same model as the documents, and the nearest vectors are returned as"
+        },
+        {
+          "document_id": "embeddings",
+          "id": "embeddings:1",
+          "text": "cosine similarity reduces to a simple dot product. Embeddings power semantic search: a query is embedded with the same model as the documents, and the nearest vectors are returned as the most relevant results. Unlike keyword matching, embedding search can retrieve passages that share no words with the query but express the same idea, which is its key advantage over lexical search."
+        },
+        {
+          "document_id": "vector-search",
+          "id": "vector-search:0",
+          "text": "# Vector Search and Approximate Nearest Neighbors Vector search finds the stored vectors closest to a query vector under a distance metric such as cosine or Euclidean distance. A brute-force scan compares the query against every stored vector, which is exact but grows linearly with the size of the collection and becomes too slow for millions of vectors. Approximate nearest neighbor, or ANN, search trades a small amount of accuracy for a large gain in speed. Instead of scanning everything, an ANN index narrows the search to a promising subset of candidates. The most common index for high-recall search is HNSW, Hierarchical Navigable Small World graphs, which connect vectors into a layered graph that can be traversed in logarithmic time. In Postgres, the pgvector extension adds a vector column type and supports both exact search and HNSW indexes. A cosine-distance query is written with the distance operator, ordering rows by how close their embedding is to the query vector and limiting to the top results. Recall is the key quality measure for an ANN index: it is the fraction of"
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-18",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.01208,
+        "faithfulness": 1.0,
+        "input_tokens": 1601,
+        "output_tokens": 163,
+        "rationale": "The answer accurately states cosine similarity, the -1 to 1 range, and the normalized-vector dot product reduction, all supported by [embeddings:0] and [embeddings:1]. It directly addresses the question matching the reference. Citations are correct, though the dot product claim is specifically in embeddings:0/embeddings:1 boundary and is properly supported.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "How is similarity between two embeddings usually measured?",
+      "reference_answer": "Similarity between embeddings is usually measured with cosine similarity, comparing the angle between vectors and ignoring magnitude."
+    },
+    {
+      "answer": "Chunking should be deterministic so that re-ingesting the same document yields the same chunks and evaluation results remain reproducible. [chunking:1]",
+      "case_id": "chunk-deterministic",
+      "change": null,
+      "context": [
+        {
+          "document_id": "chunking",
+          "id": "chunking:1",
+          "text": "while larger chunks favor recall and richer context. The right size depends on the documents and the questions, which is exactly the kind of decision an evaluation harness exists to settle. More advanced strategies chunk on semantic or structural boundaries — paragraphs, headings, or sentence groups — so that each chunk is internally coherent. Whatever the strategy, chunking should be deterministic so that re-ingesting the same document yields the same chunks and evaluation results remain reproducible."
+        },
+        {
+          "document_id": "chunking",
+          "id": "chunking:0",
+          "text": "# Chunking Documents for Retrieval Retrieval systems do not embed whole documents; they split them into smaller chunks and embed each chunk independently. Chunking matters because a chunk is the unit of retrieval: if a chunk is too large, its embedding blurs several topics together and retrieval precision drops; if it is too small, it loses the surrounding context needed to answer a question. A common strategy is fixed-size chunking with overlap. The document is divided into windows of a target length, and consecutive windows overlap by a fixed amount so that a sentence spanning a boundary is not lost. The overlap means a fact that falls at the edge of one chunk also appears whole in the next, improving the odds that retrieval surfaces it. The target size is usually expressed in tokens or words. Smaller chunks of a hundred to two hundred words favor precision and pinpoint citations, while larger chunks favor recall and richer context. The right size depends on the documents and the questions, which is exactly the kind of decision an evaluation harness exists to"
+        },
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:1",
+          "text": "causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total order, which makes it cheaper than linearizability while still avoiding the most confusing anomalies of eventual consistency. Read-your-writes consistency, a useful session guarantee, ensures a client always sees the effects of its own prior writes."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-19",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.00928,
+        "faithfulness": 1.0,
+        "input_tokens": 1311,
+        "output_tokens": 109,
+        "rationale": "The answer is directly supported by chunking:1, which states chunking should be deterministic for reproducible re-ingestion and evaluation. It fully addresses the question and the citation correctly supports the claim.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "Why should chunking be deterministic?",
+      "reference_answer": "Chunking should be deterministic so re-ingesting the same document yields the same chunks and evaluation stays reproducible."
+    },
+    {
+      "answer": "HNSW (Hierarchical Navigable Small World graphs) is the most common index for high-recall search [vector-search:0].",
+      "case_id": "vec-hnsw",
+      "change": null,
+      "context": [
+        {
+          "document_id": "vector-search",
+          "id": "vector-search:0",
+          "text": "# Vector Search and Approximate Nearest Neighbors Vector search finds the stored vectors closest to a query vector under a distance metric such as cosine or Euclidean distance. A brute-force scan compares the query against every stored vector, which is exact but grows linearly with the size of the collection and becomes too slow for millions of vectors. Approximate nearest neighbor, or ANN, search trades a small amount of accuracy for a large gain in speed. Instead of scanning everything, an ANN index narrows the search to a promising subset of candidates. The most common index for high-recall search is HNSW, Hierarchical Navigable Small World graphs, which connect vectors into a layered graph that can be traversed in logarithmic time. In Postgres, the pgvector extension adds a vector column type and supports both exact search and HNSW indexes. A cosine-distance query is written with the distance operator, ordering rows by how close their embedding is to the query vector and limiting to the top results. Recall is the key quality measure for an ANN index: it is the fraction of"
+        },
+        {
+          "document_id": "vector-search",
+          "id": "vector-search:1",
+          "text": "how close their embedding is to the query vector and limiting to the top results. Recall is the key quality measure for an ANN index: it is the fraction of the true nearest neighbors that the index actually returns. Index parameters trade recall against build time and query latency, so tuning an ANN index means choosing an acceptable point on the recall-versus-speed curve for the workload."
+        },
+        {
+          "document_id": "keyword-search",
+          "id": "keyword-search:1",
+          "text": "tests whether the document satisfies the query. The ts_rank_cd function then ranks matches by term proximity and frequency. A GIN index on the tsvector column makes these lookups fast. Because keyword search and semantic search fail in different ways — lexical search misses paraphrases, semantic search misses exact rare terms — combining them tends to outperform either one alone."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-20",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.00911,
+        "faithfulness": 1.0,
+        "input_tokens": 1267,
+        "output_tokens": 111,
+        "rationale": "The answer correctly states HNSW is the most common index for high-recall search, directly supported by vector-search:0 which explicitly says so. The claim is faithful, relevant, and the citation accurately supports it.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What index is most common for high-recall vector search?",
+      "reference_answer": "HNSW (Hierarchical Navigable Small World) graphs are the most common index for high-recall search."
+    },
+    {
+      "answer": "Recall at k is the fraction of all relevant documents that appear in the top k results. It answers \"of everything I should have found, how much did I find near the top.\" [evaluation-metrics:0]",
+      "case_id": "metric-recall",
+      "change": null,
+      "context": [
+        {
+          "document_id": "evaluation-metrics",
+          "id": "evaluation-metrics:0",
+          "text": "# Retrieval Evaluation Metrics Retrieval quality is measured against a labeled set of queries for which the relevant documents are known. The metrics below all operate on the ranked list of results a retriever returns for each query. Recall at k is the fraction of all relevant documents that appear in the top k results. It answers \"of everything I should have found, how much did I find near the top.\" Precision at k is the fraction of the top k results that are actually relevant. Recall rewards finding relevant items; precision penalizes returning irrelevant ones. Mean reciprocal rank, or MRR, focuses on the position of the first relevant result. For each query it takes the reciprocal of the rank of the first relevant hit — one if it is first, one half if it is second — and averages this over all queries. MRR is ideal when the user mostly cares about the single best answer being near the top. Normalized discounted cumulative gain, nDCG, accounts for the entire ranking with a position discount: a relevant result contributes less"
+        },
+        {
+          "document_id": "vector-search",
+          "id": "vector-search:1",
+          "text": "how close their embedding is to the query vector and limiting to the top results. Recall is the key quality measure for an ANN index: it is the fraction of the true nearest neighbors that the index actually returns. Index parameters trade recall against build time and query latency, so tuning an ANN index means choosing an acceptable point on the recall-versus-speed curve for the workload."
+        },
+        {
+          "document_id": "rag",
+          "id": "rag:1",
+          "text": "invented. The quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find. This is why retrieval quality is measured separately from answer quality. If a relevant passage is never retrieved, no amount of prompting will let the model ground its answer in it, so improving retrieval is usually the highest-leverage way to improve a RAG system end to end."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-21",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.008740000000000001,
+        "faithfulness": 1.0,
+        "input_tokens": 1258,
+        "output_tokens": 98,
+        "rationale": "The answer is directly supported by passage [evaluation-metrics:0], which defines recall at k verbatim. It fully addresses the question and the citation correctly supports the claim.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What is recall at k?",
+      "reference_answer": "Recall at k is the fraction of all relevant documents that appear in the top k results."
+    },
+    {
+      "answer": "During a network partition, the CAP theorem forces you to choose between consistency and availability — you must pick one and give up the other [cap-theorem:0].\n\nA CP system favors consistency, potentially rejecting requests rather than returning possibly stale data, while an AP system favors availability, continuing to serve reads and writes on both sides of the partition and reconciling the divergence afterward [cap-theorem:0].",
+      "case_id": "cap-tradeoff",
+      "change": null,
+      "context": [
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:0",
+          "text": "# The CAP Theorem The CAP theorem states that a distributed data store cannot simultaneously guarantee all three of consistency, availability, and partition tolerance. Since network partitions are unavoidable in any real distributed system, the practical choice during a partition is between consistency and availability: you must pick one and give up the other. Consistency here means linearizability — every read observes the most recent completed write. Availability means every request to a non-failing node receives a non-error response, even if it might be stale. Partition tolerance means the system continues to operate despite messages being dropped between nodes. A CP system favors consistency: during a partition it may reject requests rather than return possibly stale data. A CP store like a strongly consistent database sacrifices availability to keep every replica in agreement. An AP system favors availability: it keeps serving reads and writes on both sides of the partition and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability."
+        },
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:1",
+          "text": "and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability. CAP only forces the trade-off when a partition actually occurs, which is why practitioners often describe the real decision as a spectrum of latency versus consistency rather than a binary choice."
+        },
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:1",
+          "text": "causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total order, which makes it cheaper than linearizability while still avoiding the most confusing anomalies of eventual consistency. Read-your-writes consistency, a useful session guarantee, ensures a client always sees the effects of its own prior writes."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-22",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.009875000000000002,
+        "faithfulness": 1.0,
+        "input_tokens": 1355,
+        "output_tokens": 124,
+        "rationale": "The answer correctly states that during a partition CAP forces a choice between consistency and availability, fully supported by cap-theorem:0. The CP/AP elaboration is also accurate and cited correctly. It directly addresses the question and matches the reference.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "During a network partition, what does the CAP theorem force you to choose between?",
+      "reference_answer": "During a partition you must choose between consistency and availability; you cannot have both."
+    },
+    {
+      "answer": "Embedding search can retrieve passages that share no words with the query but express the same idea, which is its key advantage over lexical (keyword) search [embeddings:1].",
+      "case_id": "emb-advantage",
+      "change": null,
+      "context": [
+        {
+          "document_id": "embeddings",
+          "id": "embeddings:1",
+          "text": "cosine similarity reduces to a simple dot product. Embeddings power semantic search: a query is embedded with the same model as the documents, and the nearest vectors are returned as the most relevant results. Unlike keyword matching, embedding search can retrieve passages that share no words with the query but express the same idea, which is its key advantage over lexical search."
+        },
+        {
+          "document_id": "embeddings",
+          "id": "embeddings:0",
+          "text": "# Text Embeddings A text embedding is a dense vector of floating-point numbers that represents the meaning of a piece of text in a high-dimensional space. Texts with similar meaning map to vectors that are close together, so semantic similarity becomes geometric proximity that a computer can measure directly. Embeddings are produced by neural models trained so that related inputs land near each other. Modern sentence-embedding models output vectors with a few hundred dimensions; the bge-small model, for example, produces 384-dimensional vectors. Because the dimensionality is fixed, every text — short or long — becomes a vector of the same length. Similarity between two embeddings is usually measured with cosine similarity, which compares the angle between the vectors and ignores their magnitude. Cosine similarity ranges from -1 to 1, where 1 means the vectors point in the same direction and are maximally similar. Many systems store normalized vectors so that cosine similarity reduces to a simple dot product. Embeddings power semantic search: a query is embedded with the same model as the documents, and the nearest vectors are returned as"
+        },
+        {
+          "document_id": "hybrid-retrieval",
+          "id": "hybrid-retrieval:1",
+          "text": "uses only the rank positions, not the raw similarity scores, so it does not matter that cosine distances and BM25 scores live on completely different scales. This makes hybrid retrieval easy to assemble from heterogeneous retrievers. An optional reranking stage can follow fusion. A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly, which is more accurate than comparing independent embeddings but too expensive to run over the whole collection, so it is applied only to the fused shortlist."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-23",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.009565,
+        "faithfulness": 1.0,
+        "input_tokens": 1333,
+        "output_tokens": 116,
+        "rationale": "The answer accurately states that embedding search can retrieve passages sharing no words with the query but expressing the same idea, directly supported by [embeddings:1]. It fully addresses the question and the citation correctly backs the claim.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What can embedding search do that keyword matching cannot?",
+      "reference_answer": "Embedding search can retrieve passages that share no words with the query but express the same idea."
+    },
+    {
+      "answer": "According to the context, LLM judges have known limitations: they can be inconsistent between runs, and they may prefer longer or more confident answers regardless of correctness, a bias worth controlling for [llm-as-judge:0][llm-as-judge:1]. Because of this, the judge track complements rather than replaces the deterministic retrieval metrics [llm-as-judge:1].",
+      "case_id": "judge-limits",
+      "change": null,
+      "context": [
+        {
+          "document_id": "llm-as-judge",
+          "id": "llm-as-judge:0",
+          "text": "# LLM-as-a-Judge Evaluation Answer quality is hard to measure with string matching because two correct answers can be worded completely differently. LLM-as-a-judge evaluation uses a strong language model to score an answer against a rubric, approximating human judgment at a fraction of the cost and turnaround time. For a RAG system, three rubric dimensions are especially useful. Faithfulness measures whether every claim in the answer is supported by the retrieved context — an unsupported claim is a hallucination even if it happens to be true. Answer relevance measures whether the answer actually addresses the question that was asked. Citation correctness measures whether the cited chunks genuinely support the statements that cite them. To make scores usable, the judge is asked to return structured output: a number in a fixed range for each dimension plus a short rationale. Structured output turns a free-form opinion into machine-readable data that can be aggregated across an evaluation run and tracked over time. LLM judges have known limitations. They can be inconsistent between runs, and they may prefer longer or more confident answers regardless of"
+        },
+        {
+          "document_id": "llm-as-judge",
+          "id": "llm-as-judge:1",
+          "text": "across an evaluation run and tracked over time. LLM judges have known limitations. They can be inconsistent between runs, and they may prefer longer or more confident answers regardless of correctness, a bias worth controlling for. Because of this, the judge track complements rather than replaces the retrieval metrics, which are deterministic and need no model at all."
+        },
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:1",
+          "text": "and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability. CAP only forces the trade-off when a partition actually occurs, which is why practitioners often describe the real decision as a spectrum of latency versus consistency rather than a binary choice."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-24",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.010785,
+        "faithfulness": 1.0,
+        "input_tokens": 1367,
+        "output_tokens": 158,
+        "rationale": "The answer accurately states the known limitations (inconsistency between runs, bias toward longer/more confident answers) directly supported by the context passages. It correctly cites both passages, which contain the relevant claims. The additional point about judge track complementing retrieval metrics is supported by llm-as-judge:1. Fully relevant to the question and matches the reference.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What are known limitations of LLM judges?",
+      "reference_answer": "LLM judges can be inconsistent between runs and may prefer longer or more confident answers regardless of correctness."
+    },
+    {
+      "answer": "An AP system favors availability: during a partition it keeps serving reads and writes on both sides of the partition and reconciles the divergence afterward, accepting that clients may temporarily read stale values [cap-theorem:0][cap-theorem:1].",
+      "case_id": "cap-ap",
+      "change": null,
+      "context": [
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:1",
+          "text": "and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability. CAP only forces the trade-off when a partition actually occurs, which is why practitioners often describe the real decision as a spectrum of latency versus consistency rather than a binary choice."
+        },
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:0",
+          "text": "# The CAP Theorem The CAP theorem states that a distributed data store cannot simultaneously guarantee all three of consistency, availability, and partition tolerance. Since network partitions are unavoidable in any real distributed system, the practical choice during a partition is between consistency and availability: you must pick one and give up the other. Consistency here means linearizability — every read observes the most recent completed write. Availability means every request to a non-failing node receives a non-error response, even if it might be stale. Partition tolerance means the system continues to operate despite messages being dropped between nodes. A CP system favors consistency: during a partition it may reject requests rather than return possibly stale data. A CP store like a strongly consistent database sacrifices availability to keep every replica in agreement. An AP system favors availability: it keeps serving reads and writes on both sides of the partition and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability."
+        },
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:1",
+          "text": "causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total order, which makes it cheaper than linearizability while still avoiding the most confusing anomalies of eventual consistency. Read-your-writes consistency, a useful session guarantee, ensures a client always sees the effects of its own prior writes."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-25",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.01035,
+        "faithfulness": 1.0,
+        "input_tokens": 1315,
+        "output_tokens": 151,
+        "rationale": "The answer accurately describes AP system behavior, fully supported by cap-theorem:0 which explicitly states AP favors availability, serves both sides, and reconciles divergence. cap-theorem:1 also supports the reconciliation and stale read claims. Both citations are correct and relevant, and the answer directly addresses the question.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "How does an AP system behave during a partition?",
+      "reference_answer": "An AP system favors availability, keeps serving both sides of the partition, and reconciles divergence afterward."
+    },
+    {
+      "answer": "RAG reduces hallucination by giving the model concrete source text to draw from—it grounds the language model's answer in documents retrieved at query time rather than relying only on the model's parametric memory [rag:0].",
+      "case_id": "rag-hallucination",
+      "change": null,
+      "context": [
+        {
+          "document_id": "rag",
+          "id": "rag:0",
+          "text": "# Retrieval-Augmented Generation Retrieval-augmented generation, or RAG, grounds a language model's answer in documents retrieved at query time instead of relying only on the model's parametric memory. The pipeline has two stages: a retriever fetches the passages most relevant to the question, and a generator conditions on those passages to produce the answer. RAG addresses two weaknesses of using a language model alone. It reduces hallucination by giving the model concrete source text to draw from, and it lets the system answer questions about private or up-to-date information the model was never trained on, simply by adding documents to the index rather than retraining the model. Good RAG answers include citations that point back to the specific chunks the answer relied on. Citations let a reader verify each claim against its source and make it possible to measure whether the answer is actually grounded in the retrieved context rather than invented. The quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find. This is why retrieval quality is measured separately"
+        },
+        {
+          "document_id": "rag",
+          "id": "rag:1",
+          "text": "invented. The quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find. This is why retrieval quality is measured separately from answer quality. If a relevant passage is never retrieved, no amount of prompting will let the model ground its answer in it, so improving retrieval is usually the highest-leverage way to improve a RAG system end to end."
+        },
+        {
+          "document_id": "llm-as-judge",
+          "id": "llm-as-judge:0",
+          "text": "# LLM-as-a-Judge Evaluation Answer quality is hard to measure with string matching because two correct answers can be worded completely differently. LLM-as-a-judge evaluation uses a strong language model to score an answer against a rubric, approximating human judgment at a fraction of the cost and turnaround time. For a RAG system, three rubric dimensions are especially useful. Faithfulness measures whether every claim in the answer is supported by the retrieved context — an unsupported claim is a hallucination even if it happens to be true. Answer relevance measures whether the answer actually addresses the question that was asked. Citation correctness measures whether the cited chunks genuinely support the statements that cite them. To make scores usable, the judge is asked to return structured output: a number in a fixed range for each dimension plus a short rationale. Structured output turns a free-form opinion into machine-readable data that can be aggregated across an evaluation run and tracked over time. LLM judges have known limitations. They can be inconsistent between runs, and they may prefer longer or more confident answers regardless of"
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-26",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.010575000000000001,
+        "faithfulness": 1.0,
+        "input_tokens": 1505,
+        "output_tokens": 122,
+        "rationale": "The answer accurately states RAG reduces hallucination by providing concrete source text and grounding answers in retrieved documents, both supported by [rag:0]. It directly addresses the question and matches the reference. The citation correctly supports the claims.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "How does RAG reduce hallucination?",
+      "reference_answer": "RAG reduces hallucination by giving the model concrete source text to draw from."
+    },
+    {
+      "answer": "A CP system gives up **availability** during a partition. It favors consistency, so it may reject requests rather than return possibly stale data, sacrificing availability to keep every replica in agreement [cap-theorem:0].",
+      "case_id": "cap-ap",
+      "change": "answer of case 'cap-cp', grounded in this context, to another question",
+      "context": [
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:1",
+          "text": "and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability. CAP only forces the trade-off when a partition actually occurs, which is why practitioners often describe the real decision as a spectrum of latency versus consistency rather than a binary choice."
+        },
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:0",
+          "text": "# The CAP Theorem The CAP theorem states that a distributed data store cannot simultaneously guarantee all three of consistency, availability, and partition tolerance. Since network partitions are unavoidable in any real distributed system, the practical choice during a partition is between consistency and availability: you must pick one and give up the other. Consistency here means linearizability — every read observes the most recent completed write. Availability means every request to a non-failing node receives a non-error response, even if it might be stale. Partition tolerance means the system continues to operate despite messages being dropped between nodes. A CP system favors consistency: during a partition it may reject requests rather than return possibly stale data. A CP store like a strongly consistent database sacrifices availability to keep every replica in agreement. An AP system favors availability: it keeps serving reads and writes on both sides of the partition and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability."
+        },
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:1",
+          "text": "causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total order, which makes it cheaper than linearizability while still avoiding the most confusing anomalies of eventual consistency. Read-your-writes consistency, a useful session guarantee, ensures a client always sees the effects of its own prior writes."
+        }
+      ],
+      "defect": "other_question",
+      "derived_from": "cap-cp",
+      "expected_low": [
+        "relevance"
+      ],
+      "human": null,
+      "id": "item-27",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.009825,
+        "faithfulness": 1.0,
+        "input_tokens": 1295,
+        "output_tokens": 134,
+        "rationale": "The question asks about AP system behavior during a partition, but the answer describes CP system behavior instead. The claims made are faithful to the context and the citation correctly supports them, but the answer fails to address the actual question about AP systems. Relevance is very low because it discusses the opposite case.",
+        "relevance": 0.1
+      },
+      "kind": "defect",
+      "question": "How does an AP system behave during a partition?",
+      "reference_answer": "An AP system favors availability, keeps serving both sides of the partition, and reconciles divergence afterward."
+    },
+    {
+      "answer": "Embedding search can retrieve passages that share no words with the query but express the same idea, which is its key advantage over lexical (keyword) search [hybrid-retrieval:1].",
+      "case_id": "emb-advantage",
+      "change": "citation [embeddings:1] replaced by retrieved passage [hybrid-retrieval:1]",
+      "context": [
+        {
+          "document_id": "embeddings",
+          "id": "embeddings:1",
+          "text": "cosine similarity reduces to a simple dot product. Embeddings power semantic search: a query is embedded with the same model as the documents, and the nearest vectors are returned as the most relevant results. Unlike keyword matching, embedding search can retrieve passages that share no words with the query but express the same idea, which is its key advantage over lexical search."
+        },
+        {
+          "document_id": "embeddings",
+          "id": "embeddings:0",
+          "text": "# Text Embeddings A text embedding is a dense vector of floating-point numbers that represents the meaning of a piece of text in a high-dimensional space. Texts with similar meaning map to vectors that are close together, so semantic similarity becomes geometric proximity that a computer can measure directly. Embeddings are produced by neural models trained so that related inputs land near each other. Modern sentence-embedding models output vectors with a few hundred dimensions; the bge-small model, for example, produces 384-dimensional vectors. Because the dimensionality is fixed, every text — short or long — becomes a vector of the same length. Similarity between two embeddings is usually measured with cosine similarity, which compares the angle between the vectors and ignores their magnitude. Cosine similarity ranges from -1 to 1, where 1 means the vectors point in the same direction and are maximally similar. Many systems store normalized vectors so that cosine similarity reduces to a simple dot product. Embeddings power semantic search: a query is embedded with the same model as the documents, and the nearest vectors are returned as"
+        },
+        {
+          "document_id": "hybrid-retrieval",
+          "id": "hybrid-retrieval:1",
+          "text": "uses only the rank positions, not the raw similarity scores, so it does not matter that cosine distances and BM25 scores live on completely different scales. This makes hybrid retrieval easy to assemble from heterogeneous retrievers. An optional reranking stage can follow fusion. A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly, which is more accurate than comparing independent embeddings but too expensive to run over the whole collection, so it is applied only to the fused shortlist."
+        }
+      ],
+      "defect": "wrong_passage",
+      "derived_from": "emb-advantage",
+      "expected_low": [
+        "citation_correctness"
+      ],
+      "human": null,
+      "id": "item-28",
+      "judge": {
+        "citation_correctness": 0.0,
+        "cost_usd": 0.010365000000000001,
+        "faithfulness": 1.0,
+        "input_tokens": 1343,
+        "output_tokens": 146,
+        "rationale": "The claim is accurate and supported by the context (embeddings:1 and embeddings:0), and it directly answers the question. However, the answer cites hybrid-retrieval:1, which does not contain the supporting content; the correct citation would be embeddings:1 or embeddings:0. Thus citation correctness fails.",
+        "relevance": 1.0
+      },
+      "kind": "defect",
+      "question": "What can embedding search do that keyword matching cannot?",
+      "reference_answer": "Embedding search can retrieve passages that share no words with the query but express the same idea."
+    },
+    {
+      "answer": "Structured output turns a free-form opinion into machine-readable data that can be aggregated across an evaluation run and tracked over time [doc:0].",
+      "case_id": "judge-structured",
+      "change": "citation [llm-as-judge:0] replaced by the non-existent id [doc:0]",
+      "context": [
+        {
+          "document_id": "llm-as-judge",
+          "id": "llm-as-judge:0",
+          "text": "# LLM-as-a-Judge Evaluation Answer quality is hard to measure with string matching because two correct answers can be worded completely differently. LLM-as-a-judge evaluation uses a strong language model to score an answer against a rubric, approximating human judgment at a fraction of the cost and turnaround time. For a RAG system, three rubric dimensions are especially useful. Faithfulness measures whether every claim in the answer is supported by the retrieved context — an unsupported claim is a hallucination even if it happens to be true. Answer relevance measures whether the answer actually addresses the question that was asked. Citation correctness measures whether the cited chunks genuinely support the statements that cite them. To make scores usable, the judge is asked to return structured output: a number in a fixed range for each dimension plus a short rationale. Structured output turns a free-form opinion into machine-readable data that can be aggregated across an evaluation run and tracked over time. LLM judges have known limitations. They can be inconsistent between runs, and they may prefer longer or more confident answers regardless of"
+        },
+        {
+          "document_id": "llm-as-judge",
+          "id": "llm-as-judge:1",
+          "text": "across an evaluation run and tracked over time. LLM judges have known limitations. They can be inconsistent between runs, and they may prefer longer or more confident answers regardless of correctness, a bias worth controlling for. Because of this, the judge track complements rather than replaces the retrieval metrics, which are deterministic and need no model at all."
+        },
+        {
+          "document_id": "chunking",
+          "id": "chunking:1",
+          "text": "while larger chunks favor recall and richer context. The right size depends on the documents and the questions, which is exactly the kind of decision an evaluation harness exists to settle. More advanced strategies chunk on semantic or structural boundaries — paragraphs, headings, or sentence groups — so that each chunk is internally coherent. Whatever the strategy, chunking should be deterministic so that re-ingesting the same document yields the same chunks and evaluation results remain reproducible."
+        }
+      ],
+      "defect": "nonexistent_id",
+      "derived_from": "judge-structured",
+      "expected_low": [
+        "citation_correctness"
+      ],
+      "human": null,
+      "id": "item-29",
+      "judge": {
+        "citation_correctness": 0.0,
+        "cost_usd": 0.01105,
+        "faithfulness": 1.0,
+        "input_tokens": 1310,
+        "output_tokens": 180,
+        "rationale": "The answer's claim is directly supported by passage llm-as-judge:0, which states structured output turns free-form opinion into machine-readable data aggregated and tracked over time. It fully addresses the question of why the judge returns structured output. However, the citation marker [doc:0] does not correspond to the actual passage identifier (llm-as-judge:0), and the metadata notes no valid citations present, so citation correctness fails.",
+        "relevance": 1.0
+      },
+      "kind": "defect",
+      "question": "Why does the judge return structured output?",
+      "reference_answer": "Structured output turns a free-form opinion into machine-readable data that can be aggregated across a run and tracked over time."
+    },
+    {
+      "answer": "Causal consistency is a model that sits between strong consistency and eventual consistency. In it, operations that are causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total order, which makes it cheaper than linearizability while still avoiding the most confusing anomalies of eventual consistency [consistency-models:0][consistency-models:1].",
+      "case_id": "cons-causal",
+      "change": null,
+      "context": [
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:0",
+          "text": "# Consistency Models A consistency model is a contract between a data store and its clients that defines which orderings of reads and writes are permitted. Stronger models are easier to reason about but cost more in latency and availability; weaker models are faster and more available but push complexity onto the application. Strong consistency, or linearizability, makes the system behave as if there were a single copy of the data and every operation took effect instantaneously at some point between its invocation and its response. Once a write completes, every subsequent read returns that value. Eventual consistency only guarantees that, if no new writes are made, all replicas eventually converge to the same value. In the meantime, different replicas may return different values for the same key. Eventual consistency is common in high-availability systems that prioritize uptime over immediate agreement. Causal consistency sits between the two: operations that are causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total"
+        },
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:1",
+          "text": "causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total order, which makes it cheaper than linearizability while still avoiding the most confusing anomalies of eventual consistency. Read-your-writes consistency, a useful session guarantee, ensures a client always sees the effects of its own prior writes."
+        },
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:0",
+          "text": "# The CAP Theorem The CAP theorem states that a distributed data store cannot simultaneously guarantee all three of consistency, availability, and partition tolerance. Since network partitions are unavoidable in any real distributed system, the practical choice during a partition is between consistency and availability: you must pick one and give up the other. Consistency here means linearizability — every read observes the most recent completed write. Availability means every request to a non-failing node receives a non-error response, even if it might be stale. Partition tolerance means the system continues to operate despite messages being dropped between nodes. A CP system favors consistency: during a partition it may reject requests rather than return possibly stale data. A CP store like a strongly consistent database sacrifices availability to keep every replica in agreement. An AP system favors availability: it keeps serving reads and writes on both sides of the partition and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-30",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.012285,
+        "faithfulness": 1.0,
+        "input_tokens": 1562,
+        "output_tokens": 179,
+        "rationale": "The answer accurately describes causal consistency, with all claims supported by the context passages. It correctly states it sits between strong and eventual consistency, that causally related operations are seen in the same order, concurrent ones may differ, and it's cheaper than linearizability. All these are directly supported by [consistency-models:0] and [consistency-models:1], which are correctly cited. The answer fully addresses the question and matches the reference.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What is causal consistency?",
+      "reference_answer": "Causal consistency ensures causally related operations are seen in the same order by all processes, while concurrent operations may be seen in different orders."
+    },
+    {
+      "answer": "Structured output turns a free-form opinion into machine-readable data that can be aggregated across an evaluation run and tracked over time [llm-as-judge:0].",
+      "case_id": "judge-structured",
+      "change": null,
+      "context": [
+        {
+          "document_id": "llm-as-judge",
+          "id": "llm-as-judge:0",
+          "text": "# LLM-as-a-Judge Evaluation Answer quality is hard to measure with string matching because two correct answers can be worded completely differently. LLM-as-a-judge evaluation uses a strong language model to score an answer against a rubric, approximating human judgment at a fraction of the cost and turnaround time. For a RAG system, three rubric dimensions are especially useful. Faithfulness measures whether every claim in the answer is supported by the retrieved context — an unsupported claim is a hallucination even if it happens to be true. Answer relevance measures whether the answer actually addresses the question that was asked. Citation correctness measures whether the cited chunks genuinely support the statements that cite them. To make scores usable, the judge is asked to return structured output: a number in a fixed range for each dimension plus a short rationale. Structured output turns a free-form opinion into machine-readable data that can be aggregated across an evaluation run and tracked over time. LLM judges have known limitations. They can be inconsistent between runs, and they may prefer longer or more confident answers regardless of"
+        },
+        {
+          "document_id": "llm-as-judge",
+          "id": "llm-as-judge:1",
+          "text": "across an evaluation run and tracked over time. LLM judges have known limitations. They can be inconsistent between runs, and they may prefer longer or more confident answers regardless of correctness, a bias worth controlling for. Because of this, the judge track complements rather than replaces the retrieval metrics, which are deterministic and need no model at all."
+        },
+        {
+          "document_id": "chunking",
+          "id": "chunking:1",
+          "text": "while larger chunks favor recall and richer context. The right size depends on the documents and the questions, which is exactly the kind of decision an evaluation harness exists to settle. More advanced strategies chunk on semantic or structural boundaries — paragraphs, headings, or sentence groups — so that each chunk is internally coherent. Whatever the strategy, chunking should be deterministic so that re-ingesting the same document yields the same chunks and evaluation results remain reproducible."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-31",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.00988,
+        "faithfulness": 1.0,
+        "input_tokens": 1321,
+        "output_tokens": 131,
+        "rationale": "The answer is directly supported by passage llm-as-judge:0, which states structured output turns a free-form opinion into machine-readable data that can be aggregated across an evaluation run and tracked over time. The answer fully addresses the question and the citation correctly supports the claim.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "Why does the judge return structured output?",
+      "reference_answer": "Structured output turns a free-form opinion into machine-readable data that can be aggregated across a run and tracked over time."
+    },
+    {
+      "answer": "Chunking should be deterministic so that re-ingesting the same document yields the same chunks and evaluation results remain reproducible. [chunking:1] Deterministic chunking also cuts embedding cost by roughly 40%, because unchanged chunks never need to be re-embedded.",
+      "case_id": "chunk-deterministic",
+      "change": "appended an uncited claim absent from every passage: 'Deterministic chunking also cuts embedding cost by roughly 40%, because unchanged chunks never need to be re-embedded.'",
+      "context": [
+        {
+          "document_id": "chunking",
+          "id": "chunking:1",
+          "text": "while larger chunks favor recall and richer context. The right size depends on the documents and the questions, which is exactly the kind of decision an evaluation harness exists to settle. More advanced strategies chunk on semantic or structural boundaries — paragraphs, headings, or sentence groups — so that each chunk is internally coherent. Whatever the strategy, chunking should be deterministic so that re-ingesting the same document yields the same chunks and evaluation results remain reproducible."
+        },
+        {
+          "document_id": "chunking",
+          "id": "chunking:0",
+          "text": "# Chunking Documents for Retrieval Retrieval systems do not embed whole documents; they split them into smaller chunks and embed each chunk independently. Chunking matters because a chunk is the unit of retrieval: if a chunk is too large, its embedding blurs several topics together and retrieval precision drops; if it is too small, it loses the surrounding context needed to answer a question. A common strategy is fixed-size chunking with overlap. The document is divided into windows of a target length, and consecutive windows overlap by a fixed amount so that a sentence spanning a boundary is not lost. The overlap means a fact that falls at the edge of one chunk also appears whole in the next, improving the odds that retrieval surfaces it. The target size is usually expressed in tokens or words. Smaller chunks of a hundred to two hundred words favor precision and pinpoint citations, while larger chunks favor recall and richer context. The right size depends on the documents and the questions, which is exactly the kind of decision an evaluation harness exists to"
+        },
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:1",
+          "text": "causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total order, which makes it cheaper than linearizability while still avoiding the most confusing anomalies of eventual consistency. Read-your-writes consistency, a useful session guarantee, ensures a client always sees the effects of its own prior writes."
+        }
+      ],
+      "defect": "unsupported_claim",
+      "derived_from": "chunk-deterministic",
+      "expected_low": [
+        "faithfulness"
+      ],
+      "human": null,
+      "id": "item-32",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.010995,
+        "faithfulness": 0.5,
+        "input_tokens": 1354,
+        "output_tokens": 169,
+        "rationale": "The first sentence is fully supported by [chunking:1] and correctly cited. However, the second claim about cutting embedding cost by roughly 40% is a fabrication not supported by any context passage, undermining faithfulness. The answer is highly relevant and directly addresses the question, matching the reference. The citation to chunking:1 correctly supports the deterministic/reproducibility claim.",
+        "relevance": 1.0
+      },
+      "kind": "defect",
+      "question": "Why should chunking be deterministic?",
+      "reference_answer": "Chunking should be deterministic so re-ingesting the same document yields the same chunks and evaluation stays reproducible."
+    },
+    {
+      "answer": "The bge-small model produces 384-dimensional vectors [embeddings:0].",
+      "case_id": "emb-dim",
+      "change": null,
+      "context": [
+        {
+          "document_id": "embeddings",
+          "id": "embeddings:0",
+          "text": "# Text Embeddings A text embedding is a dense vector of floating-point numbers that represents the meaning of a piece of text in a high-dimensional space. Texts with similar meaning map to vectors that are close together, so semantic similarity becomes geometric proximity that a computer can measure directly. Embeddings are produced by neural models trained so that related inputs land near each other. Modern sentence-embedding models output vectors with a few hundred dimensions; the bge-small model, for example, produces 384-dimensional vectors. Because the dimensionality is fixed, every text — short or long — becomes a vector of the same length. Similarity between two embeddings is usually measured with cosine similarity, which compares the angle between the vectors and ignores their magnitude. Cosine similarity ranges from -1 to 1, where 1 means the vectors point in the same direction and are maximally similar. Many systems store normalized vectors so that cosine similarity reduces to a simple dot product. Embeddings power semantic search: a query is embedded with the same model as the documents, and the nearest vectors are returned as"
+        },
+        {
+          "document_id": "embeddings",
+          "id": "embeddings:1",
+          "text": "cosine similarity reduces to a simple dot product. Embeddings power semantic search: a query is embedded with the same model as the documents, and the nearest vectors are returned as the most relevant results. Unlike keyword matching, embedding search can retrieve passages that share no words with the query but express the same idea, which is its key advantage over lexical search."
+        },
+        {
+          "document_id": "vector-search",
+          "id": "vector-search:0",
+          "text": "# Vector Search and Approximate Nearest Neighbors Vector search finds the stored vectors closest to a query vector under a distance metric such as cosine or Euclidean distance. A brute-force scan compares the query against every stored vector, which is exact but grows linearly with the size of the collection and becomes too slow for millions of vectors. Approximate nearest neighbor, or ANN, search trades a small amount of accuracy for a large gain in speed. Instead of scanning everything, an ANN index narrows the search to a promising subset of candidates. The most common index for high-recall search is HNSW, Hierarchical Navigable Small World graphs, which connect vectors into a layered graph that can be traversed in logarithmic time. In Postgres, the pgvector extension adds a vector column type and supports both exact search and HNSW indexes. A cosine-distance query is written with the distance operator, ordering rows by how close their embedding is to the query vector and limiting to the top results. Recall is the key quality measure for an ANN index: it is the fraction of"
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-33",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.00963,
+        "faithfulness": 1.0,
+        "input_tokens": 1471,
+        "output_tokens": 91,
+        "rationale": "The answer correctly states 384 dimensions, directly supported by [embeddings:0], which is accurately cited. Fully relevant to the question.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "How many dimensions does the bge-small embedding model output?",
+      "reference_answer": "The bge-small model produces 384-dimensional vectors."
+    },
+    {
+      "answer": "Because the raw discounted gain is divided by the ideal gain — the score of the best possible ordering — which normalizes the result so that nDCG always falls between zero and one, making it comparable across queries with different numbers of relevant documents [evaluation-metrics:1].",
+      "case_id": "metric-ndcg",
+      "change": null,
+      "context": [
+        {
+          "document_id": "evaluation-metrics",
+          "id": "evaluation-metrics:1",
+          "text": "mostly cares about the single best answer being near the top. Normalized discounted cumulative gain, nDCG, accounts for the entire ranking with a position discount: a relevant result contributes less the lower it appears, weighted by one over the logarithm of its rank. The raw discounted gain is divided by the ideal gain — the score of the best possible ordering — so that nDCG always falls between zero and one, making it comparable across queries with different numbers of relevant documents."
+        },
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:1",
+          "text": "and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability. CAP only forces the trade-off when a partition actually occurs, which is why practitioners often describe the real decision as a spectrum of latency versus consistency rather than a binary choice."
+        },
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:0",
+          "text": "# The CAP Theorem The CAP theorem states that a distributed data store cannot simultaneously guarantee all three of consistency, availability, and partition tolerance. Since network partitions are unavoidable in any real distributed system, the practical choice during a partition is between consistency and availability: you must pick one and give up the other. Consistency here means linearizability — every read observes the most recent completed write. Availability means every request to a non-failing node receives a non-error response, even if it might be stale. Partition tolerance means the system continues to operate despite messages being dropped between nodes. A CP system favors consistency: during a partition it may reject requests rather than return possibly stale data. A CP store like a strongly consistent database sacrifices availability to keep every replica in agreement. An AP system favors availability: it keeps serving reads and writes on both sides of the partition and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-34",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.010195,
+        "faithfulness": 1.0,
+        "input_tokens": 1349,
+        "output_tokens": 138,
+        "rationale": "The answer accurately reflects the context passage [evaluation-metrics:1], explaining that nDCG normalizes by dividing raw discounted gain by ideal gain, keeping it between zero and one. All claims are supported, it directly answers the question, and the citation correctly supports the claim.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "Why does nDCG always fall between zero and one?",
+      "reference_answer": "nDCG divides the discounted gain by the ideal gain, so it always falls between zero and one and is comparable across queries."
+    },
+    {
+      "answer": "Approximate nearest neighbor (ANN) search trades a small amount of accuracy for a large gain in speed [vector-search:0].",
+      "case_id": "vec-ann",
+      "change": null,
+      "context": [
+        {
+          "document_id": "vector-search",
+          "id": "vector-search:0",
+          "text": "# Vector Search and Approximate Nearest Neighbors Vector search finds the stored vectors closest to a query vector under a distance metric such as cosine or Euclidean distance. A brute-force scan compares the query against every stored vector, which is exact but grows linearly with the size of the collection and becomes too slow for millions of vectors. Approximate nearest neighbor, or ANN, search trades a small amount of accuracy for a large gain in speed. Instead of scanning everything, an ANN index narrows the search to a promising subset of candidates. The most common index for high-recall search is HNSW, Hierarchical Navigable Small World graphs, which connect vectors into a layered graph that can be traversed in logarithmic time. In Postgres, the pgvector extension adds a vector column type and supports both exact search and HNSW indexes. A cosine-distance query is written with the distance operator, ordering rows by how close their embedding is to the query vector and limiting to the top results. Recall is the key quality measure for an ANN index: it is the fraction of"
+        },
+        {
+          "document_id": "embeddings",
+          "id": "embeddings:1",
+          "text": "cosine similarity reduces to a simple dot product. Embeddings power semantic search: a query is embedded with the same model as the documents, and the nearest vectors are returned as the most relevant results. Unlike keyword matching, embedding search can retrieve passages that share no words with the query but express the same idea, which is its key advantage over lexical search."
+        },
+        {
+          "document_id": "hybrid-retrieval",
+          "id": "hybrid-retrieval:1",
+          "text": "uses only the rank positions, not the raw similarity scores, so it does not matter that cosine distances and BM25 scores live on completely different scales. This makes hybrid retrieval easy to assemble from heterogeneous retrievers. An optional reranking stage can follow fusion. A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly, which is more accurate than comparing independent embeddings but too expensive to run over the whole collection, so it is applied only to the fused shortlist."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-35",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.008935,
+        "faithfulness": 1.0,
+        "input_tokens": 1312,
+        "output_tokens": 95,
+        "rationale": "The answer accurately states that ANN trades accuracy for speed, directly supported by [vector-search:0]. It fully addresses the question and cites correctly.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What does approximate nearest neighbor search trade off?",
+      "reference_answer": "ANN search trades a small amount of accuracy for a large gain in speed."
+    },
+    {
+      "answer": "Recall at k is the fraction of all relevant documents that appear in the top k results. It answers \"of everything I should have found, how much did I find near the top.\" [doc:evaluation-metrics:0]",
+      "case_id": "metric-recall",
+      "change": "citation [evaluation-metrics:0] replaced by the non-existent id [doc:evaluation-metrics:0]",
+      "context": [
+        {
+          "document_id": "evaluation-metrics",
+          "id": "evaluation-metrics:0",
+          "text": "# Retrieval Evaluation Metrics Retrieval quality is measured against a labeled set of queries for which the relevant documents are known. The metrics below all operate on the ranked list of results a retriever returns for each query. Recall at k is the fraction of all relevant documents that appear in the top k results. It answers \"of everything I should have found, how much did I find near the top.\" Precision at k is the fraction of the top k results that are actually relevant. Recall rewards finding relevant items; precision penalizes returning irrelevant ones. Mean reciprocal rank, or MRR, focuses on the position of the first relevant result. For each query it takes the reciprocal of the rank of the first relevant hit — one if it is first, one half if it is second — and averages this over all queries. MRR is ideal when the user mostly cares about the single best answer being near the top. Normalized discounted cumulative gain, nDCG, accounts for the entire ranking with a position discount: a relevant result contributes less"
+        },
+        {
+          "document_id": "vector-search",
+          "id": "vector-search:1",
+          "text": "how close their embedding is to the query vector and limiting to the top results. Recall is the key quality measure for an ANN index: it is the fraction of the true nearest neighbors that the index actually returns. Index parameters trade recall against build time and query latency, so tuning an ANN index means choosing an acceptable point on the recall-versus-speed curve for the workload."
+        },
+        {
+          "document_id": "rag",
+          "id": "rag:1",
+          "text": "invented. The quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find. This is why retrieval quality is measured separately from answer quality. If a relevant passage is never retrieved, no amount of prompting will let the model ground its answer in it, so improving retrieval is usually the highest-leverage way to improve a RAG system end to end."
+        }
+      ],
+      "defect": "nonexistent_id",
+      "derived_from": "metric-recall",
+      "expected_low": [
+        "citation_correctness"
+      ],
+      "human": null,
+      "id": "item-36",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.009795,
+        "faithfulness": 1.0,
+        "input_tokens": 1254,
+        "output_tokens": 141,
+        "rationale": "The answer is directly supported by passage evaluation-metrics:0, which states verbatim that recall at k is the fraction of all relevant documents appearing in the top k results. It fully addresses the question and matches the reference. The citation [doc:evaluation-metrics:0] correctly supports the claim.",
+        "relevance": 1.0
+      },
+      "kind": "defect",
+      "question": "What is recall at k?",
+      "reference_answer": "Recall at k is the fraction of all relevant documents that appear in the top k results."
+    },
+    {
+      "answer": "Eventual consistency only guarantees that, if no new writes are made, all replicas eventually converge to the same value. In the meantime, different replicas may return different values for the same key [consistency-models:0].",
+      "case_id": "cons-eventual",
+      "change": null,
+      "context": [
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:0",
+          "text": "# Consistency Models A consistency model is a contract between a data store and its clients that defines which orderings of reads and writes are permitted. Stronger models are easier to reason about but cost more in latency and availability; weaker models are faster and more available but push complexity onto the application. Strong consistency, or linearizability, makes the system behave as if there were a single copy of the data and every operation took effect instantaneously at some point between its invocation and its response. Once a write completes, every subsequent read returns that value. Eventual consistency only guarantees that, if no new writes are made, all replicas eventually converge to the same value. In the meantime, different replicas may return different values for the same key. Eventual consistency is common in high-availability systems that prioritize uptime over immediate agreement. Causal consistency sits between the two: operations that are causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total"
+        },
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:1",
+          "text": "causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total order, which makes it cheaper than linearizability while still avoiding the most confusing anomalies of eventual consistency. Read-your-writes consistency, a useful session guarantee, ensures a client always sees the effects of its own prior writes."
+        },
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:0",
+          "text": "# The CAP Theorem The CAP theorem states that a distributed data store cannot simultaneously guarantee all three of consistency, availability, and partition tolerance. Since network partitions are unavoidable in any real distributed system, the practical choice during a partition is between consistency and availability: you must pick one and give up the other. Consistency here means linearizability — every read observes the most recent completed write. Availability means every request to a non-failing node receives a non-error response, even if it might be stale. Partition tolerance means the system continues to operate despite messages being dropped between nodes. A CP system favors consistency: during a partition it may reject requests rather than return possibly stale data. A CP store like a strongly consistent database sacrifices availability to keep every replica in agreement. An AP system favors availability: it keeps serving reads and writes on both sides of the partition and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-37",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.009850000000000001,
+        "faithfulness": 1.0,
+        "input_tokens": 1480,
+        "output_tokens": 98,
+        "rationale": "The answer accurately states eventual consistency's guarantee, directly supported by consistency-models:0. It addresses the question fully and the citation correctly supports the claims.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What does eventual consistency guarantee?",
+      "reference_answer": "Eventual consistency guarantees only that, with no new writes, all replicas eventually converge to the same value."
+    },
+    {
+      "answer": "Faithfulness measures whether every claim in the answer is supported by the retrieved context — an unsupported claim is considered a hallucination even if it happens to be true [llm-as-judge:0].",
+      "case_id": "judge-faithfulness",
+      "change": null,
+      "context": [
+        {
+          "document_id": "llm-as-judge",
+          "id": "llm-as-judge:0",
+          "text": "# LLM-as-a-Judge Evaluation Answer quality is hard to measure with string matching because two correct answers can be worded completely differently. LLM-as-a-judge evaluation uses a strong language model to score an answer against a rubric, approximating human judgment at a fraction of the cost and turnaround time. For a RAG system, three rubric dimensions are especially useful. Faithfulness measures whether every claim in the answer is supported by the retrieved context — an unsupported claim is a hallucination even if it happens to be true. Answer relevance measures whether the answer actually addresses the question that was asked. Citation correctness measures whether the cited chunks genuinely support the statements that cite them. To make scores usable, the judge is asked to return structured output: a number in a fixed range for each dimension plus a short rationale. Structured output turns a free-form opinion into machine-readable data that can be aggregated across an evaluation run and tracked over time. LLM judges have known limitations. They can be inconsistent between runs, and they may prefer longer or more confident answers regardless of"
+        },
+        {
+          "document_id": "consistency-models",
+          "id": "consistency-models:0",
+          "text": "# Consistency Models A consistency model is a contract between a data store and its clients that defines which orderings of reads and writes are permitted. Stronger models are easier to reason about but cost more in latency and availability; weaker models are faster and more available but push complexity onto the application. Strong consistency, or linearizability, makes the system behave as if there were a single copy of the data and every operation took effect instantaneously at some point between its invocation and its response. Once a write completes, every subsequent read returns that value. Eventual consistency only guarantees that, if no new writes are made, all replicas eventually converge to the same value. In the meantime, different replicas may return different values for the same key. Eventual consistency is common in high-availability systems that prioritize uptime over immediate agreement. Causal consistency sits between the two: operations that are causally related are seen by all processes in the same order, while concurrent operations may be seen in different orders. It preserves cause and effect without requiring a global total"
+        },
+        {
+          "document_id": "cap-theorem",
+          "id": "cap-theorem:0",
+          "text": "# The CAP Theorem The CAP theorem states that a distributed data store cannot simultaneously guarantee all three of consistency, availability, and partition tolerance. Since network partitions are unavoidable in any real distributed system, the practical choice during a partition is between consistency and availability: you must pick one and give up the other. Consistency here means linearizability — every read observes the most recent completed write. Availability means every request to a non-failing node receives a non-error response, even if it might be stale. Partition tolerance means the system continues to operate despite messages being dropped between nodes. A CP system favors consistency: during a partition it may reject requests rather than return possibly stale data. A CP store like a strongly consistent database sacrifices availability to keep every replica in agreement. An AP system favors availability: it keeps serving reads and writes on both sides of the partition and reconciles the divergence afterward, accepting that clients may temporarily read stale values. In normal operation, with no partition present, a system can offer both strong consistency and high availability."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-38",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.01141,
+        "faithfulness": 1.0,
+        "input_tokens": 1717,
+        "output_tokens": 113,
+        "rationale": "The answer accurately states that faithfulness measures whether every claim is supported by retrieved context, directly matching passage llm-as-judge:0. It fully addresses the question, and the citation correctly supports the claim.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What does the faithfulness dimension measure?",
+      "reference_answer": "Faithfulness measures whether every claim in the answer is supported by the retrieved context; an unsupported claim is a hallucination."
+    },
+    {
+      "answer": "Retrieval is the limiting factor because the quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find [rag:1][rag:0]. If a relevant passage is never retrieved, no amount of prompting will let the model ground its answer in it, which is why improving retrieval is usually the highest-leverage way to improve a RAG system end to end [rag:1].",
+      "case_id": "rag-bound",
+      "change": null,
+      "context": [
+        {
+          "document_id": "rag",
+          "id": "rag:1",
+          "text": "invented. The quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find. This is why retrieval quality is measured separately from answer quality. If a relevant passage is never retrieved, no amount of prompting will let the model ground its answer in it, so improving retrieval is usually the highest-leverage way to improve a RAG system end to end."
+        },
+        {
+          "document_id": "rag",
+          "id": "rag:0",
+          "text": "# Retrieval-Augmented Generation Retrieval-augmented generation, or RAG, grounds a language model's answer in documents retrieved at query time instead of relying only on the model's parametric memory. The pipeline has two stages: a retriever fetches the passages most relevant to the question, and a generator conditions on those passages to produce the answer. RAG addresses two weaknesses of using a language model alone. It reduces hallucination by giving the model concrete source text to draw from, and it lets the system answer questions about private or up-to-date information the model was never trained on, simply by adding documents to the index rather than retraining the model. Good RAG answers include citations that point back to the specific chunks the answer relied on. Citations let a reader verify each claim against its source and make it possible to measure whether the answer is actually grounded in the retrieved context rather than invented. The quality of a RAG system is bounded by its retrieval: the generator cannot cite what the retriever failed to find. This is why retrieval quality is measured separately"
+        },
+        {
+          "document_id": "hybrid-retrieval",
+          "id": "hybrid-retrieval:1",
+          "text": "uses only the rank positions, not the raw similarity scores, so it does not matter that cosine distances and BM25 scores live on completely different scales. This makes hybrid retrieval easy to assemble from heterogeneous retrievers. An optional reranking stage can follow fusion. A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly, which is more accurate than comparing independent embeddings but too expensive to run over the whole collection, so it is applied only to the fused shortlist."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-39",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.01088,
+        "faithfulness": 1.0,
+        "input_tokens": 1411,
+        "output_tokens": 153,
+        "rationale": "The answer is fully supported by passages rag:1 and rag:0, both of which state retrieval bounds RAG quality and that the generator cannot cite what the retriever failed to find. The answer directly addresses the question matching the reference. Citations are accurate: rag:1 supports both claims and rag:0 also contains the bounding statement.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "Why is retrieval the limiting factor for a RAG system?",
+      "reference_answer": "A RAG system is bounded by retrieval because the generator cannot cite what the retriever failed to find."
+    },
+    {
+      "answer": "RRF does not need score calibration because it uses only the rank positions of documents, not the raw similarity scores. This means it does not matter that cosine distances and BM25 scores live on completely different scales [hybrid-retrieval:0].",
+      "case_id": "hyb-rerank",
+      "change": "answer of case 'hyb-calibration', grounded in this context, to another question",
+      "context": [
+        {
+          "document_id": "hybrid-retrieval",
+          "id": "hybrid-retrieval:1",
+          "text": "uses only the rank positions, not the raw similarity scores, so it does not matter that cosine distances and BM25 scores live on completely different scales. This makes hybrid retrieval easy to assemble from heterogeneous retrievers. An optional reranking stage can follow fusion. A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly, which is more accurate than comparing independent embeddings but too expensive to run over the whole collection, so it is applied only to the fused shortlist."
+        },
+        {
+          "document_id": "hybrid-retrieval",
+          "id": "hybrid-retrieval:0",
+          "text": "# Hybrid Retrieval and Reciprocal Rank Fusion Hybrid retrieval combines a dense semantic retriever with a sparse keyword retriever so the strengths of each cover the other's blind spots. The dense arm finds passages that share meaning with the query, and the sparse arm finds passages that share exact terms, and a fusion step merges their two ranked lists into one. Reciprocal Rank Fusion, or RRF, is a simple and robust way to merge ranked lists. For each document it sums one divided by a constant plus the rank, across every list the document appears in. The constant, often set to sixty, dampens the influence of very high ranks so that broad agreement across lists matters more than a single top placement. Documents that rank highly in multiple lists rise to the top of the fused ranking. The great advantage of RRF is that it needs no score calibration: it uses only the rank positions, not the raw similarity scores, so it does not matter that cosine distances and BM25 scores live on completely different scales. This makes hybrid retrieval"
+        },
+        {
+          "document_id": "embeddings",
+          "id": "embeddings:1",
+          "text": "cosine similarity reduces to a simple dot product. Embeddings power semantic search: a query is embedded with the same model as the documents, and the nearest vectors are returned as the most relevant results. Unlike keyword matching, embedding search can retrieve passages that share no words with the query but express the same idea, which is its key advantage over lexical search."
+        }
+      ],
+      "defect": "other_question",
+      "derived_from": "hyb-calibration",
+      "expected_low": [
+        "relevance"
+      ],
+      "human": null,
+      "id": "item-40",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.01025,
+        "faithfulness": 1.0,
+        "input_tokens": 1355,
+        "output_tokens": 139,
+        "rationale": "The answer is faithful and correctly cited—it accurately describes RRF's lack of need for score calibration, which is supported by hybrid-retrieval:0. However, the question asks what a cross-encoder reranker does, and the answer discusses RRF instead, making it entirely irrelevant to the question.",
+        "relevance": 0.0
+      },
+      "kind": "defect",
+      "question": "What does a cross-encoder reranker do?",
+      "reference_answer": "A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly."
+    },
+    {
+      "answer": "HNSW (Hierarchical Navigable Small World graphs) is the most common index for high-recall search [vector-search:0]. In pgvector, HNSW indexes are limited to 1,024 dimensions and must be rebuilt after every insert.",
+      "case_id": "vec-hnsw",
+      "change": "appended an uncited claim absent from every passage: 'In pgvector, HNSW indexes are limited to 1,024 dimensions and must be rebuilt after every insert.'",
+      "context": [
+        {
+          "document_id": "vector-search",
+          "id": "vector-search:0",
+          "text": "# Vector Search and Approximate Nearest Neighbors Vector search finds the stored vectors closest to a query vector under a distance metric such as cosine or Euclidean distance. A brute-force scan compares the query against every stored vector, which is exact but grows linearly with the size of the collection and becomes too slow for millions of vectors. Approximate nearest neighbor, or ANN, search trades a small amount of accuracy for a large gain in speed. Instead of scanning everything, an ANN index narrows the search to a promising subset of candidates. The most common index for high-recall search is HNSW, Hierarchical Navigable Small World graphs, which connect vectors into a layered graph that can be traversed in logarithmic time. In Postgres, the pgvector extension adds a vector column type and supports both exact search and HNSW indexes. A cosine-distance query is written with the distance operator, ordering rows by how close their embedding is to the query vector and limiting to the top results. Recall is the key quality measure for an ANN index: it is the fraction of"
+        },
+        {
+          "document_id": "vector-search",
+          "id": "vector-search:1",
+          "text": "how close their embedding is to the query vector and limiting to the top results. Recall is the key quality measure for an ANN index: it is the fraction of the true nearest neighbors that the index actually returns. Index parameters trade recall against build time and query latency, so tuning an ANN index means choosing an acceptable point on the recall-versus-speed curve for the workload."
+        },
+        {
+          "document_id": "keyword-search",
+          "id": "keyword-search:1",
+          "text": "tests whether the document satisfies the query. The ts_rank_cd function then ranks matches by term proximity and frequency. A GIN index on the tsvector column makes these lookups fast. Because keyword search and semantic search fail in different ways — lexical search misses paraphrases, semantic search misses exact rare terms — combining them tends to outperform either one alone."
+        }
+      ],
+      "defect": "unsupported_claim",
+      "derived_from": "vec-hnsw",
+      "expected_low": [
+        "faithfulness"
+      ],
+      "human": null,
+      "id": "item-41",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.011535,
+        "faithfulness": 0.4,
+        "input_tokens": 1307,
+        "output_tokens": 200,
+        "rationale": "The first claim—HNSW is the most common index for high-recall search—is faithful and correctly cited to vector-search:0. However, the answer adds fabricated claims not supported by any context: that pgvector HNSW indexes are limited to 1,024 dimensions and must be rebuilt after every insert. These are unsupported and false-sounding additions, lowering faithfulness. The answer does address the question directly, so relevance is high. The citation that is present correctly supports its specific claim.",
+        "relevance": 0.9
+      },
+      "kind": "defect",
+      "question": "What index is most common for high-recall vector search?",
+      "reference_answer": "HNSW (Hierarchical Navigable Small World) graphs are the most common index for high-recall search."
+    },
+    {
+      "answer": "A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly. This is more accurate than comparing independent embeddings, but it is too expensive to run over the whole collection, so it is applied only to the fused shortlist [hybrid-retrieval:1].",
+      "case_id": "hyb-rerank",
+      "change": null,
+      "context": [
+        {
+          "document_id": "hybrid-retrieval",
+          "id": "hybrid-retrieval:1",
+          "text": "uses only the rank positions, not the raw similarity scores, so it does not matter that cosine distances and BM25 scores live on completely different scales. This makes hybrid retrieval easy to assemble from heterogeneous retrievers. An optional reranking stage can follow fusion. A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly, which is more accurate than comparing independent embeddings but too expensive to run over the whole collection, so it is applied only to the fused shortlist."
+        },
+        {
+          "document_id": "hybrid-retrieval",
+          "id": "hybrid-retrieval:0",
+          "text": "# Hybrid Retrieval and Reciprocal Rank Fusion Hybrid retrieval combines a dense semantic retriever with a sparse keyword retriever so the strengths of each cover the other's blind spots. The dense arm finds passages that share meaning with the query, and the sparse arm finds passages that share exact terms, and a fusion step merges their two ranked lists into one. Reciprocal Rank Fusion, or RRF, is a simple and robust way to merge ranked lists. For each document it sums one divided by a constant plus the rank, across every list the document appears in. The constant, often set to sixty, dampens the influence of very high ranks so that broad agreement across lists matters more than a single top placement. Documents that rank highly in multiple lists rise to the top of the fused ranking. The great advantage of RRF is that it needs no score calibration: it uses only the rank positions, not the raw similarity scores, so it does not matter that cosine distances and BM25 scores live on completely different scales. This makes hybrid retrieval"
+        },
+        {
+          "document_id": "embeddings",
+          "id": "embeddings:1",
+          "text": "cosine similarity reduces to a simple dot product. Embeddings power semantic search: a query is embedded with the same model as the documents, and the nearest vectors are returned as the most relevant results. Unlike keyword matching, embedding search can retrieve passages that share no words with the query but express the same idea, which is its key advantage over lexical search."
+        }
+      ],
+      "defect": null,
+      "derived_from": null,
+      "human": null,
+      "id": "item-42",
+      "judge": {
+        "citation_correctness": 1.0,
+        "cost_usd": 0.009365,
+        "faithfulness": 1.0,
+        "input_tokens": 1373,
+        "output_tokens": 100,
+        "rationale": "The answer accurately reflects passage hybrid-retrieval:1, directly addressing the question. All claims are supported by the cited passage, which correctly backs the statements made.",
+        "relevance": 1.0
+      },
+      "kind": "generated",
+      "question": "What does a cross-encoder reranker do?",
+      "reference_answer": "A cross-encoder reranker reads the query and each candidate passage together and scores their relevance directly."
+    }
+  ],
+  "judge_run": {
+    "judge_prompt_version": "structured-scores-v1",
+    "llm_model": "claude-opus-4-8"
+  },
+  "name": "judge-calibration-2026-11-12",
+  "scale": [
+    0,
+    0.5,
+    1
+  ],
+  "schema_version": 1,
+  "shuffle_seed": 20261112,
+  "source": {
+    "dataset_name": "rag-engineering",
+    "dataset_sha256": "4eb980ca10e17c60b697a9be2a32888b0d3d71a7eb7f4a40fcecd3e2ac9063dc",
+    "dataset_version": "2026-09-16.1",
+    "generator_prompt_version": "grounded-citations-v2",
+    "git_sha": "b7798f3996dfd65b0c337b3896f11bbf8ea4756d",
+    "index_id": "idx_e97973dded30e0626f1ddc76554336655459533616da233235029e6a9f648227",
+    "k": 3,
+    "language": "en",
+    "llm_model": "claude-opus-4-8",
+    "run_id": "bf3390885ac34b03b01db67491cff932",
+    "split": "smoke",
+    "strategy": "hybrid"
+  }
+}

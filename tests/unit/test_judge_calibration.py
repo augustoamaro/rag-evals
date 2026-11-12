@@ -8,6 +8,7 @@ import pytest
 from rag.domain.entities import Answer, AnswerScores, RetrievedChunk, Usage
 from rag.services.judge_calibration import (
     agreement,
+    defect_detection,
     merge_labels,
     score_items,
     to_level,
@@ -289,3 +290,125 @@ def test_score_items_records_a_failure_and_keeps_judging_the_rest() -> None:
     assert scored["items"][0]["judge"] == {"error_type": "RuntimeError"}
     assert scored["items"][1]["judge"]["faithfulness"] == 0.9
     assert len(judge.calls) == 2
+
+
+def _planted(
+    item_id: str,
+    defect: str,
+    expected_low: list[str],
+    judge: tuple[float, float, float],
+    *,
+    case_id: str | None = None,
+) -> dict[str, Any]:
+    item = _item(item_id, kind="defect", defect=defect, judge=judge)
+    item["expected_low"] = expected_low
+    if case_id is not None:
+        item["case_id"] = case_id
+    return item
+
+
+def test_defect_detection_counts_planted_defects_the_judge_scored_down() -> None:
+    # No human labels involved: each defect was planted, so the dimension it
+    # should lower is known. "Detected" means the judge left full marks (level 1).
+    report = defect_detection(
+        _set(
+            _item("g1", judge=(1.0, 1.0, 1.0)),
+            _item("g2", judge=(1.0, 0.5, 1.0)),
+            _planted(
+                "d1",
+                "wrong_passage",
+                ["citation_correctness"],
+                (1.0, 1.0, 0.3),
+                case_id="case-g1",
+            ),
+            _planted("d2", "wrong_passage", ["citation_correctness"], (1.0, 1.0, 1.0)),
+            _planted("d3", "other_question", ["relevance"], (0.6, 0.0, 1.0)),
+        )
+    )
+
+    assert (report["defects"], report["detected"]) == (3, 2)
+    assert report["by_defect"] == {
+        "other_question": {"n": 1, "detected": 1, "dimensions": ["relevance"]},
+        "wrong_passage": {"n": 2, "detected": 1, "dimensions": ["citation_correctness"]},
+    }
+    assert report["items"][0] == {
+        "id": "d1",
+        "case_id": "case-g1",
+        "defect": "wrong_passage",
+        "dimension": "citation_correctness",
+        "judge": 0.3,
+        "judge_level": 0.5,
+        "detected": True,
+        # The same case's untouched answer, on the same dimension.
+        "clean_judge": 1.0,
+        "also_lowered": [],
+    }
+    missed, relevance = report["items"][1], report["items"][2]
+    assert (missed["id"], missed["detected"], missed["clean_judge"]) == (
+        "d2",
+        False,
+        None,
+    )
+    # A defect may drag another dimension down too; that is reported, not counted.
+    assert (relevance["detected"], relevance["also_lowered"]) == (True, ["faithfulness"])
+    # Untouched answers the judge marked down are its false alarms.
+    assert report["clean"] == {
+        "n": 2,
+        "flagged": [
+            {
+                "id": "g2",
+                "case_id": "case-g2",
+                "dimension": "relevance",
+                "judge": 0.5,
+                "judge_level": 0.5,
+            }
+        ],
+    }
+
+
+def test_defect_detection_needs_scores_and_planted_defects() -> None:
+    unscored = _set(_item("g1"), _planted("d1", "x", ["relevance"], (1, 1, 1)))
+    with pytest.raises(ValueError, match="1 without judge scores"):
+        defect_detection(unscored)
+    with pytest.raises(ValueError, match="no planted defects"):
+        defect_detection(_set(_item("g1", judge=(1, 1, 1))))
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        lambda item: item.update(expected_low=["not-a-dimension"]),
+        lambda item: item.update(expected_low=["relevance", "relevance"]),
+        lambda item: item.update(expected_low="relevance"),
+        lambda item: item.update(
+            kind="generated", defect=None, expected_low=["relevance"]
+        ),
+    ],
+)
+def test_invalid_expected_dimensions_are_rejected(change: Any) -> None:
+    item = _planted("d1", "other_question", ["relevance"], (1, 1, 1))
+    change(item)
+    with pytest.raises(ValueError, match="expected_low"):
+        validate_set(_set(item))
+
+
+def test_retained_calibration_set_matches_the_published_judge_check() -> None:
+    # Guards docs/judge-2026-11-12.md: re-scoring the set changes these numbers and
+    # must be reviewed together with the report.
+    import json
+    from pathlib import Path
+
+    path = Path(__file__).parents[2] / "benchmarks/judge-calibration/2026-11-12.json"
+    artifact = json.loads(path.read_text(encoding="utf-8"))
+    items = validate_set(artifact)
+    assert [item["kind"] for item in items].count("generated") == 30
+    report = defect_detection(artifact)
+    assert (report["defects"], report["detected"]) == (12, 11)
+    assert {name: s["detected"] for name, s in report["by_defect"].items()} == {
+        "nonexistent_id": 2,
+        "other_question": 3,
+        "unsupported_claim": 3,
+        "wrong_passage": 3,
+    }
+    assert report["clean"] == {"n": 30, "flagged": []}
+    assert all(not row["also_lowered"] for row in report["items"])

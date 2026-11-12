@@ -59,6 +59,17 @@ def validate_set(artifact: dict[str, Any]) -> list[dict[str, Any]]:
         defective = kind == "defect" and isinstance(defect, str) and bool(defect)
         if not generated and not defective:
             raise ValueError(f"item {item_id} has an inconsistent kind/defect")
+        expected = item.get("expected_low")
+        if expected is not None and (
+            not defective
+            or not isinstance(expected, list)
+            or not expected
+            or any(dimension not in DIMENSIONS for dimension in expected)
+            or len(set(expected)) != len(expected)
+        ):
+            raise ValueError(
+                f"item {item_id} expected_low must list distinct dimensions of a defect"
+            )
         context = item.get("context")
         if not isinstance(context, list) or not context:
             raise ValueError(f"item {item_id} needs a nonempty context")
@@ -190,6 +201,81 @@ def agreement(artifact: dict[str, Any]) -> dict[str, Any]:
         "overall": _summarize(items),
         "groups": {name: _summarize(members) for name, members in sorted(groups.items())},
         "disagreements": disagreements,
+    }
+
+
+def defect_detection(artifact: dict[str, Any]) -> dict[str, Any]:
+    """How many planted defects the judge scored down, without human labels.
+
+    A defect item names the dimensions it was built to lower (``expected_low``).
+    It is detected on a dimension when the judge leaves full marks there, i.e.
+    its score maps below level 1. Untouched answers scored below level 1 are the
+    judge's false alarms.
+    """
+    items = validate_set(artifact)
+    unscored = sum(not _complete(item.get("judge"), None) for item in items)
+    if unscored:
+        raise ValueError(
+            f"calibration set is incomplete: {unscored} without judge scores"
+        )
+    planted = [item for item in items if item.get("expected_low")]
+    if not planted:
+        raise ValueError("calibration set has no planted defects with expected_low")
+    clean = {item["case_id"]: item for item in items if item["kind"] == "generated"}
+
+    rows: list[dict[str, Any]] = []
+    by_defect: dict[str, dict[str, Any]] = {}
+    for item in sorted(planted, key=lambda item: item["id"]):
+        lowered = [
+            dimension
+            for dimension in DIMENSIONS
+            if to_level(float(item["judge"][dimension])) < 1
+        ]
+        summary = by_defect.setdefault(
+            item["defect"], {"n": 0, "detected": 0, "dimensions": []}
+        )
+        for dimension in item["expected_low"]:
+            score = float(item["judge"][dimension])
+            original = clean.get(item["case_id"])
+            rows.append(
+                {
+                    "id": item["id"],
+                    "case_id": item["case_id"],
+                    "defect": item["defect"],
+                    "dimension": dimension,
+                    "judge": score,
+                    "judge_level": to_level(score),
+                    "detected": dimension in lowered,
+                    "clean_judge": float(original["judge"][dimension])
+                    if original is not None
+                    else None,
+                    "also_lowered": [
+                        other for other in lowered if other not in item["expected_low"]
+                    ],
+                }
+            )
+            summary["n"] += 1
+            summary["detected"] += dimension in lowered
+            if dimension not in summary["dimensions"]:
+                summary["dimensions"].append(dimension)
+    flagged = [
+        {
+            "id": item["id"],
+            "case_id": item["case_id"],
+            "dimension": dimension,
+            "judge": float(item["judge"][dimension]),
+            "judge_level": to_level(float(item["judge"][dimension])),
+        }
+        for item in sorted(clean.values(), key=lambda item: item["id"])
+        for dimension in DIMENSIONS
+        if to_level(float(item["judge"][dimension])) < 1
+    ]
+    return {
+        "defects": len(rows),
+        "detected": sum(row["detected"] for row in rows),
+        "by_defect": dict(sorted(by_defect.items())),
+        "items": rows,
+        "clean": {"n": len(clean), "flagged": flagged},
     }
 
 

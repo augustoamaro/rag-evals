@@ -16,7 +16,9 @@ floors and paired regressions across the full benchmark, slices and critical cas
 fastembed/ONNX models download on first use and can then run from their cache.
 Optional Claude answer generation and LLM judging require
 `RAG_ANTHROPIC_API_KEY`; their outcomes, coverage, usage and estimated costs are
-recorded separately. Live answer quality and judge calibration remain to be validated.
+recorded separately. The answer track has run live on the smoke set, and the judge
+scored down 11 of 12 planted defects ([report](docs/judge-2026-11-12.md)). It has not
+been calibrated against human labels, and answer quality on harder questions is open.
 
 [Run it](#run-it) · [Dashboard workflow](#dashboard-workflow) ·
 [Measured baselines](#measured-baselines) · [Methodology](#eval-methodology) ·
@@ -116,7 +118,8 @@ rag-evals/
 │   │                  composition roots construct the client and inject it)
 │   ├── services/      ingestion · query · eval (orchestrate ports)
 │   ├── api/           FastAPI (thin routers, dependency-injected)
-│   └── cli/           Typer: rag ingest · rag eval [--judge] [--gate]
+│   └── cli/           Typer: rag ingest · rag eval [--judge] [--gate] ·
+│                      rag calibrate-judge
 ├── corpus/            bundled docs + benchmark.yaml; legacy golden.yaml fixture
 ├── benchmarks/        reviewable per-case baseline artifacts
 ├── migrations/        ordered .sql
@@ -164,6 +167,10 @@ Decisions worth calling out:
   **citation-correctness** in [0, 1] via Claude structured output. Cited ids that
   match no retrieved passage are detected in code and reported per case,
   independently of the judge's citation score.
+- **Judge check:** `rag calibrate-judge` re-judges a retained set of real answers
+  and answers with one planted defect each, then reports how many defects the
+  judge scored down and how many clean answers it flagged. With human labels
+  merged (`--labels`), it also reports level agreement and its direction.
 - **Answer coverage:** generation and judging each record success, failure or
   skipped status. Runs report attempted/scored/failed counts and `completed`,
   `partial` or `failed` status. Answer-score means cover **scored cases only**;
@@ -393,6 +400,8 @@ The [six-phase roadmap](docs/improvement-roadmap.md) follows the
 `main`:** evaluation reliability, versioned benchmarks and the experiment workflow.
 The remaining phases cover measured retrieval improvements, answer/judge
 validation, and shared operation with authentication, quotas and load testing.
+Answer/judge validation has started with a first live run and a
+[planted-defect check of the judge](docs/judge-2026-11-12.md).
 
 - **Sparse arm uses `plainto_tsquery`,** which ANDs every term — question-shaped
   queries can match nothing, part of why sparse recall trails. OR-semantics (or
@@ -409,6 +418,11 @@ validation, and shared operation with authentication, quotas and load testing.
   need separate load and recall benchmarks before production scaling.
 - **The API does not stream answers** and CORS is open — both fine for a local
   demo, both documented in the code where they'd change for production.
+- **The judge is checked, not calibrated.** It scored down 11 of 12 planted
+  defects and flagged none of 30 real answers, but accepted one citation of a
+  passage that does not exist and gave every real answer full marks. No human
+  agreement has been measured, the defects were blatant, and one model both
+  generates and judges. Citation validity is therefore checked in code.
 - **Provider billing is estimated.** Stage usage covers responses available to the
   adapter. Transport failures may have unknown spending. Pricing currently covers
   standard input/output tokens for the configured Opus model, not invoices,

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import math
+from contextlib import suppress
 from dataclasses import asdict
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 
@@ -26,6 +27,7 @@ from rag.services.gate import check_thresholds
 from rag.services.judge_calibration import (
     DIMENSIONS,
     agreement,
+    defect_detection,
     merge_labels,
     score_items,
     validate_set,
@@ -278,30 +280,53 @@ def calibrate_judge(
             f"failed={len(results) - len(scored)}  "
             f"{cost_label}=${sum(cost or 0.0 for cost in costs):.4f}"
         )
+    detection: dict[str, Any] | None = None
+    report: dict[str, Any] | None = None
+    missing = ""
+    with suppress(ValueError):  # a set needs no planted defects
+        detection = defect_detection(artifact)
     try:
         report = agreement(artifact)
     except ValueError as exc:
-        typer.echo(f"CALIBRATION INCOMPLETE: {exc}")
-        raise typer.Exit(code=1) from exc
-    typer.echo(f"items={report['items']}")
-    for dimension in DIMENSIONS:
-        summary = report["overall"][dimension]
-        flags = summary["flags"]
+        missing = str(exc)
+    if detection is None and report is None:
+        typer.echo(f"CALIBRATION INCOMPLETE: {missing}")
+        raise typer.Exit(code=1)
+    typer.echo(f"items={len(artifact['items'])}")
+    if detection is not None:
         typer.echo(
-            f"  {dimension:21s} same level {summary['same_level']}/{summary['n']}  "
-            f"human flagged {flags['both'] + flags['human_only']}: "
-            f"judge also flagged {flags['both']}, missed {flags['human_only']}  "
-            f"judge-only flags {flags['judge_only']}  "
-            f"mean |diff| {summary['mean_abs_diff']:.3f}"
+            f"planted defects: judge scored down "
+            f"{detection['detected']}/{detection['defects']}"
         )
-    for group, summaries in report["groups"].items():
-        cells = "  ".join(
-            f"{summaries[d]['same_level']}/{summaries[d]['n']}" for d in DIMENSIONS
-        )
-        typer.echo(f"  {group:28s} same level per dimension: {cells}")
-    typer.echo(f"  disagreements: {len(report['disagreements'])}")
+        for defect, summary in detection["by_defect"].items():
+            typer.echo(
+                f"  {defect:20s} {summary['detected']}/{summary['n']} "
+                f"on {', '.join(summary['dimensions'])}"
+            )
+        clean = detection["clean"]
+        flagged = len({row["id"] for row in clean["flagged"]})
+        typer.echo(f"  clean answers flagged: {flagged}/{clean['n']}")
+    if report is None:
+        typer.echo(f"Agreement with human labels not computed: {missing}")
+    else:
+        for dimension in DIMENSIONS:
+            summary = report["overall"][dimension]
+            flags = summary["flags"]
+            typer.echo(
+                f"  {dimension:21s} same level {summary['same_level']}/{summary['n']}  "
+                f"human flagged {flags['both'] + flags['human_only']}: "
+                f"judge also flagged {flags['both']}, missed {flags['human_only']}  "
+                f"judge-only flags {flags['judge_only']}  "
+                f"mean |diff| {summary['mean_abs_diff']:.3f}"
+            )
+        for group, summaries in report["groups"].items():
+            cells = "  ".join(
+                f"{summaries[d]['same_level']}/{summaries[d]['n']}" for d in DIMENSIONS
+            )
+            typer.echo(f"  {group:28s} same level per dimension: {cells}")
+        typer.echo(f"  disagreements: {len(report['disagreements'])}")
     if output is not None:
-        write_artifact(output, report)
+        write_artifact(output, {"defect_detection": detection, "agreement": report})
         typer.echo(f"Report: {output}")
 
 

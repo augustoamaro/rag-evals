@@ -1,0 +1,310 @@
+{
+  "date": "2026-11-12",
+  "live_runs": [
+    {
+      "run_id": "b696c31fd1e6481bb0f3297389564e6d",
+      "generator_prompt_version": "grounded-citations-v1",
+      "judge_prompt_version": "structured-scores-v1",
+      "llm_model": "claude-opus-4-8",
+      "dataset": "rag-engineering 2026-09-16.1",
+      "split": "smoke",
+      "language": "en",
+      "strategy": "hybrid",
+      "k": 3,
+      "index_id": "idx_e97973dded30e0626f1ddc76554336655459533616da233235029e6a9f648227",
+      "cases": 30,
+      "answers_scored": 30,
+      "answers_failed": 0,
+      "status": "completed",
+      "cost_usd": 0.5248,
+      "cost_complete": true,
+      "wall_seconds": 146,
+      "retrieval": {
+        "mrr": 0.983,
+        "ndcg": 0.988,
+        "precision": 0.378,
+        "recall": 1.0
+      },
+      "judge_means": {
+        "citation_correctness": 1.0,
+        "faithfulness": 1.0,
+        "relevance": 1.0
+      },
+      "median_tokens": {
+        "generation_input": 806.5,
+        "generation_output": 96.5,
+        "judge_input": 1433.5,
+        "judge_output": 129.0
+      },
+      "median_latency_ms": {
+        "generation": 1973.5,
+        "judging": 2628.0
+      },
+      "answers_citing_unretrieved_ids": 4,
+      "unretrieved_citations": {
+        "cap-ap": {
+          "cited": [
+            "doc:0",
+            "doc:1"
+          ],
+          "judge_citation_correctness": 1.0
+        },
+        "emb-cosine": {
+          "cited": [
+            "doc:embeddings:0",
+            "doc:embeddings:1"
+          ],
+          "judge_citation_correctness": 1.0
+        },
+        "judge-limits": {
+          "cited": [
+            "doc:llm-as-judge:0",
+            "doc:llm-as-judge:1"
+          ],
+          "judge_citation_correctness": 1.0
+        },
+        "metric-mrr": {
+          "cited": [
+            "doc:evaluation-metrics:0"
+          ],
+          "judge_citation_correctness": 1.0
+        }
+      }
+    },
+    {
+      "run_id": "bf3390885ac34b03b01db67491cff932",
+      "generator_prompt_version": "grounded-citations-v2",
+      "judge_prompt_version": "structured-scores-v1",
+      "llm_model": "claude-opus-4-8",
+      "dataset": "rag-engineering 2026-09-16.1",
+      "split": "smoke",
+      "language": "en",
+      "strategy": "hybrid",
+      "k": 3,
+      "index_id": "idx_e97973dded30e0626f1ddc76554336655459533616da233235029e6a9f648227",
+      "cases": 30,
+      "answers_scored": 30,
+      "answers_failed": 0,
+      "status": "completed",
+      "cost_usd": 0.5006,
+      "cost_complete": true,
+      "wall_seconds": 137,
+      "retrieval": {
+        "mrr": 0.983,
+        "ndcg": 0.988,
+        "precision": 0.378,
+        "recall": 1.0
+      },
+      "judge_means": {
+        "citation_correctness": 1.0,
+        "faithfulness": 1.0,
+        "relevance": 1.0
+      },
+      "median_tokens": {
+        "generation_input": 826.5,
+        "generation_output": 72.0,
+        "judge_input": 1429.0,
+        "judge_output": 114.5
+      },
+      "median_latency_ms": {
+        "generation": 1765.5,
+        "judging": 2439.0
+      },
+      "answers_citing_unretrieved_ids": 0,
+      "unretrieved_citations": {}
+    }
+  ],
+  "judge_check": {
+    "set": "benchmarks/judge-calibration/2026-11-12.json",
+    "items": 42,
+    "generated": 30,
+    "planted_defects": 12,
+    "judge_run": {
+      "judge_prompt_version": "structured-scores-v1",
+      "llm_model": "claude-opus-4-8"
+    },
+    "judged": 42,
+    "cost_usd": 0.4426,
+    "input_tokens": 59341,
+    "output_tokens": 5837,
+    "wall_seconds": 120,
+    "repeat_of_generated_answers": {
+      "scores_compared": 90,
+      "identical": 90
+    },
+    "defect_detection": {
+      "by_defect": {
+        "nonexistent_id": {
+          "detected": 2,
+          "dimensions": [
+            "citation_correctness"
+          ],
+          "n": 3
+        },
+        "other_question": {
+          "detected": 3,
+          "dimensions": [
+            "relevance"
+          ],
+          "n": 3
+        },
+        "unsupported_claim": {
+          "detected": 3,
+          "dimensions": [
+            "faithfulness"
+          ],
+          "n": 3
+        },
+        "wrong_passage": {
+          "detected": 3,
+          "dimensions": [
+            "citation_correctness"
+          ],
+          "n": 3
+        }
+      },
+      "clean": {
+        "flagged": [],
+        "n": 30
+      },
+      "defects": 12,
+      "detected": 11,
+      "items": [
+        {
+          "also_lowered": [],
+          "case_id": "kw-bm25",
+          "clean_judge": 1.0,
+          "defect": "unsupported_claim",
+          "detected": true,
+          "dimension": "faithfulness",
+          "id": "item-03",
+          "judge": 0.4,
+          "judge_level": 0.5
+        },
+        {
+          "also_lowered": [],
+          "case_id": "chunk-unit",
+          "clean_judge": 1.0,
+          "defect": "other_question",
+          "detected": true,
+          "dimension": "relevance",
+          "id": "item-11",
+          "judge": 0.3,
+          "judge_level": 0.5
+        },
+        {
+          "also_lowered": [],
+          "case_id": "rag-hallucination",
+          "clean_judge": 1.0,
+          "defect": "wrong_passage",
+          "detected": true,
+          "dimension": "citation_correctness",
+          "id": "item-13",
+          "judge": 0.0,
+          "judge_level": 0.0
+        },
+        {
+          "also_lowered": [],
+          "case_id": "cons-eventual",
+          "clean_judge": 1.0,
+          "defect": "wrong_passage",
+          "detected": true,
+          "dimension": "citation_correctness",
+          "id": "item-15",
+          "judge": 0.0,
+          "judge_level": 0.0
+        },
+        {
+          "also_lowered": [],
+          "case_id": "cap-tradeoff",
+          "clean_judge": 1.0,
+          "defect": "nonexistent_id",
+          "detected": true,
+          "dimension": "citation_correctness",
+          "id": "item-17",
+          "judge": 0.5,
+          "judge_level": 0.5
+        },
+        {
+          "also_lowered": [],
+          "case_id": "cap-ap",
+          "clean_judge": 1.0,
+          "defect": "other_question",
+          "detected": true,
+          "dimension": "relevance",
+          "id": "item-27",
+          "judge": 0.1,
+          "judge_level": 0.0
+        },
+        {
+          "also_lowered": [],
+          "case_id": "emb-advantage",
+          "clean_judge": 1.0,
+          "defect": "wrong_passage",
+          "detected": true,
+          "dimension": "citation_correctness",
+          "id": "item-28",
+          "judge": 0.0,
+          "judge_level": 0.0
+        },
+        {
+          "also_lowered": [],
+          "case_id": "judge-structured",
+          "clean_judge": 1.0,
+          "defect": "nonexistent_id",
+          "detected": true,
+          "dimension": "citation_correctness",
+          "id": "item-29",
+          "judge": 0.0,
+          "judge_level": 0.0
+        },
+        {
+          "also_lowered": [],
+          "case_id": "chunk-deterministic",
+          "clean_judge": 1.0,
+          "defect": "unsupported_claim",
+          "detected": true,
+          "dimension": "faithfulness",
+          "id": "item-32",
+          "judge": 0.5,
+          "judge_level": 0.5
+        },
+        {
+          "also_lowered": [],
+          "case_id": "metric-recall",
+          "clean_judge": 1.0,
+          "defect": "nonexistent_id",
+          "detected": false,
+          "dimension": "citation_correctness",
+          "id": "item-36",
+          "judge": 1.0,
+          "judge_level": 1.0
+        },
+        {
+          "also_lowered": [],
+          "case_id": "hyb-rerank",
+          "clean_judge": 1.0,
+          "defect": "other_question",
+          "detected": true,
+          "dimension": "relevance",
+          "id": "item-40",
+          "judge": 0.0,
+          "judge_level": 0.0
+        },
+        {
+          "also_lowered": [],
+          "case_id": "vec-hnsw",
+          "clean_judge": 1.0,
+          "defect": "unsupported_claim",
+          "detected": true,
+          "dimension": "faithfulness",
+          "id": "item-41",
+          "judge": 0.4,
+          "judge_level": 0.5
+        }
+      ]
+    },
+    "agreement_with_human_labels": null
+  },
+  "total_cost_usd": 1.468
+}

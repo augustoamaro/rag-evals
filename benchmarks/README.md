@@ -43,3 +43,22 @@ Exact snapshot cosine search deliberately avoids filtered global-ANN recall loss
 as historical snapshots accumulate. Latencies include model warm-up, depend on
 the machine and are not production load-test results. English embeddings and FTS
 remain the defaults; do not combine Portuguese results into the English baseline.
+
+## Judge calibration set
+
+`judge-calibration/2026-11-12.json` is a different kind of artifact. It **does**
+contain model-generated answers and passages of the bundled corpus: 30 answers from
+a live run and 12 copies with one planted defect each. Every item records its
+question, retrieved passages, answer, the dimension a defect was built to lower,
+the edit that produced it, and the judge's scores and rationale. Human labels are
+empty; `rag calibrate-judge --labels` fills them from a JSON file keyed by item id.
+
+```bash
+uv run rag calibrate-judge --set benchmarks/judge-calibration/2026-11-12.json
+```
+
+That prints how many planted defects the judge scored down and how many clean
+answers it flagged, without calling a model. `--score` re-judges every item with
+the configured model (paid calls) and overwrites the stored scores, so review the
+diff as you would a baseline change. The [judge report](../docs/judge-2026-11-12.md)
+records the results and their limits.

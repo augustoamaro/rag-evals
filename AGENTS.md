@@ -21,9 +21,11 @@ Claude (Opus 4.8) powers answer generation + the LLM-as-judge, gated behind
   the only Anthropic SDK *usage*; the CLI/API composition roots construct the
   client and inject it).
 - `src/rag/services` — ingestion · query · eval.
-- `src/rag/api` — FastAPI; `src/rag/cli` — Typer (`rag ingest`, `rag eval`).
+- `src/rag/api` — FastAPI; `src/rag/cli` — Typer (`rag ingest`, `rag eval`,
+  `rag calibrate-judge`).
 - `corpus/` — bundled docs + versioned `benchmark.yaml`; `golden.yaml` is legacy.
-  `benchmarks/` — per-case JSON baselines. `migrations/` — ordered `.sql`.
+  `benchmarks/` — per-case JSON baselines and the judge calibration set.
+  `migrations/` — ordered `.sql`.
 
 ## Commands
 
@@ -47,6 +49,8 @@ cd apps/web && pnpm install && pnpm dev
   `tests/integration`; pure logic gets hand-verified unit tests.
 - Anthropic SDK calls follow the project default: `claude-opus-4-8`, adaptive
   thinking, structured output (`messages.parse`) for the judge.
+- Changing the generator or judge prompt means bumping its version constant in
+  `composition.py`; runs and calibration records store it.
 - Strict typing (mypy strict + TS strict); ruff for lint + format.
 - English is the default evaluation language; Portuguese runs separately with
   `--split dev --language pt`. Keep smoke/dev and published test results distinct.

@@ -27,9 +27,13 @@ RUN uv sync --frozen --no-dev
 COPY migrations ./migrations
 COPY corpus ./corpus
 
-ENV RAG_DATABASE_URL=postgresql://rag:rag@db:5432/rag
+ENV RAG_DATABASE_URL=postgresql://rag:rag@db:5432/rag \
+    PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000
 
+# Start from the image's virtualenv rather than `uv run`, which re-syncs on every
+# start and fetches the dev group this image omits (so an offline start fails).
+# `exec` makes uvicorn PID 1, so `docker stop` triggers a clean worker shutdown.
 # Migrations/publication serialize safely; identical snapshots are reused. Move
 # ingestion to a one-shot job before scaling to avoid duplicate model preparation.
-CMD ["sh", "-c", "uv run rag ingest && uv run uvicorn rag.api.app:build_app --factory --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "rag ingest && exec uvicorn rag.api.app:build_app --factory --host 0.0.0.0 --port 8000"]

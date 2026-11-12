@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM node:20-slim AS build
+FROM node:24-slim AS build
 RUN corepack enable
 WORKDIR /app
 ARG NEXT_PUBLIC_API_URL=http://localhost:8000
@@ -9,7 +9,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 
-FROM node:20-slim AS runtime
+FROM node:24-slim AS runtime
 ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0
 WORKDIR /app
 COPY --from=build /app/.next/standalone ./

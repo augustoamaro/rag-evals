@@ -3,6 +3,7 @@ from __future__ import annotations
 import threading
 import time
 import uuid
+from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from typing import Any
@@ -249,6 +250,88 @@ def test_worker_persists_progress_and_only_executes_an_idempotent_request_once(
         worker.close()
 
 
+def test_checkpoints_write_only_added_or_replaced_case_rows(
+    pool: Pool, database_url: str
+) -> None:
+    class RecordingStore(EvalStore):
+        def __init__(self, pool: Pool) -> None:
+            super().__init__(pool)
+            self.case_writes: list[int | None] = []
+
+        def save_run(
+            self,
+            run: EvalRun,
+            config: dict[str, Any],
+            git_sha: str | None = None,
+            *,
+            connection: Connection[Any] | None = None,
+            case_results: Sequence[CaseResult] | None = None,
+        ) -> None:
+            self.case_writes.append(None if case_results is None else len(case_results))
+            super().save_run(
+                run, config, git_sha, connection=connection, case_results=case_results
+            )
+
+    class SteppingEvaluator:
+        """Mirrors EvalService: append a result, then replace it in place."""
+
+        def run(
+            self,
+            cases: list[EvalCase],
+            strategy: Strategy,
+            k: int,
+            with_answers: bool = False,
+            *,
+            control: EvaluationControl | None = None,
+        ) -> EvalRun:
+            assert control is not None
+            results: list[CaseResult] = []
+
+            def snapshot(*, running: bool) -> EvalRun:
+                return replace(
+                    _run(control.run_id),
+                    status="running" if running else "completed",
+                    retrieval_complete=not running,
+                    case_results=list(results),
+                )
+
+            for done, case in enumerate(cases):
+                results.append(CaseResult(case.id, "hybrid", ["chunk-1"], 1, 1, 1, 1))
+                control.checkpoint(snapshot(running=True), done, "retrieval", case.id)
+                results[-1] = replace(results[-1], answer=f"answer {case.id}")
+                control.checkpoint(
+                    snapshot(running=True), done + 1, "case_complete", case.id
+                )
+            return snapshot(running=False)
+
+    cases = [
+        EvalCase(case_id, "Question?", ["evidence"], "Reference")
+        for case_id in ("q1", "q2", "q3")
+    ]
+    runs = RecordingStore(pool)
+    worker = EvaluationJobs(SteppingEvaluator(), runs, JobStore(pool, database_url))
+    assert worker.start()
+    try:
+        job = worker.submit(
+            cases, Strategy.HYBRID, 10, False, str(uuid.uuid4()), _config()
+        )
+        final = worker.wait(job["id"])
+    finally:
+        worker.close()
+
+    assert final["status"] == "completed" and final["completed"] == 3
+    # One row per checkpoint, however many cases precede it; only the terminal
+    # save rewrites the complete set.
+    assert runs.case_writes == [1, 1, 1, 1, 1, 1, None]
+    saved = runs.get_run(final["run_id"])
+    assert saved is not None
+    assert [(case["case_id"], case["answer"]) for case in saved["cases"]] == [
+        ("q1", "answer q1"),
+        ("q2", "answer q2"),
+        ("q3", "answer q3"),
+    ]
+
+
 @pytest.mark.parametrize("error", [False, True])
 def test_cancellation_and_failure_keep_checkpointed_cost_and_results(
     pool: Pool, database_url: str, error: bool
@@ -359,8 +442,11 @@ def test_checkpoint_transaction_rolls_back_run_and_progress_together(
         git_sha: str | None = None,
         *,
         connection: Connection[Any] | None = None,
+        case_results: Sequence[CaseResult] | None = None,
     ) -> None:
-        original_save(run, config, git_sha, connection=connection)
+        original_save(
+            run, config, git_sha, connection=connection, case_results=case_results
+        )
         raise RuntimeError("checkpoint interrupted before job write")
 
     monkeypatch.setattr(runs, "save_run", fail_after_run_write)

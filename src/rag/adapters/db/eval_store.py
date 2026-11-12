@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from collections.abc import Sequence
 from contextlib import nullcontext
 from dataclasses import asdict
 from typing import Any
@@ -9,7 +10,7 @@ from psycopg import Connection
 from psycopg.types.json import Jsonb
 
 from rag.adapters.db.pool import Pool
-from rag.domain.entities import EvalRun
+from rag.domain.entities import CaseResult, EvalRun
 
 
 class EvalStore:
@@ -25,7 +26,13 @@ class EvalStore:
         git_sha: str | None = None,
         *,
         connection: Connection[Any] | None = None,
+        case_results: Sequence[CaseResult] | None = None,
     ) -> None:
+        """Upsert the run row and its case rows.
+
+        ``case_results`` narrows the case writes to rows added or replaced since
+        this run was last saved; ``None`` writes every case.
+        """
         answer_metrics = Jsonb(run.answer_metrics) if run.answer_metrics else None
         evidence_metrics = (
             Jsonb(run.evidence_metrics) if run.evidence_metrics is not None else None
@@ -81,7 +88,7 @@ class EvalStore:
                     run.error_type,
                 ),
             )
-            for r in run.case_results:
+            for r in run.case_results if case_results is None else case_results:
                 judge = Jsonb(asdict(r.judge_scores)) if r.judge_scores else None
                 evidence = {
                     "evidence_recall": r.evidence_recall,

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import threading
 import uuid
+from collections.abc import Sequence
 from dataclasses import replace
 from typing import Any
 
@@ -12,7 +13,7 @@ from psycopg.types.json import Jsonb
 
 from rag.adapters.db.eval_store import EvalStore
 from rag.adapters.db.pool import Pool
-from rag.domain.entities import EvalRun
+from rag.domain.entities import CaseResult, EvalRun
 from rag.domain.evaluation import (
     EvaluationBusyError,
     EvaluationRequestConflictError,
@@ -156,8 +157,13 @@ class JobStore:
         case_id: str | None,
         *,
         terminal: bool = False,
+        changed: Sequence[CaseResult] | None = None,
     ) -> dict[str, Any]:
-        """Commit the run, case results and progress as one observable checkpoint."""
+        """Commit the run, case results and progress as one observable checkpoint.
+
+        ``changed`` lists the case results added or replaced since the previous
+        committed checkpoint; ``None`` rewrites every case row.
+        """
         with self._pool.connection() as conn:
             previous = conn.execute(
                 f"SELECT {_COLUMNS} FROM eval_jobs WHERE id = %s FOR UPDATE", (job_id,)
@@ -175,7 +181,7 @@ class JobStore:
                     run = replace(run, status="cancelled", retrieval_complete=False)
                 status = run.status
                 stage, case_id = status, None
-            eval_store.save_run(run, job["config"], connection=conn)
+            eval_store.save_run(run, job["config"], connection=conn, case_results=changed)
             row = conn.execute(
                 "UPDATE eval_jobs SET run_id = %s, status = %s, completed = %s, "
                 "stage = %s, case_id = %s, error_type = %s, updated_at = now() "

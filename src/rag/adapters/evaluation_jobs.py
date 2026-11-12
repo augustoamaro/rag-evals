@@ -9,7 +9,7 @@ from typing import Any, Protocol
 
 from rag.adapters.db.eval_store import EvalStore
 from rag.adapters.db.job_store import JobStore
-from rag.domain.entities import EvalCase, EvalRun, Strategy
+from rag.domain.entities import CaseResult, EvalCase, EvalRun, Strategy
 from rag.domain.evaluation import (
     EvaluationControl,
     EvaluationRequestConflictError,
@@ -241,6 +241,7 @@ class _Control:
         self.run_id = uuid.uuid4().hex
         self.last_run: EvalRun | None = None
         self.completed = 0
+        self._persisted: list[CaseResult] = []
         self._jobs = jobs
         self._runs = runs
         self._job_id = job_id
@@ -256,6 +257,15 @@ class _Control:
         self, run: EvalRun, completed: int, stage: str, case_id: str | None
     ) -> None:
         self.last_run, self.completed = run, completed
+        # Results are immutable and only appended or replaced in place, so
+        # identity finds the rows this checkpoint touched. Rewriting every row at
+        # every checkpoint made a job's persistence quadratic in its case count.
+        changed = [
+            result
+            for position, result in enumerate(run.case_results)
+            if position >= len(self._persisted) or self._persisted[position] is not result
+        ]
         self._jobs.save_checkpoint(
-            self._job_id, run, self._runs, completed, stage, case_id
+            self._job_id, run, self._runs, completed, stage, case_id, changed=changed
         )
+        self._persisted = list(run.case_results)

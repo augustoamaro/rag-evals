@@ -111,6 +111,10 @@ def run_eval(
     settings = get_settings()
     if judge and not settings.anthropic_api_key:
         raise typer.BadParameter("answer track requires RAG_ANTHROPIC_API_KEY")
+    # Same schema guarantee as `rag ingest` and API startup. Without it the pool
+    # cannot register pgvector on a fresh database and stalls until it times out,
+    # hiding the "run rag ingest" preflight message.
+    apply_migrations(settings.database_url)
     pool = make_pool(settings.database_url)
     try:
         try:

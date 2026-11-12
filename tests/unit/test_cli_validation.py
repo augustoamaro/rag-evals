@@ -113,6 +113,7 @@ def test_incomplete_judged_eval_is_saved_reported_and_exits_nonzero(
         "rag.cli.main.get_settings",
         lambda: Settings(anthropic_api_key="test-key", _env_file=None),
     )
+    monkeypatch.setattr("rag.cli.main.apply_migrations", lambda _: None)
     monkeypatch.setattr(
         "rag.cli.main.make_pool",
         lambda _: SimpleNamespace(close=lambda: closed.append(True)),
@@ -132,3 +133,34 @@ def test_incomplete_judged_eval_is_saved_reported_and_exits_nonzero(
     assert "GATE PASSED" not in result.output
     assert saved == [(run, run.manifest)]
     assert closed == [True]
+
+
+def test_eval_migrates_first_so_a_missing_index_is_a_preflight_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from rag.domain.errors import EvalPreflightError
+
+    calls: list[str] = []
+
+    def migrate(database_url: str) -> None:
+        calls.append("migrate")
+
+    def pool(database_url: str) -> SimpleNamespace:
+        calls.append("pool")
+        return SimpleNamespace(close=lambda: calls.append("close"))
+
+    def no_index(*args: Any, **kwargs: Any) -> None:
+        calls.append("runtime")
+        raise EvalPreflightError("no index matches this dataset; run rag ingest")
+
+    monkeypatch.setattr("rag.cli.main.get_settings", lambda: Settings(_env_file=None))
+    monkeypatch.setattr("rag.cli.main.apply_migrations", migrate)
+    monkeypatch.setattr("rag.cli.main.make_pool", pool)
+    monkeypatch.setattr("rag.cli.main.build_runtime", no_index)
+    result = runner.invoke(app, ["eval"])
+    assert result.exit_code == 2
+    assert "rag ingest" in result.output
+    # The schema must exist before the pool registers pgvector on a connection.
+    assert calls == ["migrate", "pool", "runtime", "close"]

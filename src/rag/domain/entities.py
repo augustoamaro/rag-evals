@@ -59,6 +59,8 @@ class Answer:
     text: str
     citations: list[Citation] = field(default_factory=list)
     usage: Usage = field(default_factory=Usage)
+    # Bracketed ids in the text that match no retrieved passage, in first-seen order.
+    invalid_citations: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -132,6 +134,9 @@ class CaseResult:
     language: str = "en"
     answerable: bool = True
     group_id: str = ""
+    # Cited ids that match no retrieved passage. None: no answer was generated, or
+    # the run predates this check; an empty list means every citation resolved.
+    invalid_citations: list[str] | None = None
 
 
 @dataclass(frozen=True)

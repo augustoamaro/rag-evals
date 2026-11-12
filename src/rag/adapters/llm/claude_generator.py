@@ -8,11 +8,15 @@ from rag.domain.entities import Answer, Citation, RetrievedChunk, Usage
 
 _CITATION = re.compile(r"\[([^\]\s]+)\]")
 
+# No sample id here on purpose: a concrete example such as "[doc:0]" was copied
+# into live answers as a citation of a passage that had never been retrieved.
 _SYSTEM = (
-    "You answer questions strictly from the provided context passages. "
-    "Each passage is labelled with an id like [doc:0]. Cite the ids of the "
-    "passages you used inline, e.g. [doc:0]. If the context does not contain "
-    "the answer, say so plainly. Do not use outside knowledge."
+    "You answer questions strictly from the provided context passages. Each "
+    "passage starts with its id in square brackets on a line of its own. Cite "
+    "the passages you used inline by copying their ids exactly as given, "
+    "brackets included; never invent, shorten or add a prefix to an id. If the "
+    "context does not contain the answer, say so plainly. Do not use outside "
+    "knowledge."
 )
 
 
@@ -42,7 +46,10 @@ class ClaudeGenerator:
             getattr(response, "stop_reason", None), "answer generation", usage=usage
         )
         text = "".join(block.text for block in response.content if block.type == "text")
-        return Answer(text=text, citations=_parse_citations(text, context), usage=usage)
+        citations, invalid = _parse_citations(text, context)
+        return Answer(
+            text=text, citations=citations, usage=usage, invalid_citations=invalid
+        )
 
 
 def _build_prompt(question: str, context: list[RetrievedChunk]) -> str:
@@ -50,13 +57,21 @@ def _build_prompt(question: str, context: list[RetrievedChunk]) -> str:
     return f"Context passages:\n\n{passages}\n\nQuestion: {question}"
 
 
-def _parse_citations(text: str, context: list[RetrievedChunk]) -> list[Citation]:
+def _parse_citations(
+    text: str, context: list[RetrievedChunk]
+) -> tuple[list[Citation], list[str]]:
+    """Split the cited ids into retrieved passages and ids that match none."""
     valid = {rc.chunk.id for rc in context}
     seen: set[str] = set()
     cited: list[Citation] = []
+    invalid: list[str] = []
     for match in _CITATION.finditer(text):
         cid = match.group(1)
-        if cid in valid and cid not in seen:
-            seen.add(cid)
+        if cid in seen:
+            continue
+        seen.add(cid)
+        if cid in valid:
             cited.append(Citation(chunk_id=cid))
-    return cited
+        else:
+            invalid.append(cid)
+    return cited, invalid

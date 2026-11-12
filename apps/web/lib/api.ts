@@ -116,6 +116,7 @@ export interface CaseResult {
   language?: string | null;
   answerable?: boolean | null;
   group_id?: string | null;
+  invalid_citations?: string[] | null; // cited ids matching no retrieved passage; null = not checked
 }
 
 export interface RunDetail extends RunSummary {

@@ -180,6 +180,14 @@ def run_eval(
                 f"scored={run.answer_scored}/{run.answer_attempted} "
                 f"failed={run.answer_failed}  {cost_label}=${run.cost_usd:.4f}"
             )
+            # Checked in code, not by the judge: a live judge scored citations of
+            # passages that were never retrieved as fully correct.
+            checked = [r for r in run.case_results if r.invalid_citations is not None]
+            flagged = [r.case_id for r in checked if r.invalid_citations]
+            listed = f" ({', '.join(flagged)})" if flagged else ""
+            typer.echo(
+                f"  invalid citations: {len(flagged)} of {len(checked)} answers{listed}"
+            )
         if run.answer_metrics is not None:
             a = run.answer_metrics
             typer.echo(

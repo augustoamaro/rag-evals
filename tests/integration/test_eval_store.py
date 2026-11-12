@@ -135,6 +135,29 @@ def test_incomplete_run_retains_outcomes_cost_and_evidence(
     assert store.list_runs()[0]["evaluation"] == detail["evaluation"]
 
 
+def test_invalid_citations_survive_persistence_and_stay_unknown_when_absent(
+    pool: Pool,
+) -> None:
+    store = EvalStore(pool)
+    base = _run().case_results[0]
+    run = replace(
+        _run(),
+        case_results=[
+            replace(base, answer="x [doc:0]", invalid_citations=["doc:0"]),
+            replace(base, case_id="q2", answer="x [c1]", invalid_citations=[]),
+            replace(base, case_id="q3"),
+        ],
+    )
+    store.save_run(run, {"strategy": "hybrid", "k": 10})
+    store.save_run(run, {"strategy": "hybrid", "k": 10})  # the upsert keeps them
+
+    detail = store.get_run("run-1")
+    assert detail is not None
+    saved = {case["case_id"]: case["invalid_citations"] for case in detail["cases"]}
+    # None is "not checked", which must stay distinct from "checked, none found".
+    assert saved == {"q1": ["doc:0"], "q2": [], "q3": None}
+
+
 def test_legacy_rows_have_unknown_coverage_and_cost_completeness(pool: Pool) -> None:
     with pool.connection() as conn:
         conn.execute(

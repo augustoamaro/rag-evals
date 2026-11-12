@@ -137,4 +137,16 @@ describe("CaseEvidence", () => {
     expect(screen.getByText("A historical retained answer.")).toBeInTheDocument();
     expect(screen.getByText("doc:0")).toBeInTheDocument();
   });
+
+  it("flags cited ids that match no retrieved passage", () => {
+    render(<CaseEvidence result={{ ...failedJudgeCase, invalid_citations: ["doc:9", "nope"] }} />);
+
+    expect(screen.getByText(/cites passages that were not retrieved/i)).toHaveTextContent("doc:9, nope");
+  });
+
+  it.each([[[]], [null], [undefined]])("shows no citation warning for %j", (invalid) => {
+    render(<CaseEvidence result={{ ...failedJudgeCase, invalid_citations: invalid }} />);
+
+    expect(screen.queryByText(/cites passages that were not retrieved/i)).not.toBeInTheDocument();
+  });
 });

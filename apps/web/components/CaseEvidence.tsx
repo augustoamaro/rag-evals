@@ -76,6 +76,11 @@ export function CaseEvidence({ result }: { result: CaseResult }) {
           </p>
         ) : null}
         <div className="case-evidence__cost">{caseCost(result)}</div>
+        {result.invalid_citations?.length ? (
+          <p className="workflow-warning">
+            The answer cites passages that were not retrieved: {result.invalid_citations.join(", ")}
+          </p>
+        ) : null}
 
         {result.generation || result.judging ? (
           <div className="stage-grid">

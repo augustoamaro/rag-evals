@@ -314,3 +314,22 @@ def test_run_preserves_case_evidence_and_fingerprints() -> None:
     assert result.question == case.question
     assert result.reference_answer == "reference"
     assert result.retrieved_context[0].chunk.text == "alpha"
+
+
+def test_case_results_record_citations_of_passages_that_were_not_retrieved() -> None:
+    class CitingGenerator:
+        def answer(self, question: str, context: list[RetrievedChunk]) -> Answer:
+            invalid = ["doc:0"] if question == "q1" else []
+            return Answer(text="a", usage=Usage(1, 1), invalid_citations=invalid)
+
+    cases = [
+        EvalCase(id=q, question=q, relevant_snippets=[text], reference_answer="r")
+        for q, text in (("q1", "alpha"), ("q2", "beta"))
+    ]
+    retriever = ScriptedRetriever({"q1": ["c1"], "q2": ["c2"]})
+    service = EvalService(retriever, FakeStore(), CitingGenerator(), StubJudge())
+    judged = service.run(cases, Strategy.HYBRID, k=3, with_answers=True)
+    assert [r.invalid_citations for r in judged.case_results] == [["doc:0"], []]
+    # Without an answer there is nothing to check: unknown, not "no problems".
+    retrieval_only = service.run(cases, Strategy.HYBRID, k=3)
+    assert [r.invalid_citations for r in retrieval_only.case_results] == [None, None]

@@ -161,7 +161,9 @@ Decisions worth calling out:
   evidence intentionally and are never presented as a held-out test.
 - **Answer track (Claude judge):** generate an answer from the retrieved context
   with inline citations, then score **faithfulness**, **relevance**, and
-  **citation-correctness** in [0, 1] via Claude structured output.
+  **citation-correctness** in [0, 1] via Claude structured output. Cited ids that
+  match no retrieved passage are detected in code and reported per case,
+  independently of the judge's citation score.
 - **Answer coverage:** generation and judging each record success, failure or
   skipped status. Runs report attempted/scored/failed counts and `completed`,
   `partial` or `failed` status. Answer-score means cover **scored cases only**;

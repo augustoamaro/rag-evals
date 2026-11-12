@@ -199,6 +199,7 @@ class EvalService:
                     results[-1] = replace(
                         results[-1],
                         answer=answer.text if answer else None,
+                        invalid_citations=answer.invalid_citations if answer else None,
                         generation=generation,
                         cost_usd=generation.cost_usd or 0.0,
                         cost_complete=generation.cost_complete,
@@ -220,6 +221,9 @@ class EvalService:
                 results[-1] = replace(
                     results[-1],
                     answer=answer.text if answer is not None else None,
+                    invalid_citations=(
+                        answer.invalid_citations if answer is not None else None
+                    ),
                     judge_scores=scores,
                     generation=generation,
                     judging=judging,

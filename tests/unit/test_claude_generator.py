@@ -42,6 +42,32 @@ def test_generator_parses_citations_and_usage() -> None:
     assert "What does CAP say?" in sent["messages"][0]["content"]
 
 
+def test_system_prompt_has_no_example_id_a_model_could_copy() -> None:
+    # A concrete sample such as "[doc:0]" leaked into live answers as a citation
+    # of a passage that was never retrieved.
+    from rag.adapters.llm.claude_generator import _CITATION
+
+    client = FakeAnthropic(text="ok [rag:0]", usage=(1, 1))
+    ClaudeGenerator(client).answer("q", _context())
+    system = client.messages.create_calls[0]["system"]
+    assert _CITATION.findall(system) == []
+
+
+def test_generator_reports_cited_ids_that_were_not_retrieved() -> None:
+    client = FakeAnthropic(
+        text="CAP [cap-theorem:0] and more [doc:0][doc:cap-theorem:0], again [doc:0].",
+        usage=(1, 1),
+    )
+    answer = ClaudeGenerator(client).answer("q", _context())
+    assert [c.chunk_id for c in answer.citations] == ["cap-theorem:0"]
+    assert answer.invalid_citations == ["doc:0", "doc:cap-theorem:0"]
+
+
+def test_generator_reports_no_invalid_citations_for_a_clean_answer() -> None:
+    client = FakeAnthropic(text="CAP [cap-theorem:0], RAG [rag:0].", usage=(1, 1))
+    assert ClaudeGenerator(client).answer("q", _context()).invalid_citations == []
+
+
 def test_generator_rejects_truncated_or_refused_responses() -> None:
     import pytest
 

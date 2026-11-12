@@ -105,9 +105,9 @@ class EvalStore:
                     "retrieved_ids, recall, precision, mrr, ndcg, answer, judge_scores, "
                     "cost_usd, latency_ms, answer_ms, generation, judging, "
                     "cost_complete, question, reference_answer, retrieved_context, "
-                    "evidence) "
+                    "evidence, invalid_citations) "
                     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, "
-                    "%s, %s, %s, %s, %s, %s, %s) "
+                    "%s, %s, %s, %s, %s, %s, %s, %s) "
                     "ON CONFLICT (run_id, case_id) DO UPDATE SET "
                     "strategy = EXCLUDED.strategy, "
                     "retrieved_ids = EXCLUDED.retrieved_ids, "
@@ -120,7 +120,8 @@ class EvalStore:
                     "question = EXCLUDED.question, "
                     "reference_answer = EXCLUDED.reference_answer, "
                     "retrieved_context = EXCLUDED.retrieved_context, "
-                    "evidence = EXCLUDED.evidence",
+                    "evidence = EXCLUDED.evidence, "
+                    "invalid_citations = EXCLUDED.invalid_citations",
                     (
                         uuid.uuid4().hex,
                         run.id,
@@ -143,6 +144,9 @@ class EvalStore:
                         r.reference_answer,
                         Jsonb([asdict(rc) for rc in r.retrieved_context]),
                         Jsonb(evidence) if run.evidence_metrics is not None else None,
+                        Jsonb(r.invalid_citations)
+                        if r.invalid_citations is not None
+                        else None,
                     ),
                 )
             if connection is None:
@@ -173,7 +177,7 @@ class EvalStore:
                 "SELECT case_id, strategy, retrieved_ids, recall, precision, mrr, ndcg, "
                 "answer, judge_scores, cost_usd, latency_ms, answer_ms, generation, "
                 "judging, cost_complete, question, reference_answer, retrieved_context, "
-                "evidence "
+                "evidence, invalid_citations "
                 "FROM eval_case_results WHERE run_id = %s ORDER BY case_id",
                 (run_id,),
             ).fetchall()
@@ -199,6 +203,7 @@ class EvalStore:
                 "reference_answer": c[16],
                 "retrieved_context": c[17],
                 **_evidence_row(c[18]),
+                "invalid_citations": c[19],
             }
             for c in cases
         ]

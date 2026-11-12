@@ -164,3 +164,56 @@ def test_eval_migrates_first_so_a_missing_index_is_a_preflight_failure(
     assert "rag ingest" in result.output
     # The schema must exist before the pool registers pgvector on a connection.
     assert calls == ["migrate", "pool", "runtime", "close"]
+
+
+def test_judged_eval_reports_answers_citing_passages_that_were_not_retrieved(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from rag.domain.entities import CaseResult, EvalRun, RunMetrics, Strategy
+
+    def case(case_id: str, invalid: list[str] | None) -> CaseResult:
+        return CaseResult(
+            case_id, "hybrid", ["c1"], 1, 1, 1, 1, invalid_citations=invalid
+        )
+
+    run = EvalRun(
+        "run-1",
+        Strategy.HYBRID,
+        10,
+        RunMetrics(1, 1, 1, 1),
+        [case("q1", ["doc:0"]), case("q2", []), case("q3", None)],
+        answer_metrics={"faithfulness": 1, "relevance": 1, "citation_correctness": 1},
+        with_answers=True,
+        answer_attempted=2,
+        answer_scored=2,
+        manifest={"schema_version": 1},
+    )
+
+    class Store:
+        def __init__(self, pool: object) -> None:
+            pass
+
+        def save_run(self, result: EvalRun, config: dict[str, Any]) -> None:
+            pass
+
+    monkeypatch.setattr(
+        "rag.cli.main.get_settings",
+        lambda: Settings(anthropic_api_key="test-key", _env_file=None),
+    )
+    monkeypatch.setattr("rag.cli.main.apply_migrations", lambda _: None)
+    monkeypatch.setattr(
+        "rag.cli.main.make_pool", lambda _: SimpleNamespace(close=lambda: None)
+    )
+    monkeypatch.setattr("rag.cli.main.EvalStore", Store)
+    monkeypatch.setattr(
+        "rag.cli.main.build_runtime",
+        lambda *args, **kwargs: SimpleNamespace(
+            evaluator=SimpleNamespace(run=lambda *args, **kwargs: run), cases=[]
+        ),
+    )
+    result = runner.invoke(app, ["eval", "--judge"])
+    assert result.exit_code == 0
+    # q3 has no generated answer, so only two answers were checked.
+    assert "invalid citations: 1 of 2 answers (q1)" in result.output

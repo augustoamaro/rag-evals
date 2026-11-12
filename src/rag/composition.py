@@ -141,7 +141,7 @@ def build_runtime(
         "retrieval_pool_k": pool_k,
         "rrf_k": 60,
         "reranker_model": reranker_model,
-        "generator_prompt_version": "grounded-citations-v1",
+        "generator_prompt_version": "grounded-citations-v2",
         "judge_prompt_version": "structured-scores-v1",
     }
     evaluator = EvalService(

@@ -31,6 +31,13 @@ class QueryResponse(BaseModel):
     answer: str
     citations: list[CitationOut]
     chunks: list[RetrievedChunkOut]
+    generation_error: str | None = Field(
+        default=None,
+        description=(
+            "Exception type when answer generation failed; the retrieved chunks are "
+            "still returned. Provider messages are never included."
+        ),
+    )
 
 
 class RunRequest(BaseModel):

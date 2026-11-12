@@ -80,14 +80,20 @@ export default function TryPage() {
         <>
           <div className="submitted-query"><p>{result.question}</p><StrategyBadge strategy={result.strategy} /></div>
           <div className="section-title">Answer</div>
-          <div className="answer">
-            {result.response.answer}
-            {result.response.citations.length > 0 ? (
-              <div className="metric__sub" style={{ marginTop: 10 }}>
-                cited: {result.response.citations.map((c) => c.chunk_id).join(", ")}
-              </div>
-            ) : null}
-          </div>
+          {result.response.generation_error ? (
+            <p className="workflow-warning" role="alert">
+              Answer generation failed ({result.response.generation_error}). The retrieved chunks below are unaffected.
+            </p>
+          ) : (
+            <div className="answer">
+              {result.response.answer}
+              {result.response.citations.length > 0 ? (
+                <div className="metric__sub" style={{ marginTop: 10 }}>
+                  cited: {result.response.citations.map((c) => c.chunk_id).join(", ")}
+                </div>
+              ) : null}
+            </div>
+          )}
 
           <div className="section-title">Retrieved chunks</div>
           <p className="benchmark-notice">Scores use different scales for each retrieval method; compare ranks within a result, not scores across methods.</p>

@@ -25,4 +25,16 @@ describe("query requests", () => {
     expect(screen.queryByText("First answer")).not.toBeInTheDocument();
     expect(requests[0]?.signal?.aborted).toBe(true);
   });
+
+  it("keeps the retrieved chunks and explains a failed answer generation", async () => {
+    vi.stubGlobal("fetch", async () => new Response(JSON.stringify({
+      answer: "", citations: [], generation_error: "RateLimitError",
+      chunks: [{ id: "cap:0", text: "CAP forces a trade-off.", score: 0.9, rank: 1, score_type: "rrf", score_components: {} }],
+    })));
+    render(<TryPage />);
+    fireEvent.click(screen.getByRole("button", { name: "Query" }));
+    const warning = await screen.findByRole("alert");
+    expect(warning).toHaveTextContent("Answer generation failed (RateLimitError)");
+    expect(screen.getByText("CAP forces a trade-off.")).toBeInTheDocument();
+  });
 });

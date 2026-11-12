@@ -132,6 +132,7 @@ export interface QueryResponse {
   answer: string;
   citations: { chunk_id: string }[];
   chunks: RetrievedChunk[];
+  generation_error?: string | null; // exception type; chunks are still returned
 }
 
 export interface EvaluationOptions {

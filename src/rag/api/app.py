@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -26,6 +27,8 @@ from rag.domain.entities import Answer, EvalCase, EvalRun, Strategy
 from rag.domain.errors import EvalPreflightError
 from rag.domain.evaluation import EvaluationJobsPort
 from rag.domain.ports import Generator, Retriever
+
+logger = logging.getLogger(__name__)
 
 
 class EvalRunner(Protocol):
@@ -84,8 +87,17 @@ def create_app(deps: AppDeps, lifespan: Lifespan[FastAPI] | None = None) -> Fast
     def query(req: QueryRequest) -> QueryResponse:
         strategy = _parse_strategy(req.strategy)
         chunks = deps.retriever.retrieve(req.question, req.k, strategy)
+        generation_error: str | None = None
         if deps.generator is not None:
-            answer = deps.generator.answer(req.question, chunks)
+            try:
+                answer = deps.generator.answer(req.question, chunks)
+            except Exception as exc:
+                # Retrieval already succeeded, so its result is still returned.
+                # Provider messages may contain prompts, keys or other private
+                # data: report the error type only.
+                generation_error = type(exc).__name__
+                logger.warning("answer generation failed (%s)", generation_error)
+                answer = Answer(text="")
         else:
             answer = Answer(
                 text="Set RAG_ANTHROPIC_API_KEY to generate grounded answers."
@@ -107,6 +119,7 @@ def create_app(deps: AppDeps, lifespan: Lifespan[FastAPI] | None = None) -> Fast
                 )
                 for rc in chunks
             ],
+            generation_error=generation_error,
         )
 
     @app.post("/evals/run", response_model=RunIdResponse)

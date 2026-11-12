@@ -102,6 +102,35 @@ def test_query_without_generator_still_returns_chunks() -> None:
     assert body["chunks"][0]["id"] == "cap:0"
 
 
+def test_query_keeps_retrieved_chunks_when_generation_fails() -> None:
+    class FailingGenerator:
+        def answer(self, question: str, context: list[RetrievedChunk]) -> Answer:
+            raise RuntimeError("provider said: secret prompt and key material")
+
+    deps = AppDeps(
+        retriever=FakeRetriever(),
+        generator=FailingGenerator(),
+        eval_service=FakeEvalService(),
+        eval_store=FakeEvalStore(),
+        cases=[],
+        answers_available=True,
+    )
+    resp = TestClient(create_app(deps)).post("/query", json={"question": "q"})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["chunks"][0]["id"] == "cap:0"
+    assert body["answer"] == "" and body["citations"] == []
+    # Only the error type is exposed: provider messages may hold private data.
+    assert body["generation_error"] == "RuntimeError"
+    assert "secret" not in resp.text
+
+
+def test_query_reports_no_generation_error_when_the_answer_succeeds() -> None:
+    body = _client().post("/query", json={"question": "what is CAP?"}).json()
+    assert body["answer"] == "grounded answer"
+    assert body["generation_error"] is None
+
+
 def test_query_rejects_invalid_strategy() -> None:
     resp = _client().post("/query", json={"question": "q", "strategy": "bogus"})
     assert resp.status_code == 400

@@ -45,12 +45,12 @@ def test_generator_parses_citations_and_usage() -> None:
 def test_system_prompt_has_no_example_id_a_model_could_copy() -> None:
     # A concrete sample such as "[doc:0]" leaked into live answers as a citation
     # of a passage that was never retrieved.
-    from rag.adapters.llm.claude_generator import _CITATION
+    from rag.metrics.citations import cited_ids
 
     client = FakeAnthropic(text="ok [rag:0]", usage=(1, 1))
     ClaudeGenerator(client).answer("q", _context())
     system = client.messages.create_calls[0]["system"]
-    assert _CITATION.findall(system) == []
+    assert cited_ids(system) == []
 
 
 def test_generator_reports_cited_ids_that_were_not_retrieved() -> None:

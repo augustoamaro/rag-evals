@@ -13,11 +13,23 @@ from rag.adapters.db.migrations import apply_migrations
 from rag.adapters.db.pool import make_pool
 from rag.adapters.db.snapshot_store import SnapshotChunkStore
 from rag.adapters.eval_artifacts import load_artifact, write_artifact
-from rag.composition import build_runtime, ingest_dataset
+from rag.composition import (
+    JUDGE_PROMPT_VERSION,
+    build_judge,
+    build_runtime,
+    ingest_dataset,
+)
 from rag.config import get_settings
 from rag.domain.entities import Strategy
 from rag.services.comparison import compare_baseline, make_baseline
 from rag.services.gate import check_thresholds
+from rag.services.judge_calibration import (
+    DIMENSIONS,
+    agreement,
+    merge_labels,
+    score_items,
+    validate_set,
+)
 
 app = typer.Typer(help="RAG service + eval harness CLI.", no_args_is_help=True)
 
@@ -217,6 +229,80 @@ def run_eval(
             typer.echo("GATE PASSED")
     finally:
         pool.close()
+
+
+@app.command(name="calibrate-judge")
+def calibrate_judge(
+    calibration_set: Annotated[
+        Path,
+        typer.Option("--set", help="Calibration set JSON: items, labels and scores."),
+    ],
+    labels: Annotated[
+        Path | None,
+        typer.Option(help="Merge human labels (JSON keyed by item id) into the set."),
+    ] = None,
+    score: Annotated[
+        bool, typer.Option("--score", help="Run the judge on every item (paid calls).")
+    ] = False,
+    output: Annotated[
+        Path | None, typer.Option(help="Export the agreement report as JSON.")
+    ] = None,
+) -> None:
+    """Compare the LLM judge with human labels on a calibration set."""
+    try:
+        artifact = load_artifact(calibration_set)
+        validate_set(artifact)
+        if labels is not None:
+            artifact = merge_labels(artifact, load_artifact(labels))
+    except (OSError, ValueError) as exc:
+        raise typer.BadParameter(str(exc), param_hint="--set / --labels") from exc
+    settings = get_settings()
+    if score and not settings.anthropic_api_key:
+        raise typer.BadParameter("--score requires RAG_ANTHROPIC_API_KEY")
+    if labels is not None:
+        write_artifact(calibration_set, artifact)
+        typer.echo(f"Labels merged: {len(artifact['items'])} items")
+    if score:
+        artifact = score_items(artifact, build_judge(settings), settings.llm_model)
+        artifact["judge_run"] = {
+            "llm_model": settings.llm_model,
+            "judge_prompt_version": JUDGE_PROMPT_VERSION,
+        }
+        write_artifact(calibration_set, artifact)
+        results = [item["judge"] for item in artifact["items"]]
+        scored = [result for result in results if "error_type" not in result]
+        costs = [result["cost_usd"] for result in scored]
+        cost_label = "cost estimate" if None not in costs else "known cost (incomplete)"
+        typer.echo(
+            f"Judged {len(scored)}/{len(results)} items  "
+            f"failed={len(results) - len(scored)}  "
+            f"{cost_label}=${sum(cost or 0.0 for cost in costs):.4f}"
+        )
+    try:
+        report = agreement(artifact)
+    except ValueError as exc:
+        typer.echo(f"CALIBRATION INCOMPLETE: {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"items={report['items']}")
+    for dimension in DIMENSIONS:
+        summary = report["overall"][dimension]
+        flags = summary["flags"]
+        typer.echo(
+            f"  {dimension:21s} same level {summary['same_level']}/{summary['n']}  "
+            f"human flagged {flags['both'] + flags['human_only']}: "
+            f"judge also flagged {flags['both']}, missed {flags['human_only']}  "
+            f"judge-only flags {flags['judge_only']}  "
+            f"mean |diff| {summary['mean_abs_diff']:.3f}"
+        )
+    for group, summaries in report["groups"].items():
+        cells = "  ".join(
+            f"{summaries[d]['same_level']}/{summaries[d]['n']}" for d in DIMENSIONS
+        )
+        typer.echo(f"  {group:28s} same level per dimension: {cells}")
+    typer.echo(f"  disagreements: {len(report['disagreements'])}")
+    if output is not None:
+        write_artifact(output, report)
+        typer.echo(f"Report: {output}")
 
 
 if __name__ == "__main__":

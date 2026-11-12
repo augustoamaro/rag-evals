@@ -18,10 +18,14 @@ from rag.config import Settings
 from rag.domain.datasets import Dataset, dataset_digest
 from rag.domain.entities import EvalCase
 from rag.domain.errors import EvalPreflightError
-from rag.domain.ports import Generator, Retriever
+from rag.domain.ports import Generator, Judge, Retriever
 from rag.domain.snapshots import IndexSnapshot
 from rag.services.eval_service import EvalService
 from rag.services.ingestion_service import prepare_documents
+
+# Bump a version whenever its prompt changes: runs record them in the manifest.
+GENERATOR_PROMPT_VERSION = "grounded-citations-v2"
+JUDGE_PROMPT_VERSION = "structured-scores-v1"
 
 
 @dataclass(frozen=True)
@@ -40,6 +44,15 @@ def chunking_config(settings: Settings) -> dict[str, object]:
         "target_words": settings.chunk_target_words,
         "overlap_words": settings.chunk_overlap_words,
     }
+
+
+def build_judge(settings: Settings) -> Judge:
+    """The configured judge on its own, for calibration without an index."""
+    import anthropic
+
+    return ClaudeJudge(
+        anthropic.Anthropic(api_key=settings.anthropic_api_key), settings.llm_model
+    )
 
 
 def ingest_dataset(settings: Settings, pool: Pool, dataset: Dataset) -> IndexSnapshot:
@@ -141,8 +154,8 @@ def build_runtime(
         "retrieval_pool_k": pool_k,
         "rrf_k": 60,
         "reranker_model": reranker_model,
-        "generator_prompt_version": "grounded-citations-v2",
-        "judge_prompt_version": "structured-scores-v1",
+        "generator_prompt_version": GENERATOR_PROMPT_VERSION,
+        "judge_prompt_version": JUDGE_PROMPT_VERSION,
     }
     evaluator = EvalService(
         retriever,

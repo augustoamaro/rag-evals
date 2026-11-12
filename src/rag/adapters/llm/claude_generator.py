@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import re
 from typing import Any
 
 from rag.adapters.llm.errors import check_stop_reason
 from rag.domain.entities import Answer, Citation, RetrievedChunk, Usage
-
-_CITATION = re.compile(r"\[([^\]\s]+)\]")
+from rag.metrics.citations import split_citations
 
 # No sample id here on purpose: a concrete example such as "[doc:0]" was copied
 # into live answers as a citation of a passage that had never been retrieved.
@@ -46,32 +44,15 @@ class ClaudeGenerator:
             getattr(response, "stop_reason", None), "answer generation", usage=usage
         )
         text = "".join(block.text for block in response.content if block.type == "text")
-        citations, invalid = _parse_citations(text, context)
+        valid, invalid = split_citations(text, {rc.chunk.id for rc in context})
         return Answer(
-            text=text, citations=citations, usage=usage, invalid_citations=invalid
+            text=text,
+            citations=[Citation(chunk_id=cid) for cid in valid],
+            usage=usage,
+            invalid_citations=invalid,
         )
 
 
 def _build_prompt(question: str, context: list[RetrievedChunk]) -> str:
     passages = "\n\n".join(f"[{rc.chunk.id}]\n{rc.chunk.text}" for rc in context)
     return f"Context passages:\n\n{passages}\n\nQuestion: {question}"
-
-
-def _parse_citations(
-    text: str, context: list[RetrievedChunk]
-) -> tuple[list[Citation], list[str]]:
-    """Split the cited ids into retrieved passages and ids that match none."""
-    valid = {rc.chunk.id for rc in context}
-    seen: set[str] = set()
-    cited: list[Citation] = []
-    invalid: list[str] = []
-    for match in _CITATION.finditer(text):
-        cid = match.group(1)
-        if cid in seen:
-            continue
-        seen.add(cid)
-        if cid in valid:
-            cited.append(Citation(chunk_id=cid))
-        else:
-            invalid.append(cid)
-    return cited, invalid

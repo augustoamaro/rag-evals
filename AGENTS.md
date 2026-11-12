@@ -30,7 +30,7 @@ Claude (Opus 4.8) powers answer generation + the LLM-as-judge, gated behind
 ```bash
 uv sync
 uv run ruff check src tests && uv run ruff format --check src tests
-uv run mypy src
+uv run mypy src tests
 uv run pytest                  # unit (fakes, no DB/key)
 uv run pytest -m integration   # disposable Postgres (set RAG_TEST_DATABASE_URL)
 uv run rag ingest              # migrate + publish/reuse immutable index
